@@ -1,0 +1,22 @@
+{
+  "builder": {
+    "name": "@ali/builder-harmony-common",
+    "config": {
+      "framework": "next",
+      "entry": "app/page.tsx",
+      "buildCommand": "npm run build",
+      "devCommand": "npm run dev",
+      "outputDir": ".next"
+    }
+  },
+  "cache": {
+    "build": {
+      "enable": true,
+      "cacheDir": [
+        "node_modules/.cache/**",
+        ".next/cache/**"
+      ]
+    }
+  },
+  "nodeVersion": 22
+}
