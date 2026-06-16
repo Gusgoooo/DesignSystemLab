@@ -1,9 +1,4 @@
-import { deriveTheme } from "./derive-theme"
-import type { ThemeOutput, ThemeSeed } from "./schema"
-
-export function exportThemeAlgorithm(seed: ThemeSeed): string {
-  return exportThemeAlgorithmFromOutput(deriveTheme(seed))
-}
+import type { ThemeOutput } from "./schema"
 
 export function exportThemeAlgorithmFromOutput(theme: ThemeOutput): string {
   return `/**

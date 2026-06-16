@@ -1,5 +1,4 @@
-import { deriveTheme } from "./derive-theme"
-import type { ThemeOutput, ThemeSeed } from "./schema"
+import type { ThemeOutput } from "./schema"
 
 const algorithmVersions = {
   color: "oklch-seed-v1",
@@ -66,10 +65,6 @@ export const themeLabAiCodingRules = [
   "When changing theme direction, update the seed in theme-lab.json, then regenerate compiled CSS variables through Theme Lab or the available theme generation pipeline.",
 ] as const
 
-export function exportPresetJson(seed: ThemeSeed): string {
-  return exportPresetJsonFromOutput(deriveTheme(seed))
-}
-
 export function exportPresetJsonFromOutput(theme: ThemeOutput): string {
   return JSON.stringify(
     {
@@ -91,27 +86,16 @@ export function exportPresetJsonFromOutput(theme: ThemeOutput): string {
   )
 }
 
-export function exportVibeJson(seed: ThemeSeed): string {
-  return exportVibeJsonFromOutput(deriveTheme(seed))
-}
-
 export function exportVibeJsonFromOutput(theme: ThemeOutput): string {
   return JSON.stringify(
     {
       name: theme.vibe.name,
       keywords: theme.vibe.keywords,
-      avoid: theme.vibe.avoid,
-      visualLanguage: theme.vibe.visualLanguage,
-      principles: theme.vibe.principles,
-      aiPrompt: theme.vibe.aiPrompt,
+      visualContract: theme.vibe.visualContract,
     },
     null,
     2
   )
-}
-
-export function exportThemeLabManifestJson(seed: ThemeSeed): string {
-  return exportThemeLabManifestJsonFromOutput(deriveTheme(seed))
 }
 
 export function exportThemeLabManifestJsonFromOutput(
@@ -130,9 +114,9 @@ export function exportThemeLabManifestJsonFromOutput(
         seed: theme.seed,
       },
       vibe: {
-        summary: `${theme.vibe.name}: ${theme.vibe.keywords.join(", ")}`,
+        summary: theme.vibe.visualContract.summary,
         keywords: theme.vibe.keywords,
-        avoid: theme.vibe.avoid,
+        avoid: theme.vibe.visualContract.avoid,
       },
       tokenContract: themeLabTokenContract,
       aiCoding: {

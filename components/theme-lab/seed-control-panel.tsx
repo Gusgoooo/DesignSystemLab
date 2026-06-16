@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react"
 import { createContext, useContext, useEffect, useMemo, useState } from "react"
-import { ChevronDown, ChevronRight, Info, Moon, Sun } from "lucide-react"
+import { ChevronDown, ChevronRight, Info, Moon, RotateCcw, Sun } from "lucide-react"
 import { Badge } from "../ui/badge"
 import { Button } from "../ui/button"
 import { Card, CardContent } from "../ui/card"
@@ -318,6 +318,35 @@ function ThemeModeToggle(props: {
         style={getControlFloatingStyle(props.isDark)}
       >
         {label}
+      </TooltipContent>
+    </Tooltip>
+  )
+}
+
+function ResetButton(props: { onReset: () => void }) {
+  const isDark = useControlPanelIsDark()
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          type="button"
+          variant="outline"
+          size="icon-sm"
+          aria-label="重置为默认"
+          className="h-7 w-7 rounded-full border-border bg-muted/35 text-muted-foreground shadow-none hover:bg-muted hover:text-foreground"
+          onClick={props.onReset}
+        >
+          <RotateCcw className="size-3.5" />
+          <span className="sr-only">重置为默认</span>
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent
+        side="left"
+        className={`${isDark ? "dark " : ""}border border-border`}
+        style={getControlFloatingStyle(isDark)}
+      >
+        重置为默认
       </TooltipContent>
     </Tooltip>
   )
@@ -879,25 +908,19 @@ export function SeedControlPanel(props: SeedControlPanelProps) {
               设计师只编辑 Hex 种子，其余由算法推导为 map、semantic 和 shadcn token。
             </InfoTooltip>
           </div>
-          <ThemeModeToggle isDark={isDark} onChange={onDarkChange} />
+          <div className="flex items-center gap-1.5">
+            <ResetButton
+              onReset={() => onSeedChange(structuredClone(defaultThemeSeed))}
+            />
+            <ThemeModeToggle isDark={isDark} onChange={onDarkChange} />
+          </div>
         </div>
 
-        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-2">
-          <div className="space-y-1">
-            <Label className="text-[11px] font-medium text-muted-foreground">
-              预设
-            </Label>
-            <PresetSelect value={selectedPresetId} onChange={updatePreset} />
-          </div>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="h-8 text-[11px] text-muted-foreground"
-            onClick={() => onSeedChange(structuredClone(defaultThemeSeed))}
-          >
-            重置
-          </Button>
+        <div className="space-y-1">
+          <Label className="text-[11px] font-medium text-muted-foreground">
+            预设
+          </Label>
+          <PresetSelect value={selectedPresetId} onChange={updatePreset} />
         </div>
       </div>
 

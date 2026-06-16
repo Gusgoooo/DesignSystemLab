@@ -1,4 +1,3 @@
-import { deriveTheme } from "./derive-theme"
 import { exportThemeAlgorithmFromOutput } from "./export-algorithm"
 import { exportThemeCssFromOutput } from "./export-css"
 import {
@@ -6,7 +5,7 @@ import {
   themeLabAiCodingRules,
   themeLabTokenContract,
 } from "./export-json"
-import type { ThemeOutput, ThemeSeed } from "./schema"
+import type { ThemeOutput } from "./schema"
 
 export type ProjectImportMode =
   | "one-shot-page-polish"
@@ -311,9 +310,7 @@ function themeArtifactsSection(
   const compactVibe = {
     name: theme.vibe.name,
     keywords: theme.vibe.keywords,
-    avoid: theme.vibe.avoid,
-    visualLanguage: theme.vibe.visualLanguage,
-    principles: theme.vibe.principles,
+    visualContract: theme.vibe.visualContract,
   }
 
   if (options.mode === "one-shot-page-polish") {
@@ -586,28 +583,31 @@ ${markdownList([
 
 Raw Tailwind palette classes may be acceptable for non-structural one-off content only when explicitly justified, but they are forbidden for theme-bearing UI structure.
 
-## Vibe Manifest Usage
+## Visual Contract
 
-\`vibe.manifest.json\` is visual guidance, not CSS source.
+This theme is designed for product interfaces, not decorative marketing pages.
 
-Use it for:
+Use the exported tokens to maintain:
 
-- composition
-- visual hierarchy
-- density
-- surface treatment
-- motion restraint
-- icon style
-- tone
-- layout preference
-- what to avoid
+- clear surface hierarchy
+- consistent component styling
+- readable density
+- restrained brand emphasis
+- predictable interaction states
+- accessible contrast
+- stable dark mode
 
-Do not use it to:
+Do not add decorative visual effects unless the user explicitly asks.
 
-- invent new colors
-- override runtime CSS variables
-- create arbitrary CSS variables
-- add decorative effects unrelated to the product task
+Avoid:
+
+- raw Tailwind palette classes for structural UI
+- hardcoded hex colors
+- arbitrary OKLCH values
+- decorative gradients
+- random shadows
+- unapproved glassmorphism
+- copying Theme Lab preview fixtures into the user project
 
 ## Selected Scope
 
@@ -686,14 +686,6 @@ Added: none / list
 
 ${themeArtifactsSection(options, targetScope)}
 `
-}
-
-export function exportThemePrompt(seed: ThemeSeed): string {
-  return exportThemePromptFromOutput(deriveTheme(seed))
-}
-
-export function exportPersistentProjectContract(seed: ThemeSeed): string {
-  return exportPersistentProjectContractFromOutput(deriveTheme(seed))
 }
 
 export function exportPersistentProjectContractFromOutput(

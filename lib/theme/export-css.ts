@@ -1,9 +1,7 @@
-import { deriveTheme } from "./derive-theme"
 import {
   requiredSemanticTokenNames,
   requiredShadcnTokenNames,
   type ThemeOutput,
-  type ThemeSeed,
 } from "./schema"
 
 const tailwindExposureTokens = {
@@ -314,10 +312,6 @@ function serializeDarkVariables(theme: ThemeOutput): string {
       },
     ]
   )
-}
-
-export function exportThemeCss(seed: ThemeSeed): string {
-  return exportThemeCssFromOutput(deriveTheme(seed))
 }
 
 export function exportThemeCssFromOutput(theme: ThemeOutput): string {

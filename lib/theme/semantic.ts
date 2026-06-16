@@ -54,6 +54,7 @@ export function deriveSemanticTokens(
     getExpressionSurfaceRatio(seed)
   const neutralChroma = Math.min(neutral.chroma, 0.08)
   const softNeutralChroma = Math.min(neutralChroma * 0.22, 0.016)
+  const borderStrength = clamp(seed.material.borderContrast, 0.6, 1.6)
   const surfaceHue = getSurfaceHue(seed, neutral.hue, primary.hue)
   const surfaceChroma = clamp(
     softNeutralChroma +
@@ -108,9 +109,9 @@ export function deriveSemanticTokens(
     "--content-tertiary": "var(--neutral-500)",
     "--content-disabled": "var(--neutral-300)",
     "--content-inverse": "var(--neutral-0)",
-    "--border-subtle": "var(--neutral-100)",
-    "--border-default": "var(--neutral-200)",
-    "--border-strong": "var(--neutral-300)",
+    "--border-subtle": oklch(0.97 - (borderStrength - 1) * 0.08, neutralChroma, neutral.hue),
+    "--border-default": oklch(0.92 - (borderStrength - 1) * 0.1, neutralChroma, neutral.hue),
+    "--border-strong": oklch(0.86 - (borderStrength - 1) * 0.12, neutralChroma, neutral.hue),
     "--focus-ring": "var(--brand-400)",
     "--action-primary": "var(--brand-600)",
     "--action-primary-hover": "var(--brand-700)",
@@ -152,6 +153,7 @@ export function deriveDarkSemanticTokens(
   const neutralHue = neutral.hue
   const neutralChroma = Math.min(neutral.chroma, 0.08)
   const softNeutralChroma = Math.min(neutralChroma * 0.22, 0.018)
+  const borderStrength = clamp(seed.material.borderContrast, 0.6, 1.6)
   const surfaceRatio =
     clamp(seed.material.surfaceContrast, 0.75, 1.35) *
     getExpressionSurfaceRatio(seed)
@@ -192,9 +194,9 @@ export function deriveDarkSemanticTokens(
     "--content-tertiary": oklch(0.58, neutralChroma, neutralHue),
     "--content-disabled": oklch(0.42, neutralChroma, neutralHue),
     "--content-inverse": "var(--neutral-950)",
-    "--border-subtle": oklch(0.24, neutralChroma, neutralHue),
-    "--border-default": oklch(0.3, neutralChroma, neutralHue),
-    "--border-strong": oklch(0.38, neutralChroma, neutralHue),
+    "--border-subtle": oklch(0.24 + (borderStrength - 1) * 0.06, neutralChroma, neutralHue),
+    "--border-default": oklch(0.3 + (borderStrength - 1) * 0.07, neutralChroma, neutralHue),
+    "--border-strong": oklch(0.38 + (borderStrength - 1) * 0.08, neutralChroma, neutralHue),
     "--focus-ring": "var(--brand-400)",
     "--action-primary": "var(--brand-400)",
     "--action-primary-hover": "var(--brand-300)",

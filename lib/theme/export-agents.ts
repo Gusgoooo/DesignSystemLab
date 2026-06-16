@@ -1,6 +1,5 @@
-import { deriveTheme } from "./derive-theme"
 import { themeLabAiCodingRules } from "./export-json"
-import type { ThemeOutput, ThemeSeed } from "./schema"
+import type { ThemeOutput } from "./schema"
 
 function codeList(values: readonly string[]): string {
   return values.map((value) => `- \`${value}\``).join("\n")
@@ -8,10 +7,6 @@ function codeList(values: readonly string[]): string {
 
 function markdownList(values: readonly string[]): string {
   return values.map((value) => `- ${value}`).join("\n")
-}
-
-export function exportAgentsThemeRules(seed: ThemeSeed): string {
-  return exportAgentsThemeRulesFromOutput(deriveTheme(seed))
 }
 
 export function exportAgentsThemeRulesFromOutput(theme: ThemeOutput): string {
@@ -82,8 +77,9 @@ Do not scaffold a new app inside an existing project. Do not create a parallel d
 
 Visual guidance:
 
-- Use the vibe in \`theme-lab.json\` for composition, hierarchy, density, surface treatment, motion restraint, icon style, tone, and what to avoid.
-- Do not use the vibe to invent new colors or override runtime CSS variables.
+- This theme targets product interfaces, not decorative marketing pages.
+- Use the exported tokens for clear surface hierarchy, consistent components, readable density, restrained brand emphasis, predictable interaction states, and stable dark mode.
+- Do not add decorative effects (gradients, random shadows, unapproved glassmorphism) unless explicitly requested, and do not copy preview fixtures into the project.
 <!-- theme-lab:agents:end -->
 `
 }

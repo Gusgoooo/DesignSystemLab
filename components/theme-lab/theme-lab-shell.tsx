@@ -12,14 +12,13 @@ import {
   type ThemeLabTab,
 } from "./preview-tabs"
 import { SeedControlPanel } from "./seed-control-panel"
-import { AestheticPreview } from "./previews/aesthetic-preview"
 import { BlocksPreview } from "./previews/blocks-preview"
 import { ComponentsPreview } from "./previews/components-preview"
 import { TooltipProvider } from "../ui/tooltip"
 import { getControlPanelStyle } from "./control-panel-theme"
 
 const initialThemeSeed =
-  themePresets.find((preset) => preset.id === "ai-workspace")?.seed ??
+  themePresets.find((preset) => preset.id === "calm-ai-workspace")?.seed ??
   themePresets[0].seed
 
 function renderPreview(
@@ -29,10 +28,6 @@ function renderPreview(
 ) {
   if (tab === "blocks") {
     return <BlocksPreview />
-  }
-
-  if (tab === "aesthetic") {
-    return <AestheticPreview seed={seed} theme={theme} />
   }
 
   return <ComponentsPreview seed={seed} theme={theme} />
@@ -75,7 +70,7 @@ export function ThemeLabShell() {
     <TooltipProvider>
       <div
         style={getControlPanelStyle(isDark)}
-        className={`${isDark ? "dark " : ""}h-dvh overflow-hidden bg-background p-3 text-foreground`}
+        className={`${isDark ? "dark " : ""}fixed inset-0 overflow-hidden bg-background p-3 text-foreground`}
       >
         <div className="grid h-full min-h-0 grid-cols-1 grid-rows-[minmax(0,1fr)_minmax(0,1fr)] gap-3 lg:grid-cols-[288px_minmax(0,1fr)] lg:grid-rows-1">
           <aside

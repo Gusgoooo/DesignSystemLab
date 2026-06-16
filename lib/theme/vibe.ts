@@ -157,32 +157,58 @@ function deriveVisualLanguage(seed: ThemeSeed): VibeDescriptor["visualLanguage"]
   }
 }
 
-function derivePrinciples(seed: ThemeSeed): string[] {
-  return [
-    "优先使用 shadcn 语义 token，再添加项目级语义工具类。",
-    "保持从 canvas 到 overlay 的清晰表面层级。",
-    `保持${getDensityLabel(seed)}，避免重复组件中的间距漂移。`,
-    `在控件和容器中一致使用${getRadiusLabel(seed.shape.radius)}。`,
-    `保持${getMotionLabel(seed)}，让动效有明确目的。`,
-  ]
+function deriveVisualContract(
+  seed: ThemeSeed
+): VibeDescriptor["visualContract"] {
+  const density = getDensityLabel(seed)
+  const tone = toneLabels[seed.vibe.tone]
+  const domain = domainLabels[seed.vibe.domain]
+
+  return {
+    summary: `面向${domain}产品内页的设计系统,以${tone}语气和${density}建立清晰、可复用的界面层级,而非装饰性表达。`,
+    principles: [
+      "视觉质量来自组件一致性、语义 token 与稳定的表面层级,而非装饰。",
+      `保持${density},在重复组件间维持一致的间距与节奏。`,
+      "克制使用品牌色,仅用于关键操作与状态,背景与表面保持中性。",
+      "维持从 canvas 到 overlay 的清晰表面层级。",
+      "保证可预期的交互状态与可访问的对比度,明暗主题保持一致。",
+    ],
+    prefer: [
+      "shadcn 语义 class 与项目语义 token",
+      "一致的组件样式与交互状态",
+      "清晰的表面层级(canvas / panel / card / raised / overlay)",
+      "可读的密度与排版节奏",
+      "克制的品牌色强调",
+    ],
+    avoid: [
+      "装饰性视觉效果(除非用户明确要求)",
+      "用于结构性 UI 的 raw Tailwind 调色板 class",
+      "硬编码 hex 颜色与任意 OKLCH 值",
+      "装饰性渐变与随机阴影",
+      "未经批准的玻璃拟态",
+      "把 Theme Lab 预览示例直接复制进项目",
+    ],
+    tokenUsage: [
+      "结构色用 bg-background / text-foreground / bg-card / border-border",
+      "表面层级用 var(--surface-canvas|panel|raised|overlay)",
+      "文本层级用 var(--content-primary|secondary|tertiary)",
+      "边框用 var(--border-subtle|default|strong)",
+      "阴影用 var(--elevation-card|popover|dialog)",
+      "状态色用 var(--status-success|warning|info|danger) 及其 -bg / -fg",
+    ],
+  }
 }
 
 export function deriveVibeDescriptor(seed: ThemeSeed): VibeDescriptor {
   const name = deriveName(seed)
   const keywords = deriveKeywords(seed)
   const avoid = deriveAvoid(seed)
-  const radius = getRadiusLabel(seed.shape.radius)
-  const density = getDensityLabel(seed)
-  const motion = getMotionLabel(seed)
 
   return {
     name,
     keywords,
     avoid,
     visualLanguage: deriveVisualLanguage(seed),
-    principles: derivePrinciples(seed),
-    aiPrompt: `请生成具有「${keywords.join(
-      "、"
-    )}」气质的 UI。优先使用 shadcn 语义 token，保持清晰表面层级，使用${density}、${radius}、${motion}和明确的信息层级。除非明确要求，否则避免 Tailwind 原始调色板颜色、装饰性渐变、高饱和背景填充和厚重阴影。`,
+    visualContract: deriveVisualContract(seed),
   }
 }

@@ -148,8 +148,13 @@ export type VibeDescriptor = {
     motion: string
     typography: string
   }
-  principles: string[]
-  aiPrompt: string
+  visualContract: {
+    summary: string
+    principles: string[]
+    prefer: string[]
+    avoid: string[]
+    tokenUsage: string[]
+  }
 }
 
 export type ThemeOutput = {

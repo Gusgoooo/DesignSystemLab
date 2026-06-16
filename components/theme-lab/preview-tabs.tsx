@@ -2,7 +2,7 @@
 
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
 
-export type ThemeLabTab = "components" | "blocks" | "aesthetic"
+export type ThemeLabTab = "components" | "blocks"
 
 type PreviewTabsProps = {
   activeTab: ThemeLabTab
@@ -12,7 +12,6 @@ type PreviewTabsProps = {
 const tabs: Array<{ id: ThemeLabTab; label: string }> = [
   { id: "components", label: "组件" },
   { id: "blocks", label: "模块" },
-  { id: "aesthetic", label: "美学" },
 ]
 
 export function PreviewTabs(props: PreviewTabsProps) {
