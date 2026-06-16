@@ -6,7 +6,7 @@
       "entry": "app/page.tsx",
       "buildCommand": "npm run build",
       "devCommand": "npm run dev",
-      "outputDir": ".next"
+      "outputDir": "out"
     }
   },
   "cache": {

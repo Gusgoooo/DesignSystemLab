@@ -35,14 +35,6 @@ function getExpressionSurfaceRatio(seed: ThemeSeed): number {
   return 1
 }
 
-function getSurfaceHue(seed: ThemeSeed, neutralHue: number, primaryHue: number) {
-  if (seed.vibe.temperature === "neutral") {
-    return neutralHue
-  }
-
-  return primaryHue
-}
-
 export function deriveSemanticTokens(
   seed: ThemeSeed
 ): Record<string, string> {
@@ -52,10 +44,10 @@ export function deriveSemanticTokens(
   const surfaceRatio =
     clamp(seed.material.surfaceContrast, 0.75, 1.35) *
     getExpressionSurfaceRatio(seed)
-  const neutralChroma = Math.min(neutral.chroma, 0.08)
+  const neutralChroma = Math.min(neutral.chroma, 0.012)
   const softNeutralChroma = Math.min(neutralChroma * 0.22, 0.016)
   const borderStrength = clamp(seed.material.borderContrast, 0.6, 1.6)
-  const surfaceHue = getSurfaceHue(seed, neutral.hue, primary.hue)
+  const surfaceHue = neutral.hue
   const surfaceChroma = clamp(
     softNeutralChroma +
       primary.chroma *
@@ -151,13 +143,13 @@ export function deriveDarkSemanticTokens(
   )
   const danger = hexAlphaToOklch(seed.color.danger)
   const neutralHue = neutral.hue
-  const neutralChroma = Math.min(neutral.chroma, 0.08)
+  const neutralChroma = Math.min(neutral.chroma, 0.012)
   const softNeutralChroma = Math.min(neutralChroma * 0.22, 0.018)
   const borderStrength = clamp(seed.material.borderContrast, 0.6, 1.6)
   const surfaceRatio =
     clamp(seed.material.surfaceContrast, 0.75, 1.35) *
     getExpressionSurfaceRatio(seed)
-  const surfaceHue = getSurfaceHue(seed, neutralHue, primary.hue)
+  const surfaceHue = neutralHue
   const surfaceChroma = clamp(
     softNeutralChroma +
       primary.chroma *

@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo, useState, type ReactNode } from "react"
-import { Info, MoreHorizontal } from "lucide-react"
+import { MoreHorizontal } from "lucide-react"
 import { exportAgentsThemeRulesFromOutput } from "../../lib/theme/export-agents"
 import { exportThemeAlgorithmFromOutput } from "../../lib/theme/export-algorithm"
 import { exportThemeCssFromOutput } from "../../lib/theme/export-css"
@@ -33,11 +33,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "../ui/tooltip"
 import { getControlFloatingStyle } from "./control-panel-theme"
 
 type ExportPanelProps = {
@@ -78,38 +73,6 @@ const importModeOptions: ImportModeOption[] = [
     description: "写入主题合同、theme-lab.json 和 AGENTS.md 规则。",
   },
 ]
-
-const domainLabels: Record<ThemeSeed["vibe"]["domain"], string> = {
-  saas: "SaaS",
-  ai: "AI",
-  editorial: "内容",
-  finance: "金融",
-  consumer: "消费",
-  tooling: "工具",
-}
-
-function InfoTooltip(props: { children: ReactNode; isDark: boolean }) {
-  return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <button
-          type="button"
-          aria-label="查看导出说明"
-          className="inline-flex size-4 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          <Info className="size-3" />
-        </button>
-      </TooltipTrigger>
-      <TooltipContent
-        side="right"
-        className={`${props.isDark ? "dark " : ""}max-w-64 border border-border leading-5`}
-        style={getControlFloatingStyle(props.isDark)}
-      >
-        {props.children}
-      </TooltipContent>
-    </Tooltip>
-  )
-}
 
 async function copyTextToClipboard(value: string): Promise<boolean> {
   try {
@@ -239,22 +202,11 @@ export function ExportPanel(props: ExportPanelProps) {
 
   return (
     <div className="space-y-2 border-t border-border/70 bg-background/15 px-2.5 py-2.5">
-      <div className="flex items-center gap-1.5 text-[10px] leading-4 text-muted-foreground">
-        <span>
-          确定样式后，将视觉系统指令复制给您的 AI 编码工具。
-        </span>
-        <InfoTooltip isDark={props.isDark}>
-          Theme Lab 不会直接访问或修改你的本地项目。请选择导入策略，然后复制生成的
-          AI 指令到 Codex / Cursor / Claude Code 等 AI Coding 工具中执行。
-          当前场景为 {domainLabels[props.seed.vibe.domain]}。
-        </InfoTooltip>
-      </div>
       <div className="grid grid-cols-[1fr_auto] gap-2">
         <Dialog open={dialogOpen} onOpenChange={handleDialogOpenChange}>
           <Button
             type="button"
-            size="sm"
-            className="h-8 text-[11px]"
+            className="h-10 text-sm font-medium"
             onClick={() => setDialogOpen(true)}
           >
             导入到项目

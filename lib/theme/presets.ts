@@ -53,7 +53,7 @@ export const themePresets: ThemePreset[] = [
     seed: createThemeSeed({
       color: {
         primary: { hex: "#6366f1", alpha: 1 },
-        neutral: { hex: "#6b7280", alpha: 1 },
+        neutral: { hex: "#6366f1", alpha: 1 },
       },
       shape: { radius: 1, radiusRatio: 1.25 },
       density: { mode: "comfortable", controlHeight: 2.75, densityRatio: 1.08 },
@@ -80,7 +80,7 @@ export const themePresets: ThemePreset[] = [
     seed: createThemeSeed({
       color: {
         primary: { hex: "#0891b2", alpha: 1 },
-        neutral: { hex: "#737373", alpha: 1 },
+        neutral: { hex: "#0891b2", alpha: 1 },
       },
       shape: { radius: 0.625, radiusRatio: 1 },
       density: { mode: "default", controlHeight: 2.5, densityRatio: 1 },
@@ -107,7 +107,7 @@ export const themePresets: ThemePreset[] = [
     seed: createThemeSeed({
       color: {
         primary: { hex: "#2563eb", alpha: 1 },
-        neutral: { hex: "#64748b", alpha: 1 },
+        neutral: { hex: "#2563eb", alpha: 1 },
       },
       shape: { radius: 0.25, radiusRatio: 0.85 },
       density: { mode: "compact", controlHeight: 2, densityRatio: 0.85 },
@@ -135,7 +135,7 @@ export const themePresets: ThemePreset[] = [
       color: {
         primary: { hex: "#1e3a8a", alpha: 1 },
         success: { hex: "#059669", alpha: 1 },
-        neutral: { hex: "#475569", alpha: 1 },
+        neutral: { hex: "#1e3a8a", alpha: 1 },
       },
       shape: { radius: 0.125, radiusRatio: 0.8 },
       density: { mode: "compact", controlHeight: 1.9, densityRatio: 0.8 },
@@ -162,7 +162,7 @@ export const themePresets: ThemePreset[] = [
     seed: createThemeSeed({
       color: {
         primary: { hex: "#0d9488", alpha: 1 },
-        neutral: { hex: "#78716c", alpha: 1 },
+        neutral: { hex: "#0d9488", alpha: 1 },
         background: { hex: "#fffdf9", alpha: 1 },
       },
       shape: { radius: 0.875, radiusRatio: 1.15 },
@@ -190,7 +190,7 @@ export const themePresets: ThemePreset[] = [
     seed: createThemeSeed({
       color: {
         primary: { hex: "#16a34a", alpha: 1 },
-        neutral: { hex: "#71717a", alpha: 1 },
+        neutral: { hex: "#16a34a", alpha: 1 },
       },
       shape: { radius: 0.75, radiusRatio: 1.05 },
       density: { mode: "default", controlHeight: 2.625, densityRatio: 1.02 },
@@ -217,7 +217,7 @@ export const themePresets: ThemePreset[] = [
     seed: createThemeSeed({
       color: {
         primary: { hex: "#d97706", alpha: 1 },
-        neutral: { hex: "#7c6f64", alpha: 1 },
+        neutral: { hex: "#d97706", alpha: 1 },
         background: { hex: "#fffdf8", alpha: 1 },
       },
       shape: { radius: 0.5, radiusRatio: 0.95 },
@@ -245,7 +245,7 @@ export const themePresets: ThemePreset[] = [
     seed: createThemeSeed({
       color: {
         primary: { hex: "#7c3aed", alpha: 1 },
-        neutral: { hex: "#6e6a76", alpha: 1 },
+        neutral: { hex: "#7c3aed", alpha: 1 },
       },
       shape: { radius: 0.9375, radiusRatio: 1.1 },
       density: { mode: "comfortable", controlHeight: 2.55, densityRatio: 1.05 },
@@ -272,7 +272,7 @@ export const themePresets: ThemePreset[] = [
     seed: createThemeSeed({
       color: {
         primary: { hex: "#475569", alpha: 1 },
-        neutral: { hex: "#6b6b6b", alpha: 1 },
+        neutral: { hex: "#475569", alpha: 1 },
       },
       shape: { radius: 0.375, radiusRatio: 0.9 },
       density: { mode: "compact", controlHeight: 2.1, densityRatio: 0.9 },

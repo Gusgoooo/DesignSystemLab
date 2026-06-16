@@ -50,7 +50,7 @@ export function deriveColorMap(seed: ThemeSeed): Record<string, string> {
   const infoColor = color.infoMatchesPrimary ? color.primary : color.info
   const brand = hexAlphaToOklch(color.primary)
   const neutral = hexAlphaToOklch(color.neutral)
-  const neutralChroma = Math.min(neutral.chroma, 0.08)
+  const neutralChroma = Math.min(neutral.chroma, 0.012)
   const tokens: Record<string, string> = {
     "--seed-color-primary": hexAlphaToCssColor(color.primary),
     "--seed-color-success": hexAlphaToCssColor(color.success),
