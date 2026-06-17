@@ -2315,7 +2315,7 @@ function PricingMarketingBlock() {
               更快构建一致界面
             </h4>
             <p className="max-w-xl text-sm leading-6 text-muted-foreground">
-              一个 seed 驱动的主题系统，把视觉方向转译成可用且兼容 shadcn 的 token。
+              一个 seed 驱动的主题系统，把视觉方向转译成可直接应用的 token。
             </p>
             <div className="flex flex-wrap gap-2">
               <MiniButton>生成主题</MiniButton>

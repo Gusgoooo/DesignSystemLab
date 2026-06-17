@@ -681,7 +681,7 @@ function ActivateAgentDialog() {
             <DialogHeader>
               <DialogTitle>激活设计 Agent？</DialogTitle>
               <DialogDescription>
-                Agent 会使用导出的 shadcn token 规则生成 UI。
+                Agent 会使用导出的主题 token 规则生成 UI。
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
@@ -980,14 +980,14 @@ function GithubProfile() {
             <AvatarFallback>SC</AvatarFallback>
           </Avatar>
           <div>
-            <CardTitle>shadcn</CardTitle>
-            <CardDescription>@shadcn</CardDescription>
+            <CardTitle>Theme Lab</CardTitle>
+            <CardDescription>@theme-lab</CardDescription>
           </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm text-muted-foreground">
-          开源组件现在通过 Theme Lab token 渲染。
+          组件现在通过 Theme Lab token 渲染。
         </p>
         <div className="flex gap-2">
           <Badge variant="secondary">117k 星标</Badge>
