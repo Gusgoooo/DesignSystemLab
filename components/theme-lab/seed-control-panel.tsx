@@ -931,7 +931,7 @@ export function SeedControlPanel(props: SeedControlPanelProps) {
           <div className="flex min-w-0 items-center gap-2">
             <h1 className="min-w-0" aria-label="Visual System Lab">
               <img
-                src="/visual-system-lab-logo.png"
+                src="../visual-system-lab-logo.png"
                 alt=""
                 aria-hidden="true"
                 className="h-6 w-auto max-w-[190px] object-contain"

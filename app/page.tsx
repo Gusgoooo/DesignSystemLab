@@ -1,5 +1,3 @@
-import Link from "next/link"
-
 export default function HomePage() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-background text-foreground">
@@ -31,12 +29,12 @@ export default function HomePage() {
           <p className="mx-auto mt-6 max-w-xl text-base leading-7 text-muted-foreground">
             调整Token参数，定制视觉系统，并快速在您的项目中应用
           </p>
-          <Link
+          <a
             className="mt-8 inline-flex h-[var(--control-height-lg)] w-fit items-center rounded-[var(--radius-control)] bg-foreground px-6 text-sm font-medium text-background transition-colors hover:bg-foreground/90"
-            href="/theme-lab"
+            href="./theme-lab/index.html"
           >
             打开主题实验室
-          </Link>
+          </a>
         </div>
       </section>
     </main>
