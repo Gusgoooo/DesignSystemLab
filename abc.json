@@ -4,7 +4,7 @@
     "config": {
       "framework": "next",
       "entry": "app/page.tsx",
-      "buildCommand": "npm run build",
+      "buildCommand": "npm run build:publish",
       "devCommand": "npm run dev",
       "outputDir": "out"
     }
