@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState, type ReactNode } from "react"
+import { useMemo, useState } from "react"
 import { MoreHorizontal } from "lucide-react"
 import { exportAgentsThemeRulesFromOutput } from "../../lib/theme/export-agents"
 import { exportThemeAlgorithmFromOutput } from "../../lib/theme/export-algorithm"
@@ -15,6 +15,7 @@ import {
   type ProjectImportMode,
 } from "../../lib/theme/export-prompt"
 import type { ThemeOutput, ThemeSeed } from "../../lib/theme/schema"
+import { cn } from "../../lib/utils"
 import { Button } from "../ui/button"
 import { Badge } from "../ui/badge"
 import {
@@ -73,6 +74,24 @@ const importModeOptions: ImportModeOption[] = [
     description: "写入主题合同、theme-lab.json 和 AGENTS.md 规则。",
   },
 ]
+
+const importModeCardStyles: Record<
+  ProjectImportMode,
+  { background: string; glow: string }
+> = {
+  "one-shot-page-polish": {
+    background:
+      "linear-gradient(135deg, color-mix(in oklch, var(--status-info-bg) 78%, var(--background)), color-mix(in oklch, var(--card) 92%, var(--background)) 48%, color-mix(in oklch, var(--primary) 12%, var(--background)))",
+    glow:
+      "linear-gradient(90deg, color-mix(in oklch, var(--status-info) 24%, transparent), color-mix(in oklch, var(--primary) 14%, transparent), color-mix(in oklch, var(--status-success) 18%, transparent))",
+  },
+  "persistent-project-contract": {
+    background:
+      "linear-gradient(135deg, color-mix(in oklch, var(--status-warning-bg) 78%, var(--background)), color-mix(in oklch, var(--card) 92%, var(--background)) 48%, color-mix(in oklch, var(--status-danger-bg) 46%, var(--background)))",
+    glow:
+      "linear-gradient(90deg, color-mix(in oklch, var(--status-warning) 24%, transparent), color-mix(in oklch, var(--primary) 14%, transparent), color-mix(in oklch, var(--status-danger) 16%, transparent))",
+  },
+}
 
 async function copyTextToClipboard(value: string): Promise<boolean> {
   try {
@@ -212,7 +231,7 @@ export function ExportPanel(props: ExportPanelProps) {
             导入到项目
           </Button>
           <DialogContent
-            className={`${props.isDark ? "dark " : ""}max-h-[min(86vh,520px)] overflow-hidden sm:max-w-md`}
+            className={`${props.isDark ? "dark " : ""}max-h-[min(86vh,520px)] overflow-hidden sm:max-w-xl`}
             style={getControlFloatingStyle(props.isDark)}
           >
             <DialogHeader>
@@ -222,9 +241,10 @@ export function ExportPanel(props: ExportPanelProps) {
               </DialogDescription>
             </DialogHeader>
 
-            <div className="grid gap-2">
+            <div className="grid gap-3 sm:grid-cols-2">
               {importModeOptions.map((option) => {
                 const selected = option.id === mode
+                const cardStyle = importModeCardStyles[option.id]
 
                 return (
                   <button
@@ -232,17 +252,42 @@ export function ExportPanel(props: ExportPanelProps) {
                     type="button"
                     aria-pressed={selected}
                     data-state={selected ? "checked" : "unchecked"}
-                    className="rounded-[var(--radius-card)] border border-border bg-card p-3 text-left text-card-foreground transition-colors hover:bg-accent hover:text-accent-foreground data-[state=checked]:border-primary data-[state=checked]:bg-primary/5"
+                    className={cn(
+                      "group relative min-h-[132px] overflow-hidden rounded-[var(--radius-card)] border p-4 text-left text-card-foreground ring-1 transition-all duration-300",
+                      "border-border/70 ring-foreground/[0.03] hover:-translate-y-0.5 hover:border-border hover:[box-shadow:var(--elevation-card)]",
+                      "data-[state=checked]:border-primary data-[state=checked]:ring-primary/40 data-[state=checked]:[box-shadow:var(--elevation-popover)]"
+                    )}
+                    style={{ background: cardStyle.background }}
                     onClick={() => chooseMode(option.id)}
                   >
-                    <span className="flex items-center gap-2">
-                      <span className="text-sm font-semibold">
-                        {option.title}
+                    <span
+                      className="absolute inset-x-0 -top-10 h-24 blur-2xl"
+                      style={{ background: cardStyle.glow }}
+                    />
+                    <span className="absolute inset-x-0 bottom-0 h-[68%] bg-gradient-to-t from-card via-card/90 to-transparent" />
+                    <span className="relative flex h-full min-h-[100px] flex-col">
+                      <span className="flex items-center gap-2">
+                        <span className="min-w-0 flex-1 text-sm font-semibold leading-5">
+                          {option.title}
+                        </span>
+                        <Badge
+                          variant="outline"
+                          className="shrink-0 border-border/60 bg-background/55 text-foreground backdrop-blur"
+                        >
+                          {option.badge}
+                        </Badge>
                       </span>
-                      <Badge variant="outline">{option.badge}</Badge>
-                    </span>
-                    <span className="mt-1 block text-xs leading-5 text-muted-foreground">
-                      {option.description}
+                      <span className="mt-3 block text-xs leading-5 text-muted-foreground">
+                        {option.description}
+                      </span>
+                      <span className="mt-auto pt-4">
+                        <span
+                          className={cn(
+                            "block h-1.5 rounded-full bg-muted transition-colors",
+                            selected && "bg-primary"
+                          )}
+                        />
+                      </span>
                     </span>
                   </button>
                 )
@@ -268,7 +313,7 @@ export function ExportPanel(props: ExportPanelProps) {
               type="button"
               variant="outline"
               size="icon-sm"
-              className="h-8 w-8"
+              className="h-10 w-10"
               aria-label="打开导出菜单"
             >
               <MoreHorizontal />

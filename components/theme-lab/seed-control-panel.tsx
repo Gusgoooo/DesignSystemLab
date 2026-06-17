@@ -26,6 +26,7 @@ import { defaultThemeSeed } from "../../lib/theme/defaults"
 import { themePresets } from "../../lib/theme/presets"
 import type { HexAlphaColor, ThemeOutput, ThemeSeed } from "../../lib/theme/schema"
 import { normalizeHex } from "../../lib/theme/algorithms/utils"
+import { cn } from "../../lib/utils"
 import { getControlFloatingStyle } from "./control-panel-theme"
 
 type SeedControlPanelProps = {
@@ -300,12 +301,17 @@ function ThemeModeToggle(props: {
       <TooltipTrigger asChild>
         <Button
           type="button"
-          variant="outline"
+          variant={props.isDark ? "default" : "outline"}
           size="icon-sm"
           aria-label={label}
           aria-pressed={props.isDark}
           data-state={props.isDark ? "on" : "off"}
-          className="h-7 w-7 rounded-full border-border bg-muted/35 text-muted-foreground shadow-none hover:bg-muted hover:text-foreground data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:hover:bg-primary/90"
+          className={cn(
+            "h-7 w-7 rounded-full border shadow-none",
+            props.isDark
+              ? "border-primary bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
+              : "border-border bg-muted/35 text-muted-foreground hover:bg-muted hover:text-foreground"
+          )}
           onClick={() => props.onChange(!props.isDark)}
         >
           {props.isDark ? <Moon className="size-3.5" /> : <Sun className="size-3.5" />}
