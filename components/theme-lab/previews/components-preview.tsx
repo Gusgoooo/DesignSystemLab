@@ -1175,7 +1175,7 @@ function LiveWaveformCard() {
             <span
               key={index}
               className={cn(
-                "w-full rounded-full bg-primary transition-all",
+                "w-full rounded-full bg-primary transition-[background-color,height,opacity]",
                 active && "animate-pulse"
               )}
               style={{

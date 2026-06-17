@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:static": "npm run build",
     "build:publish": "next build && node scripts/strip-html-comments.mjs",
     "postbuild": "node scripts/strip-html-comments.mjs",
     "typecheck": "tsc --noEmit"

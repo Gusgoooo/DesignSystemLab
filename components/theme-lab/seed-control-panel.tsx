@@ -8,6 +8,7 @@ import { Button } from "../ui/button"
 import { Card, CardContent } from "../ui/card"
 import { Input } from "../ui/input"
 import { Label } from "../ui/label"
+import { Separator } from "../ui/separator"
 import {
   Select,
   SelectContent,
@@ -731,33 +732,54 @@ function PresetSelect(props: {
   value: string
   onChange: (presetId: string) => void
 }) {
-  const isDark = useControlPanelIsDark()
+  const [expanded, setExpanded] = useState(false)
+  const visibleCount = 4
+  const options =
+    props.value === "custom"
+      ? [{ id: "custom", name: "自定义" }, ...themePresets]
+      : themePresets
+  const visibleOptions = expanded ? options : options.slice(0, visibleCount)
+  const hiddenCount = Math.max(0, options.length - visibleOptions.length)
 
   return (
-    <Select value={props.value} onValueChange={props.onChange}>
-      <SelectTrigger
-        aria-label="选择主题预设"
-        size="sm"
-        className="h-8 w-full bg-background/70 text-[11px]"
-      >
-        <SelectValue />
-      </SelectTrigger>
-      <SelectContent
-        position="popper"
-        align="start"
-        className={isDark ? "dark" : undefined}
-        style={getControlFloatingStyle(isDark)}
-      >
-        {props.value === "custom" ? (
-          <SelectItem value="custom">自定义</SelectItem>
-        ) : null}
-        {themePresets.map((preset) => (
-          <SelectItem key={preset.id} value={preset.id}>
+    <div className="flex flex-wrap gap-1.5">
+      {visibleOptions.map((preset) => {
+        const selected = preset.id === props.value
+
+        return (
+          <Button
+            key={preset.id}
+            type="button"
+            variant={selected ? "default" : "outline"}
+            size="xs"
+            aria-pressed={selected}
+            className={cn(
+              "h-8 rounded-full px-3.5 text-xs shadow-none",
+              !selected && "bg-background/70 text-muted-foreground hover:text-foreground"
+            )}
+            onClick={() => {
+              if (preset.id !== "custom") {
+                props.onChange(preset.id)
+              }
+            }}
+          >
             {preset.name}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+          </Button>
+        )
+      })}
+      {!expanded && hiddenCount > 0 ? (
+        <Button
+          type="button"
+          variant="outline"
+          size="xs"
+          aria-expanded={expanded}
+          className="h-8 rounded-full bg-muted/40 px-3.5 text-xs text-muted-foreground shadow-none hover:bg-muted hover:text-foreground"
+          onClick={() => setExpanded(true)}
+        >
+          +{hiddenCount}
+        </Button>
+      ) : null}
+    </div>
   )
 }
 
@@ -911,7 +933,7 @@ export function SeedControlPanel(props: SeedControlPanelProps) {
               Visual System Lab
             </h1>
             <InfoTooltip>
-              设计师只编辑 Hex 种子，其余由算法推导为 map、semantic 和 shadcn token。
+              调整基础参数后，系统会自动生成可应用到项目里的完整视觉方案。
             </InfoTooltip>
           </div>
           <div className="flex items-center gap-1.5">
@@ -927,6 +949,9 @@ export function SeedControlPanel(props: SeedControlPanelProps) {
             预设
           </Label>
           <PresetSelect value={selectedPresetId} onChange={updatePreset} />
+        </div>
+        <div className="py-0.5">
+          <Separator />
         </div>
       </div>
 
@@ -973,7 +998,7 @@ export function SeedControlPanel(props: SeedControlPanelProps) {
       <TokenCard
         title="圆角"
         summary={`${formatNumber(seed.shape.radius)}rem / 比例 ${formatNumber(seed.shape.radiusRatio)}`}
-        description="圆角种子会映射到 shadcn 半径变量，并影响控件、卡片和面板外观。"
+        description="圆角会影响按钮、卡片和面板的整体外观。"
         derived={radiusDerived}
       >
         <div className="space-y-3">
@@ -1016,7 +1041,7 @@ export function SeedControlPanel(props: SeedControlPanelProps) {
       <TokenCard
         title="密度"
         summary={`${formatOptionLabel(seed.density.mode)} / ${formatNumber(seed.density.controlHeight)}rem / 比例 ${formatNumber(seed.density.densityRatio)}`}
-        description="密度会影响 shadcn 按钮与输入框高度、列表行高、间距和容器内边距。"
+        description="密度会影响按钮、输入框、列表、间距和容器留白。"
         derived={densityDerived}
       >
         <div className="space-y-3">

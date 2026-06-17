@@ -7,37 +7,26 @@ package scripts, aliases, or theme architecture changes.
 
 Current repository state:
 
-- Package manager: none detected. There is no `package.json`, lockfile, or
-  workspace config yet.
-- Scripts: none detected because `package.json` is not present.
-- App structure: none detected yet. The intended Next.js route is
-  `app/theme-lab` or an equivalent route.
-- Components structure: none detected yet. Intended locations are
-  `components/theme-lab` for product UI and `components/ui` for shadcn/ui base
-  components.
-- Styles structure: none detected yet. Intended Tailwind and shadcn integration
-  should live in `app/globals.css` or a `styles` entry imported by the app.
-- shadcn components location: none detected yet. Use `components/ui` once
-  shadcn/ui is initialized.
-- Aliases: none detected yet. Prefer a conventional `@/*` alias once
-  `tsconfig.json` and `components.json` exist.
-- Tailwind setup: none detected yet. This project should target Tailwind v4.
-- `components.json`: not present yet.
+- Package manager: npm. Use `package-lock.json` as the source of truth.
+- Framework: Next.js App Router with static export enabled.
+- App routes: `app/page.tsx`, `app/theme-lab/page.tsx`, and
+  `app/dashboard/page.tsx`.
+- Components: product UI lives in `components/theme-lab`; shadcn/ui base
+  components live in `components/ui`.
+- Styles: Tailwind v4 and theme variables live in `app/globals.css`.
+- Aliases: `@/*` is configured in `tsconfig.json` and `components.json`.
+- Static output: `next.config.ts` uses `output: "export"` and writes the
+  publishable static artifact to `out/`.
 
 ## Project-specific commands
 
-No project commands are available yet because `package.json` does not exist.
-When scripts are added, keep this section current and prefer the package
-manager indicated by the lockfile.
-
-Expected commands to document here once available:
-
-- Install dependencies
-- Run the dev server
-- Run typecheck
-- Run lint
-- Run tests, if present
-- Build the app
+- Install dependencies: `npm install`
+- Run the dev server: `npm run dev`
+- Typecheck: `npm run typecheck`
+- Build the app: `npm run build`
+- Build static artifact: `npm run build:static`
+- Static artifact output directory: `out/`
+- Lint/tests: no dedicated scripts currently.
 
 ## Project purpose
 

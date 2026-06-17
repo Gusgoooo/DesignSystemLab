@@ -44,6 +44,88 @@ ${exportThemeCssFromOutput(theme)}
 /* theme-lab:runtime:end */`
 }
 
+const oneShotThemeTokenNames = [
+  "--background",
+  "--foreground",
+  "--card",
+  "--card-foreground",
+  "--popover",
+  "--popover-foreground",
+  "--primary",
+  "--primary-foreground",
+  "--secondary",
+  "--secondary-foreground",
+  "--muted",
+  "--muted-foreground",
+  "--accent",
+  "--accent-foreground",
+  "--border",
+  "--input",
+  "--ring",
+  "--radius",
+  "--radius-control",
+  "--radius-card",
+  "--radius-panel",
+  "--control-height-sm",
+  "--control-height-md",
+  "--control-height-lg",
+  "--panel-padding",
+  "--section-gap",
+  "--elevation-card",
+  "--elevation-popover",
+  "--duration-base",
+  "--ease-standard",
+] as const
+
+function pickThemeVariables(
+  source: ThemeOutput["cssVariables"],
+  names: readonly string[]
+): Record<string, string> {
+  return names.reduce<Record<string, string>>((result, name) => {
+    const value = source[name]
+
+    if (value) {
+      result[name] = value
+    }
+
+    return result
+  }, {})
+}
+
+function oneShotThemeReferenceJson(theme: ThemeOutput): string {
+  return JSON.stringify(
+    {
+      source: "Theme Lab compact UI polish reference",
+      name: theme.vibe.name,
+      keywords: theme.vibe.keywords,
+      visualIntent: theme.vibe.visualContract.summary,
+      prefer: theme.vibe.visualContract.prefer.slice(0, 6),
+      avoid: theme.vibe.visualContract.avoid.slice(0, 6),
+      seedSnapshot: {
+        primary: theme.seed.color.primary.hex,
+        background: theme.seed.color.background.hex,
+        foreground: theme.seed.color.foreground.hex,
+        neutral: theme.seed.color.neutral.hex,
+        radius: theme.seed.shape.radius,
+        radiusRatio: theme.seed.shape.radiusRatio,
+        density: theme.seed.density.mode,
+        controlHeight: theme.seed.density.controlHeight,
+        elevation: theme.seed.material.elevation,
+        motion: theme.seed.motion.level,
+      },
+      tokens: {
+        light: pickThemeVariables(theme.cssVariables, oneShotThemeTokenNames),
+        dark: pickThemeVariables(
+          theme.darkCssVariables,
+          oneShotThemeTokenNames
+        ),
+      },
+    },
+    null,
+    2
+  )
+}
+
 function projectImportManifestJson(theme: ThemeOutput): string {
   return JSON.stringify(
     {
@@ -302,6 +384,25 @@ function selectedScopeSection(targetScope: string): string {
 If no selected scope is provided, inspect the project but do not perform broad UI changes. Ask the user to provide a route, page, component, or feature area before refactoring UI.`
 }
 
+function aiUiOptimizationSection(): string {
+  return `## AI UI Optimization Guidance
+
+This packet can be used with AI UI tools such as v0, Codex, Cursor, or Claude Code.
+
+When optimizing UI:
+
+- Be specific about the screen, component, user role, and desired interaction state.
+- Treat uploaded screenshots, selected elements, or selected files as the target scope.
+- Keep existing routes, data fetching, event handlers, validation, permissions, and business logic.
+- Improve visual hierarchy, spacing, typography, responsive behavior, and interaction states before adding new features.
+- Add or improve empty, loading, error, disabled, hover, focus, selected, and success states when relevant.
+- Prefer existing project components and shadcn/ui primitives such as Button, Card, Dialog, Tabs, Table, DropdownMenu, Sheet, Tooltip, Badge, Input, and Label.
+- Use standard product UI compositions: Settings = Tabs + Card + Form; dashboard = Card + Badge + Table; CRUD = Table + DropdownMenu + Sheet; auth/onboarding = Card + Label + Input + Button.
+- Use the exported theme tokens for surfaces, text, borders, rings, radius, shadows, and states.
+- Avoid decorative gradients, random shadows, raw palette classes, hardcoded colors, mixed radii, nested cards, and unrelated rewrites.
+- After changes, normalize the output: replace ad-hoc controls with project components, align typography and density, and remove one-off visual effects.`
+}
+
 function themeArtifactsSection(
   options: ProjectImportPromptOptions,
   targetScope: string
@@ -379,10 +480,124 @@ ${exportThemeAlgorithmFromOutput(theme)}
 \`\`\``
 }
 
+function compileOneShotPagePolishPrompt(
+  options: ProjectImportPromptOptions,
+  targetScope: string
+): string {
+  return `# One-Shot UI Polish Task
+
+## Goal
+
+Optimize the selected page or component once. Make the current interface feel more polished, clearer, and easier to use without turning this into a long-term design-system migration.
+
+## Vercel Skill Lens
+
+Use a v0-style workflow for UI generation: selected files or screenshots define the target, the output is a scoped code change, and shadcn/ui + Tailwind tokens are the default implementation language.
+
+Use shadcn/ui guidance for component composition: prefer existing Button, Card, Dialog, Tabs, Table, DropdownMenu, Sheet, Tooltip, Badge, Input, Label, Separator, and similar primitives before creating custom controls.
+
+## Hard Scope
+
+Selected scope:
+\`${targetScope || "(not provided)"}\`
+
+If no selected scope is provided, inspect the project and ask for a route, page, component, or screenshot target before editing.
+
+Do not:
+
+- create or update \`theme-lab.json\`
+- create or update \`AGENTS.md\`
+- create \`theme.seed.json\`
+- create \`vibe.manifest.json\`
+- create \`theme.algorithm.ts\`
+- create a design-system folder
+- install dependencies
+- rewrite unrelated pages
+- optimize other page styling or broad cross-page visual consistency
+- change routes, APIs, data loading, state machines, validation, permissions, or business logic
+
+## Compact Theme Lab Reference
+
+Use this as visual direction and token context only. Do not persist it as a project contract.
+
+\`\`\`json
+${oneShotThemeReferenceJson(options.theme)}
+\`\`\`
+
+## Styling Work
+
+Spend most effort on the current interface:
+
+- Clarify hierarchy: make primary actions, section titles, active states, and supporting text obvious.
+- Clean layout: align edges, normalize gaps, avoid cramped groups, and keep density consistent.
+- Improve surfaces: use standard cards/panels/dialogs with restrained borders, radius, and elevation.
+- Improve typography: use balanced headings, readable line-height, consistent caption/body sizes, and no orphaned labels.
+- Improve controls: make buttons, tabs, menus, inputs, toggles, and cards feel like one system.
+- Improve states: add or refine hover, active, focus-visible, selected, disabled, loading, empty, error, and success states where relevant.
+- Improve responsiveness: check mobile and desktop layouts, prevent overflow, and keep long text readable.
+- Improve dark mode only if the selected scope already supports it or the issue is visible in the selected scope.
+
+## Interface Quality Checklist
+
+Apply this Web Interface Guidelines subset while editing:
+
+- Use semantic interactive elements: \`button\` for actions and \`a\`/\`Link\` for navigation.
+- Icon-only buttons need \`aria-label\`; decorative icons need \`aria-hidden="true"\`.
+- Form controls need labels or \`aria-label\`; labels should share a comfortable hit target with their control.
+- Every interactive element needs a visible \`focus-visible\` state.
+- Do not use \`transition-all\`; list animated properties such as color, background-color, border-color, box-shadow, opacity, transform, or width.
+- Prefer transform/opacity animation and respect reduced-motion when adding meaningful motion.
+- Text containers should handle long content with \`min-w-0\`, \`truncate\`, \`line-clamp\`, or \`break-words\`.
+- Use \`text-wrap: balance\` or \`text-pretty\` on prominent headings when supported by the existing stack.
+- Avoid raw palette classes, hardcoded hex, arbitrary OKLCH, random gradients, and one-off shadows for structural UI.
+- Keep copy concise, action-oriented, and specific.
+
+## Execution
+
+1. Inspect the selected files and nearby components.
+2. Identify the smallest set of files needed for the visual improvement.
+3. Preserve behavior and data flow.
+4. Make the scoped UI polish using existing components and the compact Theme Lab reference.
+5. Run available typecheck, lint, build, or route-level checks.
+6. Report changed files, visual improvements, checks run, and any risk.
+
+## Final Response Format
+
+\`\`\`md
+## Files Changed
+
+...
+
+## UI Polish
+
+...
+
+## Preserved
+
+...
+
+## QA
+
+- typecheck:
+- lint:
+- build:
+- manual/browser check:
+
+## Risks
+
+...
+\`\`\`
+`
+}
+
 export function compileProjectImportPrompt(
   options: ProjectImportPromptOptions
 ): string {
   const targetScope = options.targetScope?.trim() ?? ""
+
+  if (options.mode === "one-shot-page-polish") {
+    return compileOneShotPagePolishPrompt(options, targetScope)
+  }
 
   return `# Theme Lab AI Task Packet
 
@@ -608,6 +823,8 @@ Avoid:
 - random shadows
 - unapproved glassmorphism
 - copying Theme Lab preview fixtures into the user project
+
+${aiUiOptimizationSection()}
 
 ## Selected Scope
 

@@ -54,7 +54,32 @@ npm run dev        # 启动开发服务器
 
 ```bash
 npm run build      # 生产构建
+npm run build:static # 生成可发布的静态产物到 out/
 npm run typecheck  # TypeScript 类型检查
+```
+
+## 静态发布
+
+项目已经配置为 Next.js 静态导出：
+
+- `next.config.ts` 使用 `output: "export"`，构建产物输出到 `out/`
+- `images.unoptimized: true`，避免静态导出时依赖 Next 图片服务
+- `trailingSlash: true`，让 `/theme-lab/`、`/dashboard/` 等路由都生成目录式静态页面
+- `postbuild` 会处理 `out/**/*.html`，删除 HTML 注释并把 `/_next/` 资源路径改成相对路径，便于部署到 CDN 子路径
+
+生成静态产物：
+
+```bash
+npm run build:static
+```
+
+发布时把 `out/` 目录上传到任意静态托管服务即可。Vercel 已配置为使用 `out/`：
+
+```json
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "out"
+}
 ```
 
 ## 工作流

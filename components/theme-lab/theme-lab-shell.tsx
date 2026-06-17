@@ -5,6 +5,7 @@ import { deriveTheme } from "../../lib/theme/derive-theme"
 import { themePresets } from "../../lib/theme/presets"
 import type { ThemeSeed } from "../../lib/theme/schema"
 import { ExportPanel } from "./export-panel"
+import { OnboardingTour } from "./onboarding-tour"
 import { PreviewCanvas } from "./preview-canvas"
 import { PreviewFrame } from "./preview-frame"
 import {
@@ -40,6 +41,14 @@ export function ThemeLabShell() {
   const [activeTab, setActiveTab] = useState<ThemeLabTab>("components")
   const [isDark, setIsDark] = useState(false)
   const theme = useMemo(() => deriveTheme(seed), [seed])
+  const shellStyle = useMemo(
+    () => ({
+      ...getControlPanelStyle(isDark),
+      background: isDark ? "rgb(18 18 18)" : "rgb(255 255 255)",
+    }),
+    [isDark]
+  )
+
   useEffect(() => {
     const root = document.documentElement
     const tokens = isDark ? theme.darkCssVariables : theme.cssVariables
@@ -69,13 +78,13 @@ export function ThemeLabShell() {
   return (
     <TooltipProvider>
       <div
-        style={getControlPanelStyle(isDark)}
-        className={`${isDark ? "dark " : ""}fixed inset-0 overflow-hidden bg-background p-3 text-foreground`}
+        style={shellStyle}
+        className={`${isDark ? "dark " : ""}fixed inset-0 overflow-hidden bg-white p-3 text-foreground`}
       >
         <div className="grid h-full min-h-0 grid-cols-1 grid-rows-[minmax(0,1fr)_minmax(0,1fr)] gap-3 lg:grid-cols-[288px_minmax(0,1fr)] lg:grid-rows-1">
           <aside
-            style={getControlPanelStyle(isDark)}
-            className={`${isDark ? "dark " : ""}min-h-0 overflow-hidden rounded-[20px] border border-border bg-card text-xs text-card-foreground shadow-sm`}
+            data-tour-target="style-controls"
+            className={`${isDark ? "dark " : ""}min-h-0 overflow-hidden rounded-[20px] bg-card text-xs text-card-foreground shadow-sm`}
           >
             <div className="flex h-full min-h-0 flex-col">
               <div className="min-h-0 flex-1 overflow-y-auto p-2.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -92,18 +101,14 @@ export function ThemeLabShell() {
           </aside>
 
           <main
-            style={getControlPanelStyle(isDark)}
-            className={`${isDark ? "dark " : ""}flex min-h-0 min-w-0 flex-col overflow-hidden rounded-[20px] border border-border bg-card text-card-foreground shadow-sm`}
+            data-tour-target="theme-preview"
+            className={`${isDark ? "dark " : ""}relative flex min-h-0 min-w-0 flex-col overflow-hidden rounded-[20px] bg-card text-card-foreground shadow-sm`}
           >
-            <div className="grid shrink-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 border-border border-b bg-background px-4 py-3 lg:px-5">
-              <h2 className="min-w-0 truncate font-[var(--font-weight-heading)] text-base text-foreground">
-                视觉系统示例
-              </h2>
+            <div className="pointer-events-none absolute left-1/2 top-3 z-20 -translate-x-1/2">
               <PreviewTabs activeTab={activeTab} onTabChange={setActiveTab} />
-              <div aria-hidden="true" />
             </div>
 
-            <div className="min-h-0 flex-1 overflow-hidden bg-muted">
+            <div className="min-h-0 flex-1 overflow-hidden bg-white dark:bg-neutral-950">
               <PreviewCanvas dragEnabled={activeTab !== "blocks"}>
                 <PreviewFrame theme={theme} isDark={isDark}>
                   {renderPreview(activeTab, seed, theme)}
@@ -112,6 +117,7 @@ export function ThemeLabShell() {
             </div>
           </main>
         </div>
+        <OnboardingTour restartKey={0} />
       </div>
     </TooltipProvider>
   )

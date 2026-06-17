@@ -156,7 +156,7 @@ export function PreviewCanvas(props: PreviewCanvasProps) {
       onPointerMove={handlePointerMove}
       onPointerUp={endDrag}
       className={cn(
-        "h-full overflow-auto bg-muted outline-none overscroll-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+        "h-full overflow-auto bg-white outline-none overscroll-contain dark:bg-neutral-950 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
         dragEnabled && isDragging && "cursor-grabbing select-none",
         dragEnabled && !isDragging && "cursor-grab",
         !dragEnabled && "cursor-auto",
