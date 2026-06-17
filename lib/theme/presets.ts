@@ -1,5 +1,6 @@
 import { defaultThemeSeed } from "./defaults"
-import type { ThemeSeed } from "./schema"
+import { hexToRgb } from "./algorithms/utils"
+import type { HexAlphaColor, ThemeSeed } from "./schema"
 
 export type ThemePreset = {
   id: string
@@ -12,12 +13,44 @@ type ThemeSeedOverrides = {
   [Key in keyof ThemeSeed]?: Partial<ThemeSeed[Key]>
 }
 
-function createThemeSeed(overrides: ThemeSeedOverrides): ThemeSeed {
+function toHexChannel(value: number): string {
+  return Math.round(Math.min(Math.max(value, 0), 255))
+    .toString(16)
+    .padStart(2, "0")
+}
+
+function rgbToHex(rgb: { r: number; g: number; b: number }): string {
+  return `#${toHexChannel(rgb.r)}${toHexChannel(rgb.g)}${toHexChannel(rgb.b)}`
+}
+
+function derivePresetNeutral(primary: HexAlphaColor): HexAlphaColor {
+  const primaryRgb = hexToRgb(primary.hex)
+  const neutralBase = { r: 146, g: 146, b: 146 }
+  const primaryWeight = 0.035
+  const neutralWeight = 1 - primaryWeight
+
   return {
-    color: {
-      ...defaultThemeSeed.color,
-      ...overrides.color,
-    },
+    hex: rgbToHex({
+      r: neutralBase.r * neutralWeight + primaryRgb.r * primaryWeight,
+      g: neutralBase.g * neutralWeight + primaryRgb.g * primaryWeight,
+      b: neutralBase.b * neutralWeight + primaryRgb.b * primaryWeight,
+    }),
+    alpha: primary.alpha,
+  }
+}
+
+function createThemeSeed(overrides: ThemeSeedOverrides): ThemeSeed {
+  const color = {
+    ...defaultThemeSeed.color,
+    ...overrides.color,
+  }
+
+  if (overrides.color?.primary && !overrides.color.neutral) {
+    color.neutral = derivePresetNeutral(overrides.color.primary)
+  }
+
+  return {
+    color,
     shape: {
       ...defaultThemeSeed.shape,
       ...overrides.shape,
@@ -53,7 +86,6 @@ export const themePresets: ThemePreset[] = [
     seed: createThemeSeed({
       color: {
         primary: { hex: "#6366f1", alpha: 1 },
-        neutral: { hex: "#6366f1", alpha: 1 },
       },
       shape: { radius: 1, radiusRatio: 1.25 },
       density: { mode: "comfortable", controlHeight: 2.75, densityRatio: 1.08 },
@@ -80,7 +112,6 @@ export const themePresets: ThemePreset[] = [
     seed: createThemeSeed({
       color: {
         primary: { hex: "#0891b2", alpha: 1 },
-        neutral: { hex: "#0891b2", alpha: 1 },
       },
       shape: { radius: 0.625, radiusRatio: 1 },
       density: { mode: "default", controlHeight: 2.5, densityRatio: 1 },
@@ -107,7 +138,6 @@ export const themePresets: ThemePreset[] = [
     seed: createThemeSeed({
       color: {
         primary: { hex: "#2563eb", alpha: 1 },
-        neutral: { hex: "#2563eb", alpha: 1 },
       },
       shape: { radius: 0.25, radiusRatio: 0.85 },
       density: { mode: "compact", controlHeight: 2, densityRatio: 0.85 },
@@ -135,7 +165,6 @@ export const themePresets: ThemePreset[] = [
       color: {
         primary: { hex: "#1e3a8a", alpha: 1 },
         success: { hex: "#059669", alpha: 1 },
-        neutral: { hex: "#1e3a8a", alpha: 1 },
       },
       shape: { radius: 0.125, radiusRatio: 0.8 },
       density: { mode: "compact", controlHeight: 1.9, densityRatio: 0.8 },
@@ -162,7 +191,6 @@ export const themePresets: ThemePreset[] = [
     seed: createThemeSeed({
       color: {
         primary: { hex: "#0d9488", alpha: 1 },
-        neutral: { hex: "#0d9488", alpha: 1 },
         background: { hex: "#fffdf9", alpha: 1 },
       },
       shape: { radius: 0.875, radiusRatio: 1.15 },
@@ -190,7 +218,6 @@ export const themePresets: ThemePreset[] = [
     seed: createThemeSeed({
       color: {
         primary: { hex: "#16a34a", alpha: 1 },
-        neutral: { hex: "#16a34a", alpha: 1 },
       },
       shape: { radius: 0.75, radiusRatio: 1.05 },
       density: { mode: "default", controlHeight: 2.625, densityRatio: 1.02 },
@@ -217,7 +244,6 @@ export const themePresets: ThemePreset[] = [
     seed: createThemeSeed({
       color: {
         primary: { hex: "#d97706", alpha: 1 },
-        neutral: { hex: "#d97706", alpha: 1 },
         background: { hex: "#fffdf8", alpha: 1 },
       },
       shape: { radius: 0.5, radiusRatio: 0.95 },
@@ -245,7 +271,6 @@ export const themePresets: ThemePreset[] = [
     seed: createThemeSeed({
       color: {
         primary: { hex: "#7c3aed", alpha: 1 },
-        neutral: { hex: "#7c3aed", alpha: 1 },
       },
       shape: { radius: 0.9375, radiusRatio: 1.1 },
       density: { mode: "comfortable", controlHeight: 2.55, densityRatio: 1.05 },
@@ -272,7 +297,6 @@ export const themePresets: ThemePreset[] = [
     seed: createThemeSeed({
       color: {
         primary: { hex: "#475569", alpha: 1 },
-        neutral: { hex: "#475569", alpha: 1 },
       },
       shape: { radius: 0.375, radiusRatio: 0.9 },
       density: { mode: "compact", controlHeight: 2.1, densityRatio: 0.9 },

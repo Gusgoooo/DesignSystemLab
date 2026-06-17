@@ -929,12 +929,14 @@ export function SeedControlPanel(props: SeedControlPanelProps) {
       <div className="space-y-2.5 px-0.5">
         <div className="flex items-center justify-between gap-2.5">
           <div className="flex min-w-0 items-center gap-2">
-            <h1 className="truncate text-base font-semibold tracking-[var(--tracking-body)]">
-              Visual System Lab
+            <h1 className="min-w-0" aria-label="Visual System Lab">
+              <img
+                src="/visual-system-lab-logo.png"
+                alt=""
+                aria-hidden="true"
+                className="h-6 w-auto max-w-[190px] object-contain"
+              />
             </h1>
-            <InfoTooltip>
-              调整基础参数后，系统会自动生成可应用到项目里的完整视觉方案。
-            </InfoTooltip>
           </div>
           <div className="flex items-center gap-1.5">
             <ResetButton

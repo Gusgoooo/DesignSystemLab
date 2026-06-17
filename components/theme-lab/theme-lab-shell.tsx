@@ -84,7 +84,7 @@ export function ThemeLabShell() {
         <div className="grid h-full min-h-0 grid-cols-1 grid-rows-[minmax(0,1fr)_minmax(0,1fr)] gap-3 lg:grid-cols-[288px_minmax(0,1fr)] lg:grid-rows-1">
           <aside
             data-tour-target="style-controls"
-            className={`${isDark ? "dark " : ""}min-h-0 overflow-hidden rounded-[20px] bg-card text-xs text-card-foreground shadow-sm`}
+            className={`${isDark ? "dark " : ""}min-h-0 overflow-hidden rounded-[20px] bg-[var(--lab-panel-bg)] text-xs text-card-foreground`}
           >
             <div className="flex h-full min-h-0 flex-col">
               <div className="min-h-0 flex-1 overflow-y-auto p-2.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -102,13 +102,13 @@ export function ThemeLabShell() {
 
           <main
             data-tour-target="theme-preview"
-            className={`${isDark ? "dark " : ""}relative flex min-h-0 min-w-0 flex-col overflow-hidden rounded-[20px] bg-card text-card-foreground shadow-sm`}
+            className={`${isDark ? "dark " : ""}relative flex min-h-0 min-w-0 flex-col overflow-hidden rounded-[20px] bg-[var(--lab-panel-bg)] text-card-foreground`}
           >
             <div className="pointer-events-none absolute left-1/2 top-3 z-20 -translate-x-1/2">
               <PreviewTabs activeTab={activeTab} onTabChange={setActiveTab} />
             </div>
 
-            <div className="min-h-0 flex-1 overflow-hidden bg-white dark:bg-neutral-950">
+            <div className="min-h-0 flex-1 overflow-hidden bg-[var(--lab-panel-bg)]">
               <PreviewCanvas dragEnabled={activeTab !== "blocks"}>
                 <PreviewFrame theme={theme} isDark={isDark}>
                   {renderPreview(activeTab, seed, theme)}

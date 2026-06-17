@@ -52,12 +52,12 @@ export function deriveSemanticTokens(
     softNeutralChroma +
       primary.chroma *
         (seed.vibe.expression === "expressive"
-          ? 0.03
+          ? 0.0018
           : seed.vibe.expression === "balanced"
-            ? 0.02
-            : 0.012),
-    0.004,
-    0.026
+            ? 0.0012
+            : 0.0008),
+    0.0005,
+    0.0045
   )
   const canvasSurface = oklch(
     background.lightness - 0.012 * surfaceRatio,
@@ -154,12 +154,12 @@ export function deriveDarkSemanticTokens(
     softNeutralChroma +
       primary.chroma *
         (seed.vibe.expression === "expressive"
-          ? 0.026
+          ? 0.0015
           : seed.vibe.expression === "balanced"
-            ? 0.016
-            : 0.01),
-    0.006,
-    0.03
+            ? 0.001
+            : 0.0008),
+    0.0008,
+    0.005
   )
   const canvasLightness = clamp(0.13 + (1 - surfaceRatio) * 0.008, 0.11, 0.16)
   const panelLightness = clamp(

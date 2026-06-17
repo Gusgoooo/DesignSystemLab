@@ -37,7 +37,7 @@ type OnboardingTourProps = {
   restartKey: number
 }
 
-const storageKey = "visual-system-lab:onboarding-tour:v1"
+const storageKey = "visual-system-lab:onboarding-tour:v2"
 const highlightPadding = 8
 const viewportMargin = 16
 const cardWidth = 344

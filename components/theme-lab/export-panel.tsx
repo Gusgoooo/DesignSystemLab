@@ -1,7 +1,8 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { CheckCircle2, MoreHorizontal } from "lucide-react"
+import type { CSSProperties } from "react"
+import { CheckCircle2, MoreHorizontal, X } from "lucide-react"
 import { exportAgentsThemeRulesFromOutput } from "../../lib/theme/export-agents"
 import { exportThemeAlgorithmFromOutput } from "../../lib/theme/export-algorithm"
 import { exportThemeCssFromOutput } from "../../lib/theme/export-css"
@@ -19,6 +20,7 @@ import { cn } from "../../lib/utils"
 import { Button } from "../ui/button"
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -56,7 +58,6 @@ type ImportModeOption = {
   id: ProjectImportMode
   title: string
   description: string
-  descriptionNote?: string
 }
 
 const importModeOptions: readonly ImportModeOption[] = [
@@ -68,12 +69,24 @@ const importModeOptions: readonly ImportModeOption[] = [
   {
     id: "one-shot-page-polish",
     title: "一次性优化页面",
-    description: "最小改造，只优化指定页面或组件，不写入长期规则。",
-    descriptionNote: "不优化其它页面样式和整体一致性",
+    description:
+      "最小改造，只优化指定页面或组件，不写入长期规则。不优化其它页面样式和整体一致性",
   },
 ]
 
 const defaultImportMode: ProjectImportMode = "persistent-project-contract"
+
+function getBlueprintDialogStyle(isDark: boolean): CSSProperties {
+  const baseStyle = getControlFloatingStyle(isDark)
+
+  return {
+    ...baseStyle,
+    background:
+      "radial-gradient(circle at 18% 10%, rgb(190 207 255 / 0.74) 0%, rgb(190 207 255 / 0.34) 22%, transparent 44%), radial-gradient(circle at 82% 6%, rgb(244 176 233 / 0.72) 0%, rgb(244 176 233 / 0.34) 24%, transparent 48%), radial-gradient(circle at 48% 18%, rgb(204 176 255 / 0.46) 0%, transparent 38%), linear-gradient(180deg, rgb(238 244 255) 0%, rgb(249 248 252) 44%, rgb(255 255 255) 78%)",
+    color: "rgb(23 23 23)",
+    maxHeight: "calc(100dvh - 32px)",
+  }
+}
 
 async function copyTextToClipboard(value: string): Promise<boolean> {
   try {
@@ -205,14 +218,28 @@ export function ExportPanel(props: ExportPanelProps) {
             导入到项目
           </Button>
           <DialogContent
-            className={`${props.isDark ? "dark " : ""}max-h-[min(90vh,680px)] gap-7 overflow-y-auto rounded-[28px] p-8 sm:max-w-4xl`}
-            style={getControlFloatingStyle(props.isDark)}
+            className={`${props.isDark ? "dark " : ""}gap-7 overflow-y-auto overscroll-contain rounded-[28px] border-white/70 bg-transparent p-6 sm:max-w-4xl sm:p-8`}
+            showCloseButton={false}
+            style={getBlueprintDialogStyle(props.isDark)}
           >
-            <DialogHeader className="gap-3 pr-8">
-              <DialogTitle className="text-3xl leading-tight">
-                导出 Theme Blueprint Prompt
-              </DialogTitle>
-              <DialogDescription className="text-sm leading-6">
+            <DialogHeader className="gap-3">
+              <div className="flex items-start justify-between gap-4">
+                <DialogTitle className="min-w-0 text-4xl leading-tight tracking-normal">
+                  导出 Theme Blueprint Prompt
+                </DialogTitle>
+                <DialogClose asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-11 w-11 shrink-0 rounded-full bg-white/45 text-neutral-700 shadow-none hover:bg-white/70 hover:text-neutral-950 focus-visible:ring-neutral-950/25"
+                    aria-label="关闭导出对话框"
+                  >
+                    <X className="size-5" aria-hidden="true" />
+                  </Button>
+                </DialogClose>
+              </div>
+              <DialogDescription className="text-base leading-7 text-neutral-600">
                 请选择应用方式
               </DialogDescription>
             </DialogHeader>
@@ -228,7 +255,7 @@ export function ExportPanel(props: ExportPanelProps) {
                     aria-pressed={selected}
                     data-state={selected ? "checked" : "unchecked"}
                     className={cn(
-                      "group relative min-h-[178px] overflow-hidden rounded-[24px] border border-border bg-card p-6 text-left text-card-foreground shadow-sm transition-[background-color,border-color,box-shadow,color,opacity,transform] duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                      "group relative min-h-[210px] overflow-hidden rounded-[24px] border border-border bg-card p-6 text-left text-card-foreground shadow-sm transition-[background-color,border-color,box-shadow,color,opacity,transform] duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                       "hover:-translate-y-px hover:border-border hover:bg-muted/30 hover:[box-shadow:var(--elevation-card)] active:translate-y-0",
                       "data-[state=checked]:translate-y-0 data-[state=checked]:border-primary data-[state=checked]:bg-card data-[state=checked]:ring-2 data-[state=checked]:ring-primary/15 data-[state=checked]:[box-shadow:var(--elevation-card)] data-[state=checked]:hover:translate-y-0 data-[state=checked]:hover:bg-card"
                     )}
@@ -243,17 +270,12 @@ export function ExportPanel(props: ExportPanelProps) {
                     >
                       <CheckCircle2 className="size-4" aria-hidden="true" />
                     </span>
-                    <span className="relative flex h-full min-h-[130px] flex-col">
+                    <span className="relative flex h-full min-h-[162px] flex-col">
                       <span className="min-w-0 text-pretty text-lg font-semibold leading-6">
                         {option.title}
                       </span>
-                      <span className="mt-4 block max-w-[20rem] break-words text-sm leading-6 text-muted-foreground">
-                        <span className="block">{option.description}</span>
-                        {option.descriptionNote ? (
-                          <span className="block">
-                            {option.descriptionNote}
-                          </span>
-                        ) : null}
+                      <span className="mt-4 block max-w-[24rem] text-sm leading-6 text-muted-foreground">
+                        {option.description}
                       </span>
                       <span className="mt-auto pt-6 text-sm font-medium leading-6 text-muted-foreground transition-colors group-data-[state=checked]:text-foreground">
                         {selected ? "已选择" : "点击选择"}
@@ -267,7 +289,7 @@ export function ExportPanel(props: ExportPanelProps) {
             {mode ? (
               <DialogFooter className="flex flex-col gap-3 sm:flex-col sm:items-stretch sm:justify-start">
                 <p className="text-sm leading-6 text-muted-foreground">
-                  复制指令到 Codex / Cursor / Claude Code 执行。
+                  复制指令到 Codex / Cursor / Claude Code / Qoder执行。
                 </p>
                 <Button
                   type="button"
