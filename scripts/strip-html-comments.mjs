@@ -9,6 +9,8 @@ import { dirname, join, relative, sep } from "node:path"
 // 不要删除 HTML 注释。React/Next 会用 <!--$--> / <!--/$--> 等注释节点
 // 标记 hydration 边界,删除后静态页能显示,但 Client Component 会部分失效。
 const OUT_DIR = "out"
+const WEBPACK_PUBLIC_PATH =
+  '(function(){var e=document.currentScript&&document.currentScript.src;if(!e){var t=document.querySelector(\'script[src*="/_next/static/chunks/webpack-"]\');e=t&&t.src}if(e){var r=e.indexOf("/_next/");if(r>=0)return e.slice(0,r+7)}return"/_next/"})()'
 
 function processHtml(path) {
   const relDir = relative(OUT_DIR, dirname(path))
@@ -28,9 +30,18 @@ function walk(dir) {
       walk(path)
     } else if (path.endsWith(".html")) {
       processHtml(path)
+    } else if (/\/webpack-[^/]+\.js$/.test(path)) {
+      processWebpackRuntime(path)
     }
   }
 }
 
+function processWebpackRuntime(path) {
+  const js = readFileSync(path, "utf8")
+  const nextJs = js.replace(/([A-Za-z_$][\w$]*\.p)="\/_next\/"/, `$1=${WEBPACK_PUBLIC_PATH}`)
+
+  writeFileSync(path, nextJs)
+}
+
 walk(OUT_DIR)
-console.log("Post-processed out/: preserved hydration comments + relativized /_next/ paths")
+console.log("Post-processed out/: preserved hydration comments + relativized /_next/ paths + runtime public path")

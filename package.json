@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "build:static": "npm run build",
-    "build:publish": "next build && node scripts/strip-html-comments.mjs",
+    "build:publish": "next build --webpack && node scripts/strip-html-comments.mjs && node scripts/verify-static-export.mjs",
     "postbuild": "node scripts/strip-html-comments.mjs && node scripts/verify-static-export.mjs",
     "typecheck": "tsc --noEmit"
   },

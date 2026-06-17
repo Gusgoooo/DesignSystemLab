@@ -34,6 +34,20 @@ function walkHtml(dir, files = []) {
   return files
 }
 
+function walkFiles(dir, matcher, files = []) {
+  for (const entry of readdirSync(dir)) {
+    const path = join(dir, entry)
+
+    if (statSync(path).isDirectory()) {
+      walkFiles(path, matcher, files)
+    } else if (matcher(path)) {
+      files.push(path)
+    }
+  }
+
+  return files
+}
+
 function isExternalRef(value) {
   return /^(?:https?:|mailto:|tel:|data:|blob:|#|javascript:)/i.test(value)
 }
@@ -118,6 +132,24 @@ if (rootRefs.length > 0) {
 
 if (missingRefs.length > 0) {
   fail("found href/src refs that do not resolve inside out/", missingRefs)
+}
+
+const webpackRuntimeFiles = walkFiles(
+  join(OUT_DIR, "_next", "static", "chunks"),
+  (path) => /\/webpack-[^/]+\.js$/.test(path)
+)
+const fixedRootPublicPath = []
+
+for (const file of webpackRuntimeFiles) {
+  const js = readFileSync(file, "utf8")
+
+  if (/\.p="\/_next\/"/.test(js)) {
+    fixedRootPublicPath.push(relative(OUT_DIR, file))
+  }
+}
+
+if (fixedRootPublicPath.length > 0) {
+  fail("found fixed root webpack publicPath values", fixedRootPublicPath)
 }
 
 console.log(
