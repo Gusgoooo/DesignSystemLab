@@ -929,13 +929,8 @@ export function SeedControlPanel(props: SeedControlPanelProps) {
       <div className="space-y-2.5 px-0.5">
         <div className="flex items-center justify-between gap-2.5">
           <div className="flex min-w-0 items-center gap-2">
-            <h1 className="min-w-0" aria-label="Visual System Lab">
-              <img
-                src="../visual-system-lab-logo.png"
-                alt=""
-                aria-hidden="true"
-                className="h-6 w-auto max-w-[190px] object-contain"
-              />
+            <h1 className="truncate text-lg font-extrabold leading-6 tracking-normal text-foreground">
+              Visual System Lab
             </h1>
           </div>
           <div className="flex items-center gap-1.5">

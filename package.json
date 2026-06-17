@@ -7,7 +7,7 @@
     "build": "next build",
     "build:static": "npm run build",
     "build:publish": "next build && node scripts/strip-html-comments.mjs",
-    "postbuild": "node scripts/strip-html-comments.mjs",
+    "postbuild": "node scripts/strip-html-comments.mjs && node scripts/verify-static-export.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
