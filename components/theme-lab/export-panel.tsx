@@ -46,7 +46,7 @@ type ExportPanelProps = {
 const exportButtons = [
   { id: "css", label: "复制 global CSS block" },
   { id: "manifest", label: "复制 theme-lab.json" },
-  { id: "rules", label: "复制 AGENTS 区块" },
+  { id: "rules", label: "复制 AI 指令区块" },
   { id: "preset", label: "复制完整 theme.preset.json" },
   { id: "vibe", label: "复制完整 vibe.json" },
   { id: "algorithm", label: "复制完整 theme.algorithm.ts" },

@@ -118,6 +118,43 @@ actions/buttons, filters/controls, page backgrounds, UI states, token system
 installation, token binding, product alignment, visual QA, completion
 compliance, and the rule router itself.
 
+## Design rule authoring
+
+Keep rule placement consistent:
+
+- The tool-native AI instruction file stores durable agent behavior, routing
+  policy, token contract boundaries, and rule authoring policy.
+- Detailed component, block, pattern, token, or QA rules live in dedicated
+  `design-rules/**/*.md` files.
+- `design-rules/index.json` registers every rule with `source`,
+  `requiredAlways`, and `appliesTo`.
+- Exported prompts should route to local files or raw GitHub URLs instead of
+  embedding long rule bodies.
+- Do not add detailed rules to the import dialog UI.
+
+When adding a new rule, update the dedicated rule file, `design-rules/index.json`,
+the export manifest/list if needed, and only add a short routing or authoring
+note to the tool-native AI instruction file. Do not expand it into a
+component-rule handbook.
+
+## AI instruction targets
+
+Use the target tool's native instruction file when installing Theme Lab guidance:
+
+- Claude Code: `CLAUDE.md`
+- Codex and generic coding agents: `AGENTS.md`
+- Cursor: `.cursor/rules/theme-lab.mdc` when Cursor rules exist; otherwise
+  `AGENTS.md` is acceptable for cross-agent compatibility.
+- GitHub Copilot: `.github/copilot-instructions.md`
+- Gemini CLI: `GEMINI.md`
+- Windsurf/Cascade: `.windsurfrules`
+- Qoder: `AGENTS.md` is compatible; native Qoder rules may override it.
+
+Do not create every supported instruction file by default. Detect the target AI
+tool or existing instruction files first, then update the matching native file.
+Create multiple instruction files only when the user explicitly requests
+multi-tool compatibility.
+
 ## Token architecture
 
 Use this chain:

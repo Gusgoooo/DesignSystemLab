@@ -1,4 +1,8 @@
-import { themeLabAiCodingRules, themeLabDesignRuleLibrary } from "./export-json"
+import {
+  themeLabAiCodingRules,
+  themeLabAiInstructionTargets,
+  themeLabDesignRuleLibrary,
+} from "./export-json"
 import type { ThemeOutput } from "./schema"
 
 function codeList(values: readonly string[]): string {
@@ -11,6 +15,15 @@ function markdownList(values: readonly string[]): string {
 
 function designRuleFileList(): string {
   return themeLabDesignRuleLibrary.files.map((value) => `- \`${value}\``).join("\n")
+}
+
+function aiInstructionTargetList(): string {
+  return themeLabAiInstructionTargets
+    .map((target) => {
+      const fallback = "fallbackFile" in target ? `; fallback: \`${target.fallbackFile}\`` : ""
+      return `- ${target.tool}: \`${target.primaryFile}\`${fallback}`
+    })
+    .join("\n")
 }
 
 function userDesignRulesSection(userDesignRules?: string): string {
@@ -87,6 +100,26 @@ Distributed design rule router:
 Known rule files:
 
 ${designRuleFileList()}
+
+AI instruction targets:
+
+Use the target tool's native instruction file for this Theme Lab section:
+
+${aiInstructionTargetList()}
+
+Do not create every supported instruction file by default. Detect the target AI
+tool or existing instruction files first, then update the matching native file.
+Create multiple instruction files only when the user explicitly requests
+multi-tool compatibility.
+
+Design rule authoring policy:
+
+- The tool-native AI instruction file stores durable agent behavior, routing policy, token contract boundaries, and rule authoring policy.
+- Detailed component, block, pattern, token, or QA rules live in dedicated \`design-rules/**/*.md\` files.
+- \`design-rules/index.json\` registers every rule with \`source\`, \`requiredAlways\`, and \`appliesTo\`.
+- Exported prompts should route to local files or raw GitHub URLs instead of embedding long rule bodies.
+- Do not add detailed rules to the import dialog UI.
+- When adding a new rule, update the dedicated rule file, \`design-rules/index.json\`, and the export manifest/list if needed. Add only a short routing or authoring note to the tool-native AI instruction file.
 
 UI normalization rule:
 

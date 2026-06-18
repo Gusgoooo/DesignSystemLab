@@ -51,6 +51,45 @@ export const themeLabDesignRuleLibrary = {
   ],
 } as const
 
+export const themeLabAiInstructionTargets = [
+  {
+    tool: "Claude Code",
+    primaryFile: "CLAUDE.md",
+    notes: "Use for Claude Code project memory and persistent project instructions.",
+  },
+  {
+    tool: "OpenAI Codex",
+    primaryFile: "AGENTS.md",
+    notes: "Codex reads AGENTS.md for repository guidance.",
+  },
+  {
+    tool: "Cursor",
+    primaryFile: ".cursor/rules/theme-lab.mdc",
+    fallbackFile: "AGENTS.md",
+    notes: "Use Cursor project rules when present; AGENTS.md is acceptable for cross-agent compatibility.",
+  },
+  {
+    tool: "GitHub Copilot",
+    primaryFile: ".github/copilot-instructions.md",
+    notes: "Use repository-wide Copilot custom instructions.",
+  },
+  {
+    tool: "Gemini CLI",
+    primaryFile: "GEMINI.md",
+    notes: "Use Gemini CLI context files.",
+  },
+  {
+    tool: "Windsurf/Cascade",
+    primaryFile: ".windsurfrules",
+    notes: "Use Windsurf project rules when the project already uses Windsurf.",
+  },
+  {
+    tool: "Qoder",
+    primaryFile: "AGENTS.md",
+    notes: "Qoder is compatible with AGENTS.md; native Qoder rules may take precedence.",
+  },
+] as const
+
 export const themeLabTokenContract = {
   allowed: [
     "bg-background",
@@ -202,7 +241,9 @@ export const themeLabAiCodingRules = [
   "In horizontal control rows, keep filters, search, tabs, view switches, status switches, sort, and date ranges left-aligned; keep operation buttons such as create, export, refresh, save, apply, delete, and bulk actions right-aligned on desktop.",
   "Do not mix visibly different heights for TabsList, TabsTrigger, Input, SelectTrigger, Button, DropdownMenuTrigger, and date range triggers in the same toolbar unless the controls belong to separate visual regions.",
   "When card or table UI is present, the final report must list the exact local rule file or raw GitHub URL opened for the card/table rule.",
-  "For long-term projects, land the persistent token contract through exactly the three default touchpoints: existing global CSS token block, theme-lab.json, and AGENTS.md Theme Lab section.",
+  "For long-term projects, land the persistent token contract through exactly the three conceptual touchpoints: existing global CSS token block, theme-lab.json, and the target tool's native AI instruction file.",
+  "Resolve the AI instruction target by tool: Claude Code uses CLAUDE.md; Codex and generic agents use AGENTS.md; Cursor uses .cursor/rules/theme-lab.mdc when Cursor rules exist; GitHub Copilot uses .github/copilot-instructions.md; Gemini CLI uses GEMINI.md; Windsurf uses .windsurfrules; Qoder can use AGENTS.md.",
+  "Do not create every supported AI instruction file by default; update the detected or requested tool-native file, and create multiple instruction files only when the user explicitly requests multi-tool compatibility.",
   "Do not create or update local design-rules/ files by default; read distributed rules from raw GitHub URLs unless the user explicitly asks to install the rule library locally.",
   "For one-shot selected-scope optimization, create or reuse a minimal but complete token bridge covering surfaces, foregrounds, borders, focus rings, radius, density, elevation, states, and motion for the changed UI.",
   "Do not ship partial token setup such as primary/background only; incomplete token systems cause invisible text, mismatched radius, unsafe focus states, and inconsistent cards.",
@@ -280,6 +321,7 @@ export function exportThemeLabManifestJsonFromOutput(
         : undefined,
       aiCoding: {
         defaultProjectMode: "existing-product-project",
+        instructionTargets: themeLabAiInstructionTargets,
         rules: themeLabAiCodingRules,
       },
     },

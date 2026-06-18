@@ -18,7 +18,18 @@ Required persistent touchpoints:
 
 - existing global CSS theme block
 - `theme-lab.json`
-- `AGENTS.md` Theme Lab section
+- tool-native AI instruction file Theme Lab section
+
+Use the target tool's native AI instruction file:
+
+- Claude Code: `CLAUDE.md`
+- Codex and generic coding agents: `AGENTS.md`
+- Cursor: `.cursor/rules/theme-lab.mdc` when Cursor rules exist; otherwise
+  `AGENTS.md` is acceptable for cross-agent compatibility
+- GitHub Copilot: `.github/copilot-instructions.md`
+- Gemini CLI: `GEMINI.md`
+- Windsurf/Cascade: `.windsurfrules`
+- Qoder: `AGENTS.md` is compatible; native Qoder rules may override it
 
 `design-rules/` is a rule reference library, not part of the default persistent
 theme contract. Read rule files from local `design-rules/` only when the target
@@ -29,7 +40,7 @@ Only create or update local `design-rules/` files when the user explicitly asks
 to install the rule library into the project.
 
 The persistent contract is incomplete if `theme-lab.json` exists but the global
-CSS variables or AGENTS Theme Lab section are missing.
+CSS variables or tool-native AI instruction section are missing.
 
 ## One-Shot Token Bridge
 

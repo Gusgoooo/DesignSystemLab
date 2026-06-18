@@ -3,6 +3,7 @@ import { exportThemeCssFromOutput } from "./export-css"
 import {
   exportVibeJsonFromOutput,
   themeLabAiCodingRules,
+  themeLabAiInstructionTargets,
   themeLabDesignRuleLibrary,
   themeLabTokenContract,
 } from "./export-json"
@@ -46,6 +47,35 @@ function markdownList(values: readonly string[]): string {
 
 function codeList(values: readonly string[]): string {
   return values.map((value) => `- \`${value}\``).join("\n")
+}
+
+function aiInstructionTargetList(): string {
+  return themeLabAiInstructionTargets
+    .map((target) => {
+      const fallback = "fallbackFile" in target ? `; fallback: \`${target.fallbackFile}\`` : ""
+      return `- ${target.tool}: \`${target.primaryFile}\`${fallback}`
+    })
+    .join("\n")
+}
+
+function aiInstructionTargetResolverSection(): string {
+  return `## AI Instruction Target Resolver
+
+The third persistent Theme Lab touchpoint is the target tool's native AI instruction file, not always \`AGENTS.md\`.
+
+Use this mapping:
+
+${aiInstructionTargetList()}
+
+Resolution rules:
+
+1. If the user names a target AI tool, use that tool's native instruction file.
+2. If the target project already has one of the supported instruction files, update that existing file.
+3. If multiple supported instruction files already exist, update each existing file with the same concise Theme Lab section unless the user asks to target only one tool.
+4. If the target tool is unknown and no supported instruction file exists, use \`AGENTS.md\` as the cross-agent fallback.
+5. Do not create every supported instruction file by default. Create multiple instruction files only when the user explicitly requests multi-tool compatibility.
+
+The content should remain the same concise Theme Lab section. Only the filename/location changes by tool.`
 }
 
 function runtimeCssBlock(theme: ThemeOutput): string {
@@ -443,7 +473,7 @@ This is the no-persistence option for improving one page or component without ch
 
 File strategy:
 - Do not create \`theme-lab.json\`.
-- Do not create or update \`AGENTS.md\`.
+- Do not create or update any AI instruction file such as \`AGENTS.md\`, \`CLAUDE.md\`, \`GEMINI.md\`, \`.cursor/rules/*.mdc\`, or \`.github/copilot-instructions.md\`.
 - Do not create or update \`design-rules\` files unless the user explicitly provides the exported rule package for this task.
 - Do not create \`theme.seed.json\`.
 - Do not create \`vibe.manifest.json\`.
@@ -477,7 +507,7 @@ Start with the persistent project contract:
 
 1. Existing global CSS theme block
 2. \`theme-lab.json\`
-3. \`AGENTS.md\` Theme Lab section
+3. Target tool's native AI instruction file Theme Lab section
 
 Then install or update the distributed design rule library when a rule package is provided:
 
@@ -527,7 +557,7 @@ For theme persistence, create or update exactly these persistent touchpoints:
 
 1. Existing global CSS theme block
 2. \`theme-lab.json\`
-3. \`AGENTS.md\` Theme Lab section
+3. Target tool's native AI instruction file Theme Lab section
 
 The "exactly three persistent touchpoints" rule applies to the Theme Lab
 contract. The distributed \`design-rules/\` library is a separate rule reference
@@ -543,7 +573,9 @@ landed:
 
 - global CSS runtime token block in the existing global CSS file
 - \`theme-lab.json\`
-- \`AGENTS.md\` Theme Lab section
+- target tool's native AI instruction file Theme Lab section
+
+${aiInstructionTargetResolverSection()}
 
 Do not create additional theme files unless the user explicitly requests the full reproducible package.
 
@@ -555,7 +587,7 @@ Global CSS marker:
 /* theme-lab:runtime:end */
 \`\`\`
 
-AGENTS.md marker:
+AI instruction file marker:
 
 \`\`\`md
 <!-- theme-lab:agents:start -->
@@ -572,7 +604,10 @@ Use the stable three-file contract:
 
 1. Runtime CSS variables in the existing global CSS file.
 2. \`theme-lab.json\` at the project root.
-3. \`AGENTS.md\` Theme Lab section.
+3. Target tool's native AI instruction file Theme Lab section.
+   - Use \`CLAUDE.md\` for Claude Code.
+   - Use \`AGENTS.md\` for Codex, Qoder, and generic agents.
+   - Use the AI Instruction Target Resolver for Cursor, Copilot, Gemini, and Windsurf.
 
 Use the distributed design-rule library separately:
 
@@ -1072,7 +1107,7 @@ Read the token-system rule before editing token-bearing UI:
 Token availability:
 
 - First check whether the project already exposes matching shadcn/theme CSS variables such as \`--radius\`, \`--radius-card\`, \`--radius-control\`, \`--background\`, \`--card\`, \`--border\`, \`--ring\`, and elevation variables.
-- If the needed Theme Lab variables are missing, add the smallest complete runtime CSS variable bridge to the existing global CSS file or existing theme layer. This one-shot bridge may use the provided runtime CSS variables, but do not create \`theme-lab.json\`, \`AGENTS.md\`, prompt files, or a new design-system folder.
+- If the needed Theme Lab variables are missing, add the smallest complete runtime CSS variable bridge to the existing global CSS file or existing theme layer. This one-shot bridge may use the provided runtime CSS variables, but do not create \`theme-lab.json\`, any AI instruction file, prompt files, or a new design-system folder.
 - If the target project already has a compatible token system, map the Theme Lab values into that system instead of inventing new values.
 
 Mandatory token audit after normalization:
@@ -1163,7 +1198,7 @@ ${runtimeCssBlock(theme)}
 ${projectImportManifestJson(theme, options.userDesignRules)}
 \`\`\`
 
-\`AGENTS.md\` Theme Lab section content:
+Target AI instruction file Theme Lab section content:
 \`\`\`md
 ${agentsMarkerBlock(options.userDesignRules)}
 \`\`\`
@@ -1258,7 +1293,7 @@ If no selected scope is provided, inspect the project and ask for a route, page,
 Do not:
 
 - create or update \`theme-lab.json\`
-- create or update \`AGENTS.md\`
+- create or update any AI instruction file such as \`AGENTS.md\`, \`CLAUDE.md\`, \`GEMINI.md\`, \`.cursor/rules/*.mdc\`, or \`.github/copilot-instructions.md\`
 - create \`theme.seed.json\`
 - create \`vibe.manifest.json\`
 - create \`theme.algorithm.ts\`
@@ -1490,7 +1525,7 @@ Do not treat this prompt as the source of truth. The source of truth is the Them
 - algorithmVersion = deterministic generation reference.
 - theme.css / global CSS variables = runtime styling source.
 - vibe manifest = visual guidance, not CSS source.
-- \`AGENTS.md\` = persistent AI coding rules when installed.
+- target tool's native AI instruction file = persistent AI coding rules when installed.
 - \`design-rules/index.json\` = distributed design rule router when installed.
 - matched \`design-rules/**/*.md\` files = detailed component and pattern rules.
 
@@ -1733,7 +1768,7 @@ ${isProductWideTask ? `1. Inspect project structure, route inventory, component 
 6. Detect components/blocks inside each page type: sidebar, page heading, cards, tables, actions, filters, forms, dialogs/sheets, states, and page canvas.
 7. Open only matched component/pattern rule files from local files or raw GitHub URLs.
 8. Install or update the persistent Theme Lab contract using exactly the three default touchpoints.
-9. Build the token-system plan from \`design-rules/core/token-system.md\` or its raw GitHub URL; verify global CSS, \`theme-lab.json\`, AGENTS, and semantic tokens are complete. Do not install local \`design-rules/\` unless explicitly requested.
+9. Build the token-system plan from \`design-rules/core/token-system.md\` or its raw GitHub URL; verify global CSS, \`theme-lab.json\`, the target AI instruction file, and semantic tokens are complete. Do not install local \`design-rules/\` unless explicitly requested.
 10. Create a product-wide normalization plan and Design Rule Checks for relevant page types.
 11. Define the existing app shell and cross-page layout grammar to preserve before editing pages.
 12. Extract business logic, API calls, data contracts, handlers, validation, permissions, and state from existing pages.
