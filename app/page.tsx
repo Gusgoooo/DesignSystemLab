@@ -31,7 +31,7 @@ export default function HomePage() {
           </p>
           <a
             className="mt-8 inline-flex h-[var(--control-height-lg)] w-fit items-center rounded-[var(--radius-control)] bg-foreground px-6 text-sm font-medium text-background transition-colors hover:bg-foreground/90"
-            href="./theme-lab/index.html"
+            href="./theme-lab/"
           >
             打开主题实验室
           </a>

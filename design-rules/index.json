@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "name": "Theme Lab Distributed Design Rules",
+  "basePath": "design-rules",
+  "routing": {
+    "instruction": "Read this index first. Load requiredAlways rules, inventory the selected UI by element type, then load only matched rule files from source.",
+    "missingRuleBehavior": "If no rule matches an element, make the smallest safe normalization with existing project components and Theme Lab tokens, then report the missing rule.",
+    "priorityOrder": [
+      "user-authored project rules",
+      "matched design-rules source files",
+      "existing local product patterns",
+      "generic UI judgment"
+    ]
+  },
+  "rules": [
+    {
+      "id": "rule-router",
+      "title": "Rule Router",
+      "source": "design-rules/core/rule-router.md",
+      "requiredAlways": true,
+      "appliesTo": ["all ui work", "rule selection", "design rule routing"]
+    },
+    {
+      "id": "ui-normalization",
+      "title": "UI Normalization",
+      "source": "design-rules/core/ui-normalization.md",
+      "requiredAlways": true,
+      "appliesTo": ["redesign", "optimize", "refactor", "selected scope", "product ui"]
+    },
+    {
+      "id": "token-binding",
+      "title": "Theme Lab Token Binding",
+      "source": "design-rules/core/token-binding.md",
+      "requiredAlways": true,
+      "appliesTo": ["tokens", "colors", "radius", "shadow", "focus", "state", "theme"]
+    },
+    {
+      "id": "visual-qa",
+      "title": "Visual QA Gate",
+      "source": "design-rules/core/visual-qa.md",
+      "requiredAlways": true,
+      "appliesTo": ["final qa", "visual review", "before after"]
+    },
+    {
+      "id": "product-alignment",
+      "title": "Product Alignment",
+      "source": "design-rules/core/product-alignment.md",
+      "requiredAlways": false,
+      "appliesTo": ["long-term project", "product-wide", "layout consistency", "app shell"]
+    },
+    {
+      "id": "card",
+      "title": "Cards",
+      "source": "design-rules/components/card.md",
+      "requiredAlways": false,
+      "appliesTo": ["card", "clickable card", "metric card", "summary card", "preview card"]
+    },
+    {
+      "id": "table",
+      "title": "Tables",
+      "source": "design-rules/components/table.md",
+      "requiredAlways": false,
+      "appliesTo": ["table", "data table", "table row", "list table", "grid"]
+    },
+    {
+      "id": "page-heading",
+      "title": "Page Headings",
+      "source": "design-rules/components/page-heading.md",
+      "requiredAlways": false,
+      "appliesTo": ["page heading", "page header", "title action bar", "resource header", "detail header", "list header"]
+    },
+    {
+      "id": "sidebar",
+      "title": "Sidebars",
+      "source": "design-rules/components/sidebar.md",
+      "requiredAlways": false,
+      "appliesTo": ["sidebar", "app navigation", "navigation rail", "side navigation", "app shell"]
+    },
+    {
+      "id": "actions-and-buttons",
+      "title": "Actions And Buttons",
+      "source": "design-rules/components/actions-and-buttons.md",
+      "requiredAlways": false,
+      "appliesTo": ["button", "action", "action group", "primary action", "secondary action", "toolbar"]
+    },
+    {
+      "id": "filters-and-controls",
+      "title": "Filters And Controls",
+      "source": "design-rules/components/filters-and-controls.md",
+      "requiredAlways": false,
+      "appliesTo": ["filter", "search", "sort", "view control", "segmented control", "date range"]
+    },
+    {
+      "id": "page-background",
+      "title": "Page Background",
+      "source": "design-rules/patterns/page-background.md",
+      "requiredAlways": false,
+      "appliesTo": ["page canvas", "page background", "top ambient wash", "global content backdrop"]
+    },
+    {
+      "id": "states",
+      "title": "UI States",
+      "source": "design-rules/patterns/states.md",
+      "requiredAlways": false,
+      "appliesTo": ["empty state", "loading state", "error state", "success state", "disabled state", "selected state", "hover", "focus"]
+    }
+  ]
+}
