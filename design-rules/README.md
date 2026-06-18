@@ -43,7 +43,9 @@ say so instead of pretending the card rule was applied.
 
 ## Rule Families
 
-- `core`: execution boundaries, token binding, product alignment, visual QA.
+- `core`: execution boundaries, token system installation, token binding,
+  product alignment, visual QA, and completion compliance.
+- `blocks`: page-level compositions such as page shells and standard dashboards.
 - `components`: cards, tables, page headings, sidebars, buttons/actions, filters.
 - `patterns`: page backgrounds and UI states.
 

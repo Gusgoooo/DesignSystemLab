@@ -13,6 +13,19 @@ Each scope should have a clear action hierarchy:
 
 Primary actions should be easy to find but not visually noisy.
 
+## Buttons Are Actions, Not Single-Select Controls
+
+Do not use a row of `Button` components to represent a single selected option.
+
+Invalid pattern:
+
+- selected option = primary button
+- unselected options = secondary, outline, or ghost buttons
+
+Use shadcn `Tabs` for single-select view, filter, mode, status, period, or
+section switching. Keep `Button` components for commands that perform actions,
+such as create, save, export, delete, refresh, open, submit, or cancel.
+
 ## Token Pairs
 
 Filled buttons and filled action states must use matching foreground tokens:

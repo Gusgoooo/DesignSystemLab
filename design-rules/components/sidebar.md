@@ -18,6 +18,39 @@ Do not polish only the main content while leaving an old bespoke sidebar beside 
 
 For one-page optimization, replace or normalize the full sidebar used by that page as part of the same task.
 
+## Confirmation Rule
+
+Do not ask an open-ended heuristic question such as "Should I also update the
+sidebar?" when a sidebar is detected.
+
+Default behavior:
+
+- include the sidebar in the normalization plan automatically
+- state that the sidebar is included because the selected scope contains it
+- include a direct confirmation line in the execution plan
+- ask for confirmation of the full plan only through that direct confirmation
+  line when the environment or user workflow requires approval before editing
+
+The execution plan must include this shape:
+
+```md
+Direct Confirmation:
+The selected scope contains a sidebar, so sidebar normalization/replacement is
+included by default. Please confirm the full plan if you want me to proceed.
+```
+
+Use direct confirmation language, not exploratory language:
+
+```txt
+I found a sidebar in the selected scope, so the plan includes sidebar
+normalization/replacement according to the sidebar rule. Please confirm this
+plan if you want me to proceed.
+```
+
+If the user already asked the agent to implement the change and the environment
+does not require an approval step, proceed with the sidebar included. Do not
+pause only to ask whether the sidebar should be part of the scope.
+
 ## Inspect First
 
 Before replacement, inspect:

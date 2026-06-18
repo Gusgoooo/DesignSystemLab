@@ -54,6 +54,49 @@ Before editing, identify the top three UI problems in scope:
 
 Then normalize specifically to solve those problems.
 
+## UI/UX Quality Rules
+
+Before applying tokens, make the screen easier to understand.
+
+Every normalized screen should make these things clear:
+
+- where the user is
+- what the page is about
+- what changed or needs attention
+- what the primary action is
+- what secondary actions are available
+- what state the data is in
+- what the user can safely ignore
+
+Design for progressive exploration:
+
+- show summary before detail
+- expose enough preview information before requiring a click
+- group related controls near the content they affect
+- keep destructive or rare actions visually quieter until needed
+- use tables and cards as entry points into deeper information, not as isolated decoration
+- make loading, empty, error, disabled, selected, hover, and focus states feel like part of the same component system
+
+Use hierarchy deliberately:
+
+- one dominant page heading
+- one clear primary action per workflow region
+- compact metadata below or beside titles
+- stronger text for object identity
+- muted text for helper context
+- badges only for real status, type, priority, or state
+- icons only when they speed recognition or clarify action meaning
+
+Avoid:
+
+- equal visual weight for every block
+- action bars with too many loud buttons
+- cards that contain only icon + title + generic description
+- tables that expose every database field at once
+- filters far away from the data they affect
+- nested cards or panel-inside-panel layouts
+- adding decoration to compensate for weak information design
+
 ## Invalid Outcomes
 
 - only swapping raw values for tokens

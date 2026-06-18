@@ -35,6 +35,13 @@
       "appliesTo": ["tokens", "colors", "radius", "shadow", "focus", "state", "theme"]
     },
     {
+      "id": "token-system",
+      "title": "Token System Installation",
+      "source": "design-rules/core/token-system.md",
+      "requiredAlways": true,
+      "appliesTo": ["token system", "theme bridge", "theme-lab.json", "one-shot token bridge", "persistent theme contract"]
+    },
+    {
       "id": "visual-qa",
       "title": "Visual QA Gate",
       "source": "design-rules/core/visual-qa.md",
@@ -42,11 +49,56 @@
       "appliesTo": ["final qa", "visual review", "before after"]
     },
     {
+      "id": "completion-compliance",
+      "title": "Completion Compliance Gate",
+      "source": "design-rules/core/completion-compliance.md",
+      "requiredAlways": true,
+      "appliesTo": ["completion", "compliance", "final report", "done criteria", "qa gate"]
+    },
+    {
       "id": "product-alignment",
       "title": "Product Alignment",
       "source": "design-rules/core/product-alignment.md",
       "requiredAlways": false,
       "appliesTo": ["long-term project", "product-wide", "layout consistency", "app shell"]
+    },
+    {
+      "id": "page-shell",
+      "title": "Page Shell And Layout",
+      "source": "design-rules/blocks/page-shell.md",
+      "requiredAlways": false,
+      "appliesTo": [
+        "page shell",
+        "page layout",
+        "app shell",
+        "route layout",
+        "authenticated product shell",
+        "management page",
+        "detail page",
+        "settings page",
+        "form page",
+        "crud flow",
+        "auth page",
+        "onboarding",
+        "tool page"
+      ]
+    },
+    {
+      "id": "dashboard",
+      "title": "Dashboard Block",
+      "source": "design-rules/blocks/dashboard.md",
+      "requiredAlways": false,
+      "appliesTo": [
+        "dashboard",
+        "standard dashboard",
+        "analytics overview",
+        "admin home",
+        "reporting workspace",
+        "operations cockpit",
+        "product console",
+        "dashboard page",
+        "dashboard shell"
+      ]
     },
     {
       "id": "card",
@@ -88,7 +140,21 @@
       "title": "Filters And Controls",
       "source": "design-rules/components/filters-and-controls.md",
       "requiredAlways": false,
-      "appliesTo": ["filter", "search", "sort", "view control", "segmented control", "date range"]
+      "appliesTo": [
+        "filter",
+        "search",
+        "sort",
+        "view control",
+        "segmented control",
+        "single select",
+        "single-select",
+        "mode switch",
+        "status switch",
+        "status filter",
+        "period switch",
+        "tabs",
+        "date range"
+      ]
     },
     {
       "id": "page-background",

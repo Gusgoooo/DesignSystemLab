@@ -112,9 +112,11 @@ Do not compress all UI rules into a single prompt. Before UI normalization:
 6. Apply matched rules before generic UI judgment.
 7. If no rule matches, keep changes conservative and report the missing rule.
 
-The distributed rule library currently covers cards, tables, page headings,
-sidebars, actions/buttons, filters/controls, page backgrounds, UI states, token
-binding, product alignment, visual QA, and the rule router itself.
+The distributed rule library currently covers page shell/layout routing,
+standard dashboard blocks, cards, tables, page headings, sidebars,
+actions/buttons, filters/controls, page backgrounds, UI states, token system
+installation, token binding, product alignment, visual QA, completion
+compliance, and the rule router itself.
 
 ## Token architecture
 

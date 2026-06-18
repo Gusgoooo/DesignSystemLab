@@ -34,6 +34,12 @@ const taskLabels: Record<ProjectImportTask, string> = {
   "visual-review": "Visual review only",
 }
 
+const modeLabels: Record<ProjectImportMode, string> = {
+  "one-shot-page-polish": "One-shot selected-scope UI normalization",
+  "persistent-project-contract": "Persistent project visual contract",
+  "full-reproducible-package": "Full reproducible Theme Lab package",
+}
+
 function markdownList(values: readonly string[]): string {
   return values.map((value) => `- ${value}`).join("\n")
 }
@@ -46,6 +52,24 @@ function runtimeCssBlock(theme: ThemeOutput): string {
   return `/* theme-lab:runtime:start */
 ${exportThemeCssFromOutput(theme)}
 /* theme-lab:runtime:end */`
+}
+
+function promptRouteSection(
+  options: ProjectImportPromptOptions,
+  targetScope: string,
+  promptTemplate: string
+): string {
+  return `## Prompt Route
+
+Use this section as the explicit task-router record before editing.
+
+- promptTemplate: \`${promptTemplate}\`
+- selectedMode: \`${options.mode}\` (${modeLabels[options.mode]})
+- selectedTask: \`${options.task}\` (${taskLabels[options.task]})
+- targetScope: \`${targetScope || "(not provided)"}\`
+- designRuleRouter: \`${themeLabDesignRuleLibrary.entrypoint}\`
+- designRuleRawRouter: ${themeLabDesignRuleLibrary.rawEntrypoint}
+- ruleLoading: detect page structure first, read requiredAlways rules, open matched page-structure/block rules, then open matched component/pattern/token rules from local files or raw GitHub URLs`
 }
 
 const oneShotThemeTokenNames = [
@@ -198,25 +222,43 @@ function designRuleFileList(): string {
   return codeList(themeLabDesignRuleLibrary.files)
 }
 
+function designRuleRawUrl(file: string): string {
+  return `${themeLabDesignRuleLibrary.rawBaseUrl}/${file}`
+}
+
+function designRuleRawFileList(): string {
+  return themeLabDesignRuleLibrary.files
+    .map((value) => `- \`${value}\` -> ${designRuleRawUrl(value)}`)
+    .join("\n")
+}
+
 function designRuleFileRouterSection(): string {
   return `## Distributed Design Rule Router
 
-Design rules live in separate files. Do not compress them into this prompt.
+This prompt is a detector and router. Detailed design rules live in separate
+files. Do not compress component, block, page-structure, or token-system rules
+into this prompt.
 
 Rule library entrypoint:
 
 - \`design-rules/index.json\`
+- Raw GitHub fallback: ${themeLabDesignRuleLibrary.rawEntrypoint}
 
 Routing workflow:
 
 1. Read \`design-rules/index.json\` if it exists.
-2. Load every rule marked \`requiredAlways\`.
-3. Inventory the selected UI scope by element type: page heading, sidebar, cards, tables, actions, filters, forms, states, and page canvas.
-4. Match each element type against \`rules[].appliesTo\`.
-5. Open only the matched files from \`rules[].source\`.
-6. Apply matched rules before generic UI judgment.
-7. If a needed rule file is missing, keep the change conservative and report the missing rule file.
-8. Do not load unrelated rule files unless the user asks for a full rule audit.
+   - If local files are not available, read ${themeLabDesignRuleLibrary.rawEntrypoint}.
+2. Load every rule marked \`requiredAlways\`, including token-system, token-binding, visual QA, and completion compliance.
+3. Detect page structure first: app shell, dashboard, index/table, detail page, settings, form/CRUD, auth, onboarding, tool page, or other product surface.
+4. Open the matched page-structure/block rule first, such as \`design-rules/blocks/page-shell.md\` or \`design-rules/blocks/dashboard.md\`.
+5. Inventory components and blocks inside that structure: page heading, sidebar, cards, tables, actions, filters, forms, dialogs/sheets, states, and page canvas.
+6. Match each element type against \`rules[].appliesTo\`.
+7. Open only the matched files from \`rules[].source\`, using local files first or the corresponding raw GitHub URL when local files are unavailable.
+8. Build the token system plan from \`design-rules/core/token-system.md\` before changing token-bearing UI.
+9. Apply matched rules before generic UI judgment.
+10. Before final response, verify completion with \`design-rules/core/completion-compliance.md\`.
+11. If a needed rule file is missing, keep the change conservative and report the missing rule file.
+12. Do not load unrelated rule files unless the user asks for a full rule audit.
 
 Rule Read Confirmation is mandatory before editing:
 
@@ -226,10 +268,17 @@ Rule Read Confirmation is mandatory before editing:
   "requiredRuleFilesLoaded": [
     "design-rules/core/rule-router.md",
     "design-rules/core/ui-normalization.md",
+    "design-rules/core/token-system.md",
     "design-rules/core/token-binding.md",
-    "design-rules/core/visual-qa.md"
+    "design-rules/core/visual-qa.md",
+    "design-rules/core/completion-compliance.md"
   ],
   "matchedRuleFilesLoaded": [
+    {
+      "elementType": "page-shell",
+      "source": "design-rules/blocks/page-shell.md",
+      "firstHeading": "Page Shell And Layout"
+    },
     {
       "elementType": "card",
       "source": "design-rules/components/card.md",
@@ -242,9 +291,19 @@ Rule Read Confirmation is mandatory before editing:
 
 If the selected scope contains cards, \`design-rules/components/card.md\` must be opened and listed before card UI is changed. If a rule file cannot be opened, do not claim the rule was applied. Ask the user to provide the local rule files or raw file URLs, or continue conservatively and report the missing file when the task allows it.
 
+If the selected scope changes page structure, \`design-rules/blocks/page-shell.md\` must be opened and listed before page-shell/layout UI is changed.
+
+If the task installs, bridges, or audits Theme Lab tokens, \`design-rules/core/token-system.md\` must be opened and listed before token-bearing UI is changed.
+
+Before final response, \`design-rules/core/completion-compliance.md\` must be opened and used as the completion gate.
+
 Known rule files:
 
 ${designRuleFileList()}
+
+Raw GitHub rule URLs:
+
+${designRuleRawFileList()}
 
 User-authored rules in this task are still highest priority. The distributed files are the reusable project rule library.`
 }
@@ -397,8 +456,15 @@ File strategy:
 - Reconnect existing APIs, data loaders, mutations, handlers, validation, and state after normalizing the UI.
 - If no selected scope is provided, stop after project inspection and ask the user for a target scope.
 
+Token strategy:
+- Create or reuse the smallest complete token bridge required for the selected scope.
+- The bridge must cover every touched token family: surfaces, foregrounds, borders, focus rings, radius, control height, spacing/density, elevation, states, and motion.
+- Do not ship a partial bridge with only primary/background colors.
+- Use \`design-rules/core/token-system.md\` or its raw GitHub URL to build the token plan.
+- Keep the bridge compatible with future optimization, so later pages can reuse the same semantic token names instead of inventing new values.
+
 Tradeoff:
-This option avoids persistent Theme Lab files. If \`design-rules/index.json\` already exists, read matched rule files. If it does not exist, use the rules in this task packet and report that the distributed rule library is missing.`
+This option avoids persistent Theme Lab files. If \`design-rules/index.json\` already exists, read matched rule files. If it does not exist, read the raw GitHub rule index and matched raw rule URLs from this prompt.`
   }
 
   if (mode === "full-reproducible-package") {
@@ -466,6 +532,17 @@ For theme persistence, create or update exactly these persistent touchpoints:
 The "exactly three persistent touchpoints" rule only applies to theme contract files. The distributed \`design-rules/\` library is a separate design-rule reference package, not a theme contract file. UI normalization may modify existing route, layout, app shell, and component files after the normalization plan identifies them as part of the product-wide alignment.
 
 Do not create extra persistent theme files unless explicitly requested, but do create or update the distributed \`design-rules/\` package when it is provided as part of this Theme Lab export. Modify the existing product UI files required to complete the normalization.
+
+The long-term project is not complete if it only references raw GitHub rule
+links. Raw links are for bootstrapping. The local project must contain the full
+Theme Lab contract and the local distributed rule router:
+
+- global CSS runtime token block
+- \`theme-lab.json\`
+- \`AGENTS.md\` Theme Lab section
+- \`design-rules/index.json\`
+- required and matched \`design-rules/**/*.md\` files, or the complete
+  exported \`design-rules/\` package when available
 
 Do not create additional theme files unless the user explicitly requests the full reproducible package.
 
@@ -626,7 +703,8 @@ Before editing, write a short normalization plan that states:
 2. Which components or repeated class patterns will be standardized.
 3. Which Theme Lab token pairs will be applied.
 4. Which user-authored design rules apply, or which rule is missing.
-5. How existing APIs, handlers, validation, permissions, and state will remain connected.`
+5. How existing APIs, handlers, validation, permissions, and state will remain connected.
+6. If a sidebar is detected: "Direct Confirmation: The selected scope contains a sidebar, so sidebar normalization/replacement is included by default. Please confirm the full plan if you want me to proceed."`
 }
 
 function productWideRebuildMandateSection(): string {
@@ -690,7 +768,8 @@ Before editing, write a product alignment plan that states:
 4. Which user-authored design rules apply to each page type.
 5. Which legacy visible controls will be normalized.
 6. Which semantic token pairs will be used for filled surfaces.
-7. How APIs, handlers, validation, permissions, state, and cross-page consistency will be verified.`
+7. How APIs, handlers, validation, permissions, state, and cross-page consistency will be verified.
+8. If a sidebar is detected: "Direct Confirmation: The selected scope contains a sidebar, so sidebar normalization/replacement is included by default. Please confirm the full plan if you want me to proceed."`
 }
 
 function referenceFirstQualityGateSection(): string {
@@ -703,10 +782,11 @@ Before editing, identify which user-authored rule applies to the selected UI pat
 Rule selection:
 
 - Token hookup, colors, radius, shadows, state classes: use Theme Lab token contract and semantic token pairs.
-- Page canvas background: use the Page Top Ambient Background Rule when a plain page canvas needs a quiet atmospheric top wash.
-- Page headings and page headers: use the Page Heading Reuse Rule.
-- Cards and tables: use the Card And Table Progressive Disclosure Rule.
-- Sidebar and app navigation: use the Shadcn Sidebar Block Replacement Rule when the selected page or product scope contains a sidebar.
+- Page canvas background: open \`design-rules/patterns/page-background.md\` or its raw GitHub URL when a plain page canvas needs a quiet atmospheric top wash.
+- Page headings and page headers: open \`design-rules/components/page-heading.md\` or its raw GitHub URL.
+- Cards: open \`design-rules/components/card.md\` or its raw GitHub URL.
+- Tables: open \`design-rules/components/table.md\` or its raw GitHub URL.
+- Sidebar and app navigation: open \`design-rules/components/sidebar.md\` or its raw GitHub URL when the selected page or product scope contains a sidebar.
 - Ad hoc buttons, inputs, cards, tabs, dialogs, menus, or form controls: use existing project components first, then shadcn/ui primitives already present in the project.
 - Layout, hierarchy, density, and spacing: preserve the existing product structure and normalize only inconsistent or unclear areas.
 - Empty, loading, error, disabled, selected, hover, focus, and success states: use existing component variants and Theme Lab semantic tokens.
@@ -739,7 +819,7 @@ function userAuthoredDesignRulesPromptSection(userDesignRules?: string): string 
 
 No extra user-authored rules were provided in this export.
 
-Use the built-in Theme Lab rules in this packet. If a page pattern has no matching rule, keep the change conservative, preserve the current workflow, and report the missing rule instead of inventing a new visual system.`
+Use the distributed Theme Lab rule router and raw rule links in this packet. If a page pattern has no matching rule, keep the change conservative, preserve the current workflow, and report the missing rule instead of inventing a new visual system.`
   }
 
   return `## User-Authored Design Rule Library
@@ -912,6 +992,8 @@ Rule:
 
 - If the current UI scope contains a sidebar, include that sidebar in the UI normalization scope. Do not polish only the main content while leaving an old bespoke sidebar beside it.
 - For one-page optimization, if the page includes a sidebar, replace or normalize the complete sidebar used by that page as part of the same task.
+- Do not ask an open-ended question such as "Should I also update the sidebar?" when a sidebar is detected.
+- When a sidebar is detected, include it by default in the execution plan and add this direct confirmation line: "Direct Confirmation: The selected scope contains a sidebar, so sidebar normalization/replacement is included by default. Please confirm the full plan if you want me to proceed."
 - First inspect the existing sidebar's navigation data, active route logic, collapse behavior, permission gates, workspace/account switchers, search, badges, nested groups, user menu, keyboard behavior, responsive behavior, and route links.
 - Choose the closest matching shadcn sidebar block from the official sidebar blocks page based on the product's navigation structure and density. Match structure, not demo content.
 - Preserve the existing product navigation content, route URLs, permissions, active states, badges/counts, account/workspace context, user menu actions, and responsive behavior unless the user explicitly asks to change them.
@@ -957,39 +1039,23 @@ Before final report, confirm that the ambient layer covers only the top fifth, r
 }
 
 function cardTableProgressiveDisclosureSection(): string {
-  return `## Card And Table Progressive Disclosure Rule
+  return `## Card And Table Rule Loading
 
-Cards and tables are not decorative containers. They are compressed previews of the next level of content.
+Do not use summarized card/table rules embedded in this prompt as the source of truth.
 
-Card rules:
+If the selected scope contains cards:
 
-- If a card is clickable or opens a detail view, its content must be derived from the destination/detail content. Pull a useful subset forward: title, status, type, owner, date, latest activity, key metric, short outcome, next action, or 2-4 important facts.
-- A card should help the user decide whether to click. Do not show only a title, icon, and generic description when the destination contains richer useful information.
-- Avoid long paragraphs. Use compact blocks, labels, values, chips, short snippets, and 1-2 line summaries. Prefer several scannable facts over one dense text block.
-- Create text hierarchy: primary title or metric, secondary metadata, tertiary helper text. Vary size, weight, and tone deliberately using semantic text tokens such as \`text-foreground\`, \`text-muted-foreground\`, and matching foreground tokens on filled surfaces.
-- For number-heavy cards, group related values into small sub-sections or mini cells with subtle token-backed surfaces. Each value should have a label, unit, trend/status when available, and consistent alignment. Do not leave many unrelated numbers floating in one flat text stack.
-- Optional ambient color is allowed only as a very subtle semantic signal. This ambient layer is a decorative exception: it does not have to use token colors, token opacity, token blur, or token gradient values, because its job is atmospheric hinting rather than structural styling.
-- Prefer a top ambient wash for cards: anchor the color to the upper edge inside the card, clip it to the card radius, and let it fade downward into the normal \`bg-card\` surface. It should feel like pale morning haze or soft overhead light at the top of the card, not a full-card gradient.
-- The top ambient wash should occupy only the upper 20-35% of the card and become fully transparent before it reaches the card's main content area. Keep the strongest color near the top edge or upper corners; the center and lower body of the card should remain visually clean.
-- Keep the band horizontally broad and soft, with low saturation, high lightness, low opacity, and no hard edges. One gentle hue or two adjacent hues is enough, such as very pale cyan, blue, mint, or lavender when they fit the product meaning.
-- The top ambient wash is allowed to use non-token color values, opacity, blur, and gradient stops only because it is non-structural decoration. The card shell, text, border, focus state, actions, badges, metric cells, radius, spacing, and elevation must remain token-bound.
-- The ambient layer must sit behind card content, use \`pointer-events-none\`, and never reduce text contrast, hide dividers, wash over metrics, compete with the primary action, or become a decorative blob, bokeh field, rainbow gradient, or strong brand-color strip.
-- Use this treatment sparingly. Apply it to cards where atmosphere communicates status, category, priority, product domain, or an important preview state; do not apply it to every basic card just to decorate the page.
-- Keep card actions predictable. The primary click target should be clear; secondary actions should be quiet and not compete with the content preview.
+- open \`design-rules/components/card.md\`
+- if local files are unavailable, open ${designRuleRawUrl("design-rules/components/card.md")}
+- list the loaded source in Rule Read Confirmation before changing card UI
 
-Table rules:
+If the selected scope contains tables:
 
-- Treat a table row as a card-like preview without card background rendering. Each row should expose enough of the destination/detail content for the user to decide whether to open it.
-- Columns should follow progressive exploration: identity first, then status/category, then the most decision-relevant facts, then latest signal or next action, then row actions.
-- Do not dump every available field into columns. Keep the table scannable and move deeper information into row expansion, sheet, detail page, popover, or tooltip when appropriate.
-- Avoid paragraph-heavy cells. Use concise cell layouts, secondary metadata lines, badges, compact value stacks, and truncation with accessible full-content access when needed.
-- Numeric tables should use consistent alignment, units, tabular numbers when available, and grouped metrics when several values belong together.
-- Table hierarchy should come from typography, alignment, spacing, dividers, status badges, and row states rather than decorative card backgrounds.
-- Row hover, selected, focused, disabled, loading, empty, and error states must remain readable and token-correct.
+- open \`design-rules/components/table.md\`
+- if local files are unavailable, open ${designRuleRawUrl("design-rules/components/table.md")}
+- list the loaded source in Rule Read Confirmation before changing table UI
 
-Shared card/table rule:
-
-- Cards and tables must preserve existing content and workflow while making the next layer easier to predict. They should reveal a useful overview, then let the user progressively explore more detail through click, expand, sheet, dialog, or navigation.`
+If those files cannot be opened, do not claim the card/table rules were applied. Continue conservatively only when safe, and report the missing rule file or inaccessible raw URL.`
 }
 
 function oneShotTokenApplicationGateSection(): string {
@@ -997,10 +1063,15 @@ function oneShotTokenApplicationGateSection(): string {
 
 The selected scope must use the exported Theme Lab token system where it touches theme-bearing UI. Do not keep old raw color, radius, shadow, border, spacing, or motion values when a semantic token or existing component variant is available.
 
+Read the token-system rule before editing token-bearing UI:
+
+- local: \`design-rules/core/token-system.md\`
+- raw: ${designRuleRawUrl("design-rules/core/token-system.md")}
+
 Token availability:
 
 - First check whether the project already exposes matching shadcn/theme CSS variables such as \`--radius\`, \`--radius-card\`, \`--radius-control\`, \`--background\`, \`--card\`, \`--border\`, \`--ring\`, and elevation variables.
-- If the needed Theme Lab variables are missing, add the smallest required runtime CSS variable bridge to the existing global CSS file or existing theme layer. This one-shot bridge may use the provided runtime CSS variables, but do not create \`theme-lab.json\`, \`AGENTS.md\`, prompt files, or a new design-system folder.
+- If the needed Theme Lab variables are missing, add the smallest complete runtime CSS variable bridge to the existing global CSS file or existing theme layer. This one-shot bridge may use the provided runtime CSS variables, but do not create \`theme-lab.json\`, \`AGENTS.md\`, prompt files, or a new design-system folder.
 - If the target project already has a compatible token system, map the Theme Lab values into that system instead of inventing new values.
 
 Mandatory token audit after normalization:
@@ -1026,7 +1097,7 @@ Before the final report, inspect the changed files and explicitly confirm the ra
 function aiUiOptimizationSection(): string {
   return `## AI UI Optimization Guidance
 
-This packet can be used with AI UI tools such as v0, Codex, Cursor, or Claude Code.
+This packet is tool-agnostic. Use it with any code-capable AI agent that can inspect files, edit code, and run checks.
 
 When optimizing UI:
 
@@ -1134,6 +1205,8 @@ function compileOneShotPagePolishPrompt(
 ): string {
   return `# One-Shot Selected-Scope UI Normalization Task
 
+${promptRouteSection(options, targetScope, "one-shot-selected-scope-ui-normalization")}
+
 ## Language Rule
 
 Write all task instructions, plans, implementation notes, and final reports in English. Preserve code identifiers, file paths, route paths, API names, and user-provided business copy literally when needed.
@@ -1148,26 +1221,29 @@ This is not a "replace colors with tokens" task and not a "redesign from scratch
 
 Work in this order:
 
-1. Extract the business rules, API calls, data loading, mutations, handlers, validation, permissions, state, domain copy, page content, and workflow order from the current UI.
-2. Before editing, identify the top 3 UI normalization problems in the selected scope:
+1. Read the distributed rule index locally or from the raw GitHub fallback.
+2. Detect the selected page structure first and open the matched page-structure/block rule file.
+3. Detect components/blocks in the selected scope and open only the matched component/pattern rule files.
+4. Open the token-system, token-binding, visual-qa, and completion-compliance rule files.
+5. Extract the business rules, API calls, data loading, mutations, handlers, validation, permissions, state, domain copy, page content, and workflow order from the current UI.
+6. Before editing, identify the top 3 UI normalization problems in the selected scope:
    - hierarchy problem
    - component consistency problem
    - token/state/contrast problem
-3. Normalize specifically to solve those problems.
-4. Preserve existing information architecture, page regions, workflow order, and useful layout structure.
-5. Identify the user-authored design rule that applies. If no rule exists, state the missing rule and keep the change conservative.
-6. Replace ad hoc controls and repeated visual fragments with existing project components or shadcn/ui primitives where behavior is preserved.
-7. Keep the visible page recognizable and avoid increasing visual noise.
-8. Reconnect the existing APIs, mutations, handlers, validation, permissions, and state to the normalized UI.
-9. Ensure Theme Lab tokens are available through an existing token system or a minimal one-shot CSS variable bridge.
-10. Apply Theme Lab semantic tokens and matching foreground/background pairs to surfaces, text, radius, shadow, spacing, focus/state, and motion.
-11. Normalize details such as spacing, radius, shadow, focus states, empty states, loading states, responsiveness, and contrast.
+7. Normalize specifically to solve those problems.
+8. Preserve existing information architecture, page regions, workflow order, and useful layout structure.
+9. Replace ad hoc controls and repeated visual fragments with existing project components or shadcn/ui primitives where behavior is preserved.
+10. Keep the visible page recognizable and avoid increasing visual noise.
+11. Reconnect the existing APIs, mutations, handlers, validation, permissions, and state to the normalized UI.
+12. Ensure Theme Lab tokens are available through an existing token system or a minimal complete one-shot CSS variable bridge.
+13. Apply Theme Lab semantic tokens and matching foreground/background pairs to surfaces, text, radius, shadow, spacing, focus/state, and motion.
+14. Run the completion compliance gate before final response.
 
 Do not start by swapping class values. Do not treat token replacement as the main work. The one-shot task is successful only when the selected UI remains recognizable, component inconsistency is reduced, API behavior is connected, and semantic token pairs are applied correctly.
 
-## Vercel Skill Lens
+## Component Composition Lens
 
-Use a v0-style workflow for UI generation: selected files or screenshots define the target, the output is a scoped code change, and shadcn/ui + Tailwind tokens are the default implementation language.
+Use a scoped UI normalization workflow: selected files, routes, components, or screenshots define the target, and the output should be a scoped code change that preserves existing behavior.
 
 Use shadcn/ui guidance for component composition: prefer existing Sidebar, Button, Card, Dialog, Tabs, Table, DropdownMenu, Sheet, Tooltip, Badge, Input, Label, Separator, Breadcrumb, Command, Popover, Select, Checkbox, Switch, and similar primitives before creating custom controls.
 
@@ -1356,6 +1432,14 @@ export function compileProjectImportPrompt(
   const isProductWideTask = options.task === "refactor-product-wide"
 
   return `# Theme Lab AI Task Packet
+
+${promptRouteSection(
+  options,
+  targetScope,
+  isProductWideTask
+    ? "persistent-product-wide-ui-alignment"
+    : "persistent-selected-scope-ui-normalization"
+)}
 
 ## Language Rule
 
@@ -1640,36 +1724,39 @@ Do not ask for a single selected page before starting. First inspect the reposit
 
 ## Execution Plan
 
-${isProductWideTask ? `1. Inspect project structure and route inventory.
-2. Detect project mode.
-3. Find global CSS and token/component baseline.
-4. Install or update the persistent Theme Lab contract.
-5. Install or update the distributed design-rule library when the rule package is provided.
-6. Read \`design-rules/index.json\`, load required rules, and load only matched files for the route/page inventory.
-7. Group product routes by page type such as dashboard, management table, settings, detail page, CRUD flow, auth/onboarding, or AI/productivity surface.
-8. Create a product-wide normalization plan and Design Rule Checks for relevant page types.
-9. Define the existing app shell and cross-page layout grammar to preserve before editing pages.
-10. Extract business logic, API calls, data contracts, handlers, validation, permissions, and state from existing pages.
-11. Normalize product pages with existing project components, shadcn/ui primitives, matched design-rule files, semantic token pairs, and consistent layout grammar.
-12. Reconnect existing APIs, mutations, handlers, validation, permissions, and state to normalized pages.
-13. Apply Theme Lab tokens through semantic foreground/background pairs.
-14. Normalize hierarchy, density, actions, states, contrast, and responsive behavior across pages.
-15. Run available checks.
-16. Report changed files, loaded rule files, design rule checks, product-wide layout grammar, API reconnection, token pair checks, consistency checks, and risks.` : `1. Inspect project structure.
-2. Detect project mode.
-3. Find global CSS and token/component baseline.
-4. Decide integration strategy.
-5. Apply the selected file strategy.
-6. Inspect selected scope if provided.
-7. Read \`design-rules/index.json\` if available, load required rules, and load only matched files for the selected scope.
-8. Extract business logic, API calls, data contracts, handlers, validation, permissions, and state from the old UI.
-9. Create a selected-scope normalization plan and Design Rule Check.
-10. Normalize selected-scope visible UI with existing project components, shadcn/ui primitives, matched design-rule files, and semantic token pairs if task allows modifications.
-11. Reconnect existing APIs, mutations, handlers, validation, permissions, and state to the normalized UI.
-12. Apply Theme Lab tokens through semantic foreground/background pairs.
-13. Improve hierarchy, density, states, contrast, and responsive behavior if task allows modifications.
-14. Run available checks.
-15. Report changed files, loaded rule files, and risks.`}
+${isProductWideTask ? `1. Inspect project structure, route inventory, component libraries, global CSS, and existing token baseline.
+2. Read \`design-rules/index.json\` locally or from the raw GitHub fallback.
+3. Load requiredAlways rules, including rule-router, ui-normalization, token-system, token-binding, visual-qa, and completion-compliance.
+4. Detect product page structures first: dashboard, management table, detail page, settings, form/CRUD, auth/onboarding, AI/productivity surface, or tool page.
+5. Open matched page-structure/block rules from local files or raw GitHub URLs, such as page-shell and dashboard.
+6. Detect components/blocks inside each page type: sidebar, page heading, cards, tables, actions, filters, forms, dialogs/sheets, states, and page canvas.
+7. Open only matched component/pattern rule files from local files or raw GitHub URLs.
+8. Install or update the persistent Theme Lab contract and fully land the local distributed rule router.
+9. Build the token-system plan from \`design-rules/core/token-system.md\`; verify global CSS, \`theme-lab.json\`, AGENTS, rule files, and semantic tokens are complete locally.
+10. Create a product-wide normalization plan and Design Rule Checks for relevant page types.
+11. Define the existing app shell and cross-page layout grammar to preserve before editing pages.
+12. Extract business logic, API calls, data contracts, handlers, validation, permissions, and state from existing pages.
+13. Normalize product pages with existing project components, shadcn/ui primitives, matched design-rule files, semantic token pairs, and consistent layout grammar.
+14. Reconnect existing APIs, mutations, handlers, validation, permissions, and state to normalized pages.
+15. Run token audit and completion compliance gate.
+16. Run available checks.
+17. Report changed files, local/raw rule files loaded, design rule checks, product-wide layout grammar, API reconnection, token pair checks, compliance results, and risks.` : `1. Inspect project structure, selected scope, component libraries, global CSS, and existing token baseline.
+2. Read \`design-rules/index.json\` locally or from the raw GitHub fallback.
+3. Load requiredAlways rules, including rule-router, ui-normalization, token-system, token-binding, visual-qa, and completion-compliance.
+4. Detect the selected page structure first: dashboard, management table, detail page, settings, form/CRUD, auth/onboarding, tool page, or other product surface.
+5. Open the matched page-structure/block rule from local files or raw GitHub URLs, such as page-shell or dashboard.
+6. Detect components/blocks inside the selected scope: sidebar, page heading, cards, tables, actions, filters, forms, dialogs/sheets, states, and page canvas.
+7. Open only matched component/pattern rule files from local files or raw GitHub URLs.
+8. Build a minimal but complete one-shot token bridge plan from \`design-rules/core/token-system.md\`.
+9. Extract business logic, API calls, data contracts, handlers, validation, permissions, and state from the old UI.
+10. Create a selected-scope normalization plan and Design Rule Check.
+11. Normalize selected-scope visible UI with existing project components, shadcn/ui primitives, matched design-rule files, and semantic token pairs if task allows modifications.
+12. Reconnect existing APIs, mutations, handlers, validation, permissions, and state to the normalized UI.
+13. Apply the complete one-shot token bridge and semantic foreground/background pairs for the changed UI.
+14. Run token audit and completion compliance gate.
+15. Improve hierarchy, density, states, contrast, and responsive behavior if task allows modifications.
+16. Run available checks.
+17. Report changed files, local/raw rule files loaded, token bridge completeness, compliance results, and risks.`}
 
 ${options.task === "visual-review" ? "Do not modify files. Only inspect and report." : ""}
 

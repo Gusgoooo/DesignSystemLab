@@ -65,15 +65,22 @@ Runtime source:
 Distributed design rule router:
 
 - Entry point: \`${themeLabDesignRuleLibrary.entrypoint}\`
-- Load requiredAlways rules first.
-- Inventory the selected UI by element type.
+- Raw fallback: \`${themeLabDesignRuleLibrary.rawEntrypoint}\`
+- Load requiredAlways rules first, including token-system, token-binding, visual QA, and completion compliance.
+- Detect page structure first.
+- Open matched page-structure/block rules before component rules.
+- Inventory components and blocks inside the selected structure.
 - Match element types against \`rules[].appliesTo\`.
-- Open only matched files from \`rules[].source\`.
+- Open only matched files from \`rules[].source\`, using local files first and raw GitHub URLs only when local files are unavailable.
+- Build the token-system plan before changing token-bearing UI.
+- Use completion compliance before final response.
 - Do not load every rule file by default.
 - If a matching rule file is missing, keep the change conservative and report the missing rule.
 - Before editing, output a Rule Read Confirmation with \`ruleIndexRead\`, \`requiredRuleFilesLoaded\`, \`matchedRuleFilesLoaded\`, and \`missingRuleFiles\`.
 - For matched files, include the exact \`source\`, matched \`elementType\`, and first markdown heading.
 - If the selected scope contains cards, \`design-rules/components/card.md\` must be opened and listed before card UI is changed.
+- If the selected scope changes page structure, \`design-rules/blocks/page-shell.md\` must be opened and listed before layout changes.
+- If token-bearing UI is changed, \`design-rules/core/token-system.md\` and \`design-rules/core/token-binding.md\` must be opened and listed.
 - Do not claim a rule was applied unless its file was actually opened.
 - If local files or raw URLs are inaccessible, say so explicitly and ask for accessible rule files or raw URLs.
 

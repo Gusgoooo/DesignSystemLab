@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import type { CSSProperties } from "react"
 import { CheckCircle2, MoreHorizontal, X } from "lucide-react"
 import { exportAgentsThemeRulesFromOutput } from "../../lib/theme/export-agents"
@@ -35,8 +35,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu"
-import { Label } from "../ui/label"
-import { Textarea } from "../ui/textarea"
 import { getControlFloatingStyle } from "./control-panel-theme"
 
 type ExportPanelProps = {
@@ -78,7 +76,6 @@ const importModeOptions: readonly ImportModeOption[] = [
 ]
 
 const defaultImportMode: ProjectImportMode = "persistent-project-contract"
-const designRulesStorageKey = "theme-lab:user-design-rules"
 
 function getBlueprintDialogStyle(isDark: boolean): CSSProperties {
   const baseStyle = getControlFloatingStyle(isDark)
@@ -127,30 +124,6 @@ export function ExportPanel(props: ExportPanelProps) {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [mode, setMode] = useState<ProjectImportMode>(defaultImportMode)
   const [copiedPrompt, setCopiedPrompt] = useState(false)
-  const [designRulesLoaded, setDesignRulesLoaded] = useState(false)
-  const [userDesignRules, setUserDesignRules] = useState("")
-
-  useEffect(() => {
-    try {
-      setUserDesignRules(localStorage.getItem(designRulesStorageKey) ?? "")
-    } catch {
-      setUserDesignRules("")
-    } finally {
-      setDesignRulesLoaded(true)
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!designRulesLoaded) {
-      return
-    }
-
-    try {
-      localStorage.setItem(designRulesStorageKey, userDesignRules)
-    } catch {
-      // Ignore storage failures; the copied prompt still includes current text.
-    }
-  }, [designRulesLoaded, userDesignRules])
 
   const projectImportPrompt = useMemo(
     () => {
@@ -160,11 +133,10 @@ export function ExportPanel(props: ExportPanelProps) {
           mode === "persistent-project-contract"
             ? "refactor-product-wide"
             : "refactor-selected-scope",
-        userDesignRules,
         theme: props.theme,
       })
     },
-    [mode, props.theme, userDesignRules]
+    [mode, props.theme]
   )
 
   function handleDialogOpenChange(nextOpen: boolean): void {
@@ -203,7 +175,7 @@ export function ExportPanel(props: ExportPanelProps) {
     }
 
     if (id === "manifest") {
-      return exportThemeLabManifestJsonFromOutput(props.theme, userDesignRules)
+      return exportThemeLabManifestJsonFromOutput(props.theme)
     }
 
     if (id === "vibe") {
@@ -211,7 +183,7 @@ export function ExportPanel(props: ExportPanelProps) {
     }
 
     if (id === "rules") {
-      return exportAgentsThemeRulesFromOutput(props.theme, userDesignRules)
+      return exportAgentsThemeRulesFromOutput(props.theme)
     }
 
     return exportThemeAlgorithmFromOutput(props.theme)
@@ -313,49 +285,6 @@ export function ExportPanel(props: ExportPanelProps) {
                   </button>
                 )
               })}
-            </div>
-
-            <div className="space-y-3">
-              <div className="space-y-1.5">
-                <Label
-                  htmlFor="theme-lab-design-rules"
-                  className="text-base font-semibold leading-6 text-neutral-900"
-                >
-                  设计规范参考
-                </Label>
-                <p className="text-sm leading-6 text-neutral-600">
-                  写你自己的 UI 规则；导出的指令会先识别页面元素，再匹配这些规则并接入 token。
-                </p>
-              </div>
-              <Textarea
-                id="theme-lab-design-rules"
-                value={userDesignRules}
-                onChange={(event) => {
-                  setUserDesignRules(event.target.value)
-                  setCopiedPrompt(false)
-                }}
-                placeholder={[
-                  "例如：",
-                  "## Card rules",
-                  "- Clickable cards should preview detail-page content.",
-                  "- Use compact facts, labels, values, chips, and clear text hierarchy.",
-                  "- Card ambient tint should start from the top edge, fade downward, and stay very subtle.",
-                  "- It may use non-token colors only as non-structural decoration behind content.",
-                  "",
-                  "## Page background rules",
-                  "- Add a barely visible top ambient wash only on the page canvas.",
-                  "- Keep it within the top fifth and fade it into bg-background.",
-                  "",
-                  "## Sidebar rules",
-                  "- If the page includes a sidebar, replace the full sidebar using the closest shadcn sidebar block.",
-                  "- If no block matches, use npx shadcn@latest add sidebar-08 and connect sidebar tokens.",
-                  "",
-                  "## Page heading rules",
-                  "- Reuse a left title + metadata facts + right action group structure.",
-                  "- Keep primary action visible and collapse secondary actions into More on mobile.",
-                ].join("\n")}
-                className="min-h-[148px] resize-y rounded-[18px] border-neutral-300/80 bg-white/60 p-4 text-sm leading-6 text-neutral-900 shadow-sm placeholder:text-neutral-500 focus-visible:border-neutral-500 focus-visible:ring-neutral-500/20"
-              />
             </div>
 
             {mode ? (
