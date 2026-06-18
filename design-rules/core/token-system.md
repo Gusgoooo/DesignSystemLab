@@ -10,25 +10,26 @@ partial surface systems.
 
 ## Long-Term Project Contract
 
-For persistent or long-term projects, the token system must be fully landed in
-the target project.
+For persistent or long-term projects, the token system lands through the three
+Theme Lab contract touchpoints. Do not create extra token-system files by
+default.
 
-Required persistent files:
+Required persistent touchpoints:
 
 - existing global CSS theme block
 - `theme-lab.json`
 - `AGENTS.md` Theme Lab section
-- `design-rules/index.json`
-- matched `design-rules/**/*.md` files, or the complete exported `design-rules/`
-  package when the user provides it
 
-Do not treat raw GitHub links as the long-term project contract. Raw links are
-for reading and bootstrapping. A long-term project must have the rule files
-available locally so future agents can read them without relying on prompt
-memory.
+`design-rules/` is a rule reference library, not part of the default persistent
+theme contract. Read rule files from local `design-rules/` only when the target
+project already has it. Otherwise, read the raw GitHub rule URLs from the task
+prompt.
+
+Only create or update local `design-rules/` files when the user explicitly asks
+to install the rule library into the project.
 
 The persistent contract is incomplete if `theme-lab.json` exists but the global
-CSS variables, AGENTS section, or design-rule router are missing.
+CSS variables or AGENTS Theme Lab section are missing.
 
 ## One-Shot Token Bridge
 
@@ -123,7 +124,9 @@ Before editing UI, output a token plan:
 
 - existing token system found
 - global CSS/theme file to update or reuse
-- persistent files to land for long-term work
+- three persistent touchpoints to land for long-term work
+- whether `design-rules/` is local, raw-only, or explicitly requested for local
+  installation
 - one-shot bridge variables needed for selected-scope work
 - component libraries detected, such as shadcn, Ant Design, Material UI, Radix,
   or custom components
@@ -141,7 +144,6 @@ Token setup is incomplete if:
 - only color tokens were added while radius, elevation, density, and state tokens
   remain undefined
 - one-shot work leaves future optimization without a usable token bridge
-- long-term work relies only on raw links instead of landing the local contract
-  files
+- long-term work creates extra rule or token files without explicit user request
 
 Report unresolved token gaps before final response.

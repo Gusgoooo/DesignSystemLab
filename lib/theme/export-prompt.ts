@@ -529,20 +529,21 @@ For theme persistence, create or update exactly these persistent touchpoints:
 2. \`theme-lab.json\`
 3. \`AGENTS.md\` Theme Lab section
 
-The "exactly three persistent touchpoints" rule only applies to theme contract files. The distributed \`design-rules/\` library is a separate design-rule reference package, not a theme contract file. UI normalization may modify existing route, layout, app shell, and component files after the normalization plan identifies them as part of the product-wide alignment.
+The "exactly three persistent touchpoints" rule applies to the Theme Lab
+contract. The distributed \`design-rules/\` library is a separate rule reference
+package and is raw-link based by default.
 
-Do not create extra persistent theme files unless explicitly requested, but do create or update the distributed \`design-rules/\` package when it is provided as part of this Theme Lab export. Modify the existing product UI files required to complete the normalization.
+Do not create or update local \`design-rules/\` files unless the user explicitly
+asks to install the rule library into the target project. Raw GitHub rule links
+are the default way to read component, block, token-system, and compliance
+rules.
 
-The long-term project is not complete if it only references raw GitHub rule
-links. Raw links are for bootstrapping. The local project must contain the full
-Theme Lab contract and the local distributed rule router:
+The long-term project contract is complete when these three touchpoints are
+landed:
 
-- global CSS runtime token block
+- global CSS runtime token block in the existing global CSS file
 - \`theme-lab.json\`
 - \`AGENTS.md\` Theme Lab section
-- \`design-rules/index.json\`
-- required and matched \`design-rules/**/*.md\` files, or the complete
-  exported \`design-rules/\` package when available
 
 Do not create additional theme files unless the user explicitly requests the full reproducible package.
 
@@ -1731,8 +1732,8 @@ ${isProductWideTask ? `1. Inspect project structure, route inventory, component 
 5. Open matched page-structure/block rules from local files or raw GitHub URLs, such as page-shell and dashboard.
 6. Detect components/blocks inside each page type: sidebar, page heading, cards, tables, actions, filters, forms, dialogs/sheets, states, and page canvas.
 7. Open only matched component/pattern rule files from local files or raw GitHub URLs.
-8. Install or update the persistent Theme Lab contract and fully land the local distributed rule router.
-9. Build the token-system plan from \`design-rules/core/token-system.md\`; verify global CSS, \`theme-lab.json\`, AGENTS, rule files, and semantic tokens are complete locally.
+8. Install or update the persistent Theme Lab contract using exactly the three default touchpoints.
+9. Build the token-system plan from \`design-rules/core/token-system.md\` or its raw GitHub URL; verify global CSS, \`theme-lab.json\`, AGENTS, and semantic tokens are complete. Do not install local \`design-rules/\` unless explicitly requested.
 10. Create a product-wide normalization plan and Design Rule Checks for relevant page types.
 11. Define the existing app shell and cross-page layout grammar to preserve before editing pages.
 12. Extract business logic, API calls, data contracts, handlers, validation, permissions, and state from existing pages.
