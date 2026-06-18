@@ -157,6 +157,98 @@ function deriveVisualLanguage(seed: ThemeSeed): VibeDescriptor["visualLanguage"]
   }
 }
 
+function deriveCraftDirectives(seed: ThemeSeed): string[] {
+  const directives: string[] = []
+  const primary = hexAlphaToOklch(seed.color.primary)
+  const radiusLabel = getRadiusLabel(seed.shape.radius)
+
+  if (seed.vibe.tone === "premium" || seed.vibe.expression === "expressive") {
+    directives.push(
+      "Headings: use a generous, confident scale (such as text-2xl/3xl) with tight tracking and clear weight contrast so sections read at a glance."
+    )
+  } else if (seed.vibe.expression === "minimal" || seed.vibe.tone === "calm") {
+    directives.push(
+      "Headings: keep type sizes restrained; establish dominance through weight and surrounding whitespace rather than large sizes."
+    )
+  } else {
+    directives.push(
+      "Headings: apply one consistent, repeatable type scale across pages instead of ad-hoc sizes."
+    )
+  }
+
+  if (seed.density.mode === "comfortable") {
+    directives.push(
+      "Spacing: use generous section-gap and panel-padding; let whitespace group related content before reaching for borders."
+    )
+  } else if (seed.density.mode === "compact") {
+    directives.push(
+      "Spacing: keep spacing tight but align everything to a strict grid; dense is fine, cramped and misaligned is not."
+    )
+  } else {
+    directives.push(
+      "Spacing: keep an even, steady rhythm of spacing across repeated blocks."
+    )
+  }
+
+  if (seed.material.elevation === "flat") {
+    directives.push(
+      "Depth: separate surfaces with canvas/panel/card steps and subtle borders; avoid shadows to convey hierarchy."
+    )
+  } else if (seed.material.elevation === "floating") {
+    directives.push(
+      "Depth: express layering with the elevation tokens ([box-shadow:var(--elevation-card)] and var(--elevation-popover)) rather than heavy borders."
+    )
+  } else {
+    directives.push(
+      "Depth: use restrained elevation; never stack a strong border and a strong shadow on the same surface."
+    )
+  }
+
+  if (radiusLabel === "large-radius") {
+    directives.push(
+      "Radius: apply the generous corner radius consistently to controls, cards, and panels for one coherent shape language."
+    )
+  } else if (radiusLabel === "low-radius") {
+    directives.push(
+      "Radius: keep a crisp, small radius applied consistently; do not mix sharp and heavily rounded corners."
+    )
+  } else {
+    directives.push(
+      "Radius: apply the medium radius consistently across controls, cards, and panels."
+    )
+  }
+
+  if (primary.chroma > 0.18) {
+    directives.push(
+      "Color: the brand color is vivid — deploy it sparingly and decisively, mainly on the single primary action, and keep large areas neutral."
+    )
+  } else if (primary.chroma < 0.08) {
+    directives.push(
+      "Color: the brand color is quiet — build interest through hierarchy, spacing, and typography rather than saturation."
+    )
+  } else {
+    directives.push(
+      "Color: reserve the brand color for the primary action and a few key accents; keep surfaces and backgrounds neutral."
+    )
+  }
+
+  if (seed.motion.level === "expressive") {
+    directives.push(
+      "Motion: add tasteful transform/opacity transitions on the duration tokens for interactive feedback, and respect prefers-reduced-motion."
+    )
+  } else if (seed.motion.level === "none") {
+    directives.push(
+      "Motion: no animation; rely on instant, clearly tokenized state changes."
+    )
+  } else {
+    directives.push(
+      "Motion: use quick, supportive transitions only for interactive feedback, never as page-load decoration."
+    )
+  }
+
+  return directives
+}
+
 function deriveVisualContract(
   seed: ThemeSeed
 ): VibeDescriptor["visualContract"] {
@@ -179,6 +271,7 @@ function deriveVisualContract(
       "Clear surface hierarchy (canvas / panel / card / raised / overlay)",
       "Readable density and typographic rhythm",
       "Restrained brand-color emphasis",
+      "A stable categorical color mapping (the same category always maps to the same chart color)",
     ],
     avoid: [
       "Decorative visual effects unless explicitly requested",
@@ -189,13 +282,14 @@ function deriveVisualContract(
       "Copying Theme Lab preview fixtures directly into the project",
     ],
     tokenUsage: [
-      "Use bg-background / text-foreground / bg-card / border-border for structural color.",
-      "Use var(--surface-canvas|panel|raised|overlay) for surface hierarchy.",
-      "Use var(--content-primary|secondary|tertiary) for text hierarchy.",
-      "Use var(--border-subtle|default|strong) for borders.",
-      "Use var(--elevation-card|popover|dialog) for shadows.",
-      "Use var(--status-success|warning|info|danger) plus -bg / -fg for status color.",
+      "Structural color uses the shadcn semantic classes (bg-background/text-foreground, bg-card/text-card-foreground, bg-muted/text-muted-foreground, border-border, ring-ring). This is the canonical vocabulary.",
+      "Status: bg-success-bg/text-success-foreground (soft) or bg-success/text-success-foreground (solid); the same pattern for warning, info, and danger.",
+      "Categorical (non-status types, chart and legend series): bg-chart-1..5 / text-chart-1..5 with a stable category-to-index mapping.",
+      "Tags and labels stay neutral (bg-muted or the outline variant) unless they carry real status, type, priority, or category meaning.",
+      "Radius, spacing, elevation, and motion use the variable-backed utilities (rounded-[var(--radius-*)], gap/padding tokens, [box-shadow:var(--elevation-*)], duration/ease tokens).",
+      "Optional: var(--surface-*) and var(--content-*) exist for finer hierarchy but are not required; do not duplicate the shadcn tokens with them.",
     ],
+    craft: deriveCraftDirectives(seed),
   }
 }
 

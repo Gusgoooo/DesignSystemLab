@@ -103,6 +103,24 @@ the one-shot bridge must cover at least:
 - `--duration-base`
 - `--ease-standard`
 
+If the selected scope shows status (success, warning, info, danger) on badges,
+alerts, or indicators, also include each status family as a solid plus soft
+background plus paired foreground:
+
+- `--status-success`, `--status-success-bg`, `--status-success-fg`
+- `--status-warning`, `--status-warning-bg`, `--status-warning-fg`
+- `--status-info`, `--status-info-bg`, `--status-info-fg`
+- `--status-danger`, `--status-danger-bg`, `--status-danger-fg`
+
+If the selected scope distinguishes non-status categories, model types, or chart
+and legend series, also include the categorical palette:
+
+- `--chart-1`
+- `--chart-2`
+- `--chart-3`
+- `--chart-4`
+- `--chart-5`
+
 If the selected scope contains a sidebar, also include:
 
 - `--sidebar`

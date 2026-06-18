@@ -17,6 +17,10 @@ Use matching background and foreground pairs:
 - `bg-sidebar text-sidebar-foreground`
 - `bg-sidebar-primary text-sidebar-primary-foreground`
 - `bg-sidebar-accent text-sidebar-accent-foreground`
+- `bg-success-bg text-success-foreground` (also `bg-success text-success-foreground`)
+- `bg-warning-bg text-warning-foreground` (also `bg-warning text-warning-foreground`)
+- `bg-info-bg text-info-foreground` (also `bg-info text-info-foreground`)
+- `bg-danger-bg text-danger-foreground` (also `bg-danger text-danger-foreground`)
 
 Never use same-role filled pairs:
 
@@ -26,6 +30,20 @@ Never use same-role filled pairs:
 - `bg-destructive text-destructive`
 - `bg-card text-card`
 - `bg-popover text-popover`
+
+## Status And Categorical Color
+
+`--status-*` and `--chart-1..5` are sanctioned semantic color families, not
+unapproved scales. Use them for status and category meaning instead of raw
+palette colors.
+
+- status (success/warning/info/danger): the soft `bg-*-bg text-*-foreground` or
+  solid `bg-* text-*-foreground` pairs above
+- non-status categories, model types, chart and legend series: `bg-chart-1..5`,
+  `text-chart-1..5`, `border-chart-1..5`, with a stable category-to-index mapping
+
+See Semantic And Categorical Color for when to apply color versus staying
+neutral.
 
 ## Token-Bound Values
 
@@ -60,7 +78,7 @@ Examples:
 - one-off border colors
 - legacy non-token radius values
 - random gradients
-- unapproved color scales
+- unapproved color scales beyond the sanctioned `--status-*` and `--chart-1..5` families
 
 ## Strong Token QA Gate
 

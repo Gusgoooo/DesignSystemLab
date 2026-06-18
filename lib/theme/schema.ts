@@ -154,6 +154,7 @@ export type VibeDescriptor = {
     prefer: string[]
     avoid: string[]
     tokenUsage: string[]
+    craft: string[]
   }
 }
 

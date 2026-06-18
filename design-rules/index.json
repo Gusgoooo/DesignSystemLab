@@ -169,6 +169,13 @@
       "source": "design-rules/patterns/states.md",
       "requiredAlways": false,
       "appliesTo": ["empty state", "loading state", "error state", "success state", "disabled state", "selected state", "hover", "focus"]
+    },
+    {
+      "id": "semantic-color",
+      "title": "Semantic And Categorical Color",
+      "source": "design-rules/patterns/semantic-color.md",
+      "requiredAlways": false,
+      "appliesTo": ["badge", "tag", "chip", "label", "pill", "status color", "category color", "categorical color", "chart color", "legend", "data series"]
     }
   ]
 }

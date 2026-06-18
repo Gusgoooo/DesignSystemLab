@@ -388,6 +388,10 @@ function UIElements() {
           <Badge>徽标</Badge>
           <Badge variant="secondary">次要</Badge>
           <Badge variant="outline">描边</Badge>
+          <Badge variant="success">成功</Badge>
+          <Badge variant="warning">警告</Badge>
+          <Badge variant="info">信息</Badge>
+          <Badge variant="danger">危险</Badge>
           <RadioGroup
             value={radio}
             onValueChange={setRadio}
