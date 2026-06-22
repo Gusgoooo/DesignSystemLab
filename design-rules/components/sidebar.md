@@ -1,6 +1,13 @@
 # Sidebars
 
-Use this rule whenever the selected page, component scope, or product-wide scope contains a sidebar, app navigation rail, or sidebar-like navigation shell.
+Use this rule whenever the selected page, component scope, or product-wide scope
+contains a sidebar, app navigation rail, or sidebar-like navigation shell.
+
+## Intent
+
+The sidebar is part of the product shell, not a decorative side panel. It should
+preserve navigation, route logic, account/workspace context, permissions, and
+responsive behavior while aligning with the Theme Lab token system.
 
 ## Approved Reference
 
@@ -12,11 +19,14 @@ Use it for structure selection, not demo content.
 
 ## Scope Rule
 
-If the selected page contains a sidebar, include the complete sidebar in the UI normalization scope.
+If the selected page contains a sidebar, include the complete sidebar in the UI
+normalization scope.
 
-Do not polish only the main content while leaving an old bespoke sidebar beside it.
+Do not polish only the main content while leaving an old bespoke sidebar beside
+it.
 
-For one-page optimization, replace or normalize the full sidebar used by that page as part of the same task.
+For one-page optimization, replace or normalize the full sidebar used by that
+page as part of the same task.
 
 ## Confirmation Rule
 
@@ -70,7 +80,8 @@ Before replacement, inspect:
 
 ## Replacement Rule
 
-Choose the closest matching shadcn sidebar block based on the existing navigation structure and density.
+Choose the closest matching shadcn sidebar block based on the existing
+navigation structure and density.
 
 If no block clearly matches, install the fallback:
 
@@ -78,7 +89,8 @@ If no block clearly matches, install the fallback:
 npx shadcn@latest add sidebar-08
 ```
 
-Then adapt it to existing routes, labels, groups, data, permissions, and active states.
+Then adapt it to existing routes, labels, groups, data, permissions, and active
+states.
 
 Before running any shadcn command, inspect:
 
@@ -129,7 +141,7 @@ Use:
 - `ring-sidebar-ring` or `ring-ring`
 - token-backed radius, spacing, and elevation
 
-## Verify States
+## States
 
 Check:
 
@@ -151,3 +163,14 @@ Check:
 - copy fake users
 - copy placeholder routes
 - leave navigation disconnected
+- leave old sidebar styling beside a normalized main content area
+
+## Final Report
+
+State:
+
+- sidebar regions found
+- shadcn block or manual pattern used
+- route, active, permission, workspace/account, user menu, and responsive
+  behavior preserved
+- token pairs and sidebar states checked

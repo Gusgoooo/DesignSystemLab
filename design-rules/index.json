@@ -157,6 +157,116 @@
       ]
     },
     {
+      "id": "forms-and-inputs",
+      "title": "Forms And Inputs",
+      "source": "design-rules/components/forms-and-inputs.md",
+      "requiredAlways": false,
+      "appliesTo": [
+        "form",
+        "forms",
+        "input",
+        "inputs",
+        "textarea",
+        "select",
+        "checkbox",
+        "switch",
+        "radio group",
+        "slider",
+        "field",
+        "field group",
+        "validation",
+        "settings form",
+        "crud form",
+        "auth form",
+        "date picker"
+      ]
+    },
+    {
+      "id": "tabs",
+      "title": "Tabs",
+      "source": "design-rules/components/tabs.md",
+      "requiredAlways": false,
+      "appliesTo": [
+        "tabs",
+        "tab",
+        "tab list",
+        "tab panel",
+        "segmented control",
+        "view switch",
+        "mode switch",
+        "status switch",
+        "period switch",
+        "single select",
+        "single-select",
+        "section switch"
+      ]
+    },
+    {
+      "id": "overlays",
+      "title": "Overlays",
+      "source": "design-rules/components/overlays.md",
+      "requiredAlways": false,
+      "appliesTo": [
+        "dialog",
+        "alert dialog",
+        "modal",
+        "sheet",
+        "drawer",
+        "popover",
+        "dropdown",
+        "dropdown menu",
+        "menu",
+        "command palette",
+        "combobox",
+        "date picker",
+        "context menu"
+      ]
+    },
+    {
+      "id": "badges-and-alerts",
+      "title": "Badges And Alerts",
+      "source": "design-rules/components/badges-and-alerts.md",
+      "requiredAlways": false,
+      "appliesTo": [
+        "badge",
+        "badges",
+        "tag",
+        "chip",
+        "pill",
+        "label",
+        "status badge",
+        "status indicator",
+        "alert",
+        "notice",
+        "banner",
+        "toast",
+        "callout",
+        "validation summary"
+      ]
+    },
+    {
+      "id": "metrics-and-charts",
+      "title": "Metrics And Charts",
+      "source": "design-rules/components/metrics-and-charts.md",
+      "requiredAlways": false,
+      "appliesTo": [
+        "metric",
+        "metrics",
+        "kpi",
+        "stat",
+        "stats",
+        "progress",
+        "chart",
+        "charts",
+        "legend",
+        "data series",
+        "sparkline",
+        "trend",
+        "dashboard metric",
+        "summary metric"
+      ]
+    },
+    {
       "id": "page-background",
       "title": "Page Background",
       "source": "design-rules/patterns/page-background.md",

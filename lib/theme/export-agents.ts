@@ -186,6 +186,11 @@ UI normalization rule:
 - Tables are card-like previews without card background rendering: each row should expose enough identity, status, key facts, latest signal, and action context for progressive exploration.
 - Tables should avoid dumping every field into columns; keep rows scannable and move deeper information into row expansion, sheets, detail pages, popovers, or tooltips when appropriate.
 - Table hierarchy should come from typography, alignment, spacing, dividers, badges, and row states rather than decorative backgrounds.
+- Forms and inputs must preserve labels, validation, default values, submission handlers, disabled/read-only states, loading/submitting behavior, and field-level errors while using token-backed control styling.
+- Tabs must be used for single-select view, mode, status, period, and section switching; do not represent selected state with primary/secondary button rows.
+- Dialogs, sheets, popovers, dropdowns, and command palettes must preserve trigger semantics, controlled open state, focus behavior, dismissal, form state, and destructive confirmation behavior.
+- Badges, alerts, chips, and notices must separate neutral labels, real status, category, priority, selected filters, and interaction state; use semantic-color rules for status and chart/category colors.
+- Metrics and charts must preserve calculations, units, filters, date ranges, chart transforms, permissions, and stable series color mapping; never replace real data with sample values.
 - Semantic token pairs are mandatory for filled surfaces: use \`bg-primary text-primary-foreground\`, \`bg-secondary text-secondary-foreground\`, \`bg-card text-card-foreground\`, \`bg-popover text-popover-foreground\`, \`bg-accent text-accent-foreground\`, \`bg-destructive text-destructive-foreground\`, \`bg-sidebar text-sidebar-foreground\`, \`bg-sidebar-primary text-sidebar-primary-foreground\`, and \`bg-sidebar-accent text-sidebar-accent-foreground\`.
 - Never use same-role filled background/text pairs such as \`bg-primary text-primary\`, \`bg-secondary text-secondary\`, \`bg-accent text-accent\`, \`bg-destructive text-destructive\`, \`bg-card text-card\`, or \`bg-popover text-popover\`.
 

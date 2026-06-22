@@ -1,10 +1,18 @@
 # Page Headings
 
-Use this rule for page headings, page headers, title/action bars, resource headers, detail headers, and list headers.
+Use this rule for page headings, page headers, title/action bars, resource
+headers, detail headers, list headers, and page-level metadata/action regions.
 
-The user-provided pattern is not optional inspiration. Reuse its composition as closely as the product allows.
+## Intent
 
-## Structure
+The page heading explains where the user is, what object or workflow is in
+scope, and which action matters most. It should provide orientation before
+decoration.
+
+The user-provided pattern is not optional inspiration. Reuse its composition as
+closely as the product allows.
+
+## Anatomy
 
 Use this structure:
 
@@ -36,7 +44,8 @@ Use actual product fields:
 - last updated
 - due date
 
-Do not invent demo content such as job titles, fake locations, fake salaries, or fake dates.
+Do not invent demo content such as job titles, fake locations, fake salaries, or
+fake dates.
 
 ## Dependencies
 
@@ -44,7 +53,8 @@ Do not add `@heroicons/react` unless the project already uses it.
 
 Do not add `@headlessui/react` unless the project already uses it.
 
-Map icons to the project's existing icon library. If the project uses `lucide-react`, use suitable lucide icons.
+Map icons to the project's existing icon library. If the project uses
+`lucide-react`, use suitable lucide icons.
 
 Use project or shadcn components for actions and menus:
 
@@ -54,7 +64,7 @@ Use project or shadcn components for actions and menus:
 - `DropdownMenuContent`
 - `DropdownMenuItem`
 
-## Token Conversion
+## Token Binding
 
 Convert raw sample colors to Theme Lab tokens:
 
@@ -76,17 +86,28 @@ Do not use:
 - `hover:bg-indigo-500`
 - raw inset-ring colors
 
-## Layout Rules
+## Layout
 
 Keep the heading unframed by default.
 
-Do not wrap the whole heading in a decorative card unless the product already uses framed headers.
+Do not wrap the whole heading in a decorative card unless the product already
+uses framed headers.
 
-Keep metadata short. Move long detail copy into body content, cards, tabs, or detail panels.
+Keep metadata short. Move long detail copy into body content, cards, tabs, or
+detail panels.
 
 Long titles must use `min-w-0`, `truncate`, wrapping, or responsive stacking.
 
 Actions must not collide with the title.
+
+## Action Behavior
+
+The primary action remains visible. Secondary actions can become quiet buttons,
+icon buttons with accessible labels, or dropdown items. On small screens,
+collapse secondary actions into a More menu when horizontal space is limited.
+
+Do not demote the true primary command into a menu unless the existing product
+workflow already does so.
 
 ## Reusable Skeleton
 
@@ -112,6 +133,15 @@ Actions must not collide with the title.
   </div>
 </div>
 ```
+
+## Do Not
+
+- copy demo metadata
+- add a new icon package for the heading alone
+- frame every heading in a card by default
+- let long titles collide with actions
+- hide the primary action in a secondary menu
+- use raw palette colors from copied examples
 
 ## Final Report
 

@@ -1,20 +1,27 @@
 # Filters And Controls
 
-Use this rule for search, filters, sort controls, view controls, segmented controls, date ranges, and table toolbars.
+Use this rule for search, filters, sort controls, view controls, segmented
+controls, date ranges, table toolbars, active-filter chips, and bulk-action
+toolbars.
 
-## Goal
+## Intent
 
-Controls should help the user narrow or reshape data without becoming a second dashboard.
+Controls should help the user narrow, reshape, or operate on data without
+becoming a second dashboard.
 
-## Structure
+## Anatomy
 
 Prefer predictable grouping:
 
 - search first
 - filters next
 - sort and view controls after filters
+- active filter state visible near the controls
 - bulk actions near selection state
 - primary creation action outside the filter group when possible
+
+Controls should sit near the content they affect. Page-level controls affect the
+whole page; section controls affect only that section.
 
 ## Component Rule
 
@@ -29,6 +36,7 @@ Use existing project or shadcn components:
 - `Popover`
 - `Button`
 - `Badge`
+- `Calendar`
 
 ## Single-Select Rule
 
@@ -59,7 +67,7 @@ If the choice is a true form field that will be submitted as data and does not
 switch visible content, `RadioGroup` is allowed. Even then, do not fake the
 single-select state with a row of primary/secondary buttons.
 
-## Horizontal Control Row Rule
+## Horizontal Control Row
 
 When multiple horizontal controls appear in the same row, such as `Tabs`,
 buttons, `Select`, search input, date range, or view controls, make the row feel
@@ -67,7 +75,8 @@ like one coordinated toolbar.
 
 Use two alignment zones:
 
-- left side: search, filters, tabs, view switches, status switches, sort, date range
+- left side: search, filters, tabs, view switches, status switches, sort, date
+  range
 - right side: primary and secondary operation buttons such as create, export,
   refresh, save, apply, delete, or bulk actions
 
@@ -89,10 +98,6 @@ Use one token-backed control height for the row, usually:
 - `h-[var(--control-height-sm)]` for dense table/tool rows
 - `h-[var(--control-height-md)]` for page-level control rows
 
-Do not mix visibly different control heights in one row unless there is a clear
-hierarchy difference between a page-level action area and a lower-density
-content region.
-
 Recommended structure:
 
 ```tsx
@@ -110,23 +115,29 @@ On narrow screens, controls may wrap. Preserve reading order: filters and tabs
 first, operation buttons after them. Do not let right-aligned actions collide
 with tabs or squeeze labels until they become unreadable.
 
-## Density
-
-Controls should be compact but comfortable.
-
-Use token-backed control heights and spacing:
-
-- `h-[var(--control-height-sm)]`
-- `h-[var(--control-height-md)]`
-- `gap-[var(--section-gap)]`
-
-## State Rule
+## Active Filter State
 
 Show active filters clearly.
 
-Use removable chips or compact badges when filter state persists.
+Use removable chips or compact badges when filter state persists. Active filter
+chips should usually stay neutral unless the value itself carries real status or
+category meaning.
 
-Empty, loading, disabled, and error states must remain readable and token-correct.
+Empty, loading, disabled, and error states must remain readable and
+token-correct.
+
+## Token Binding
+
+Controls should use token-backed height, border, focus, radius, and text:
+
+- `h-[var(--control-height-sm)]`
+- `h-[var(--control-height-md)]`
+- `rounded-[var(--radius-control)]`
+- `border-border`
+- `bg-background text-foreground`
+- `bg-popover text-popover-foreground`
+- `text-muted-foreground`
+- `ring-ring`
 
 ## Do Not
 
@@ -134,7 +145,19 @@ Empty, loading, disabled, and error states must remain readable and token-correc
 - use raw color chips for active filters
 - create many equal-weight buttons
 - use a row of primary/secondary buttons for single-select state
-- mix different heights for tabs, buttons, select triggers, and inputs in the same control row
-- leave operation buttons floating in the middle when filters and tabs are left-aligned
+- mix different heights for tabs, buttons, select triggers, and inputs in the
+  same control row
+- leave operation buttons floating in the middle when filters and tabs are
+  left-aligned
 - hide active filter state
 - make filter bars taller than the content they control
+
+## Final Report
+
+State:
+
+- control groups found
+- single-select controls mapped to Tabs, Select, or RadioGroup
+- active filter state preserved
+- toolbar alignment and shared control height verified
+- responsive wrapping and token states checked

@@ -39,6 +39,8 @@ Also identify:
 - tables/lists
 - charts
 - forms
+- tabs
+- badges/alerts/status indicators
 - dialogs/sheets/drawers/popovers
 - empty/loading/error states
 
@@ -53,6 +55,11 @@ After structure inventory, open matched rules:
 - tables/lists -> `design-rules/components/table.md`
 - buttons/actions/toolbars -> `design-rules/components/actions-and-buttons.md`
 - filters/search/sort/view controls -> `design-rules/components/filters-and-controls.md`
+- forms/inputs/validation -> `design-rules/components/forms-and-inputs.md`
+- tabs/single-select switches -> `design-rules/components/tabs.md`
+- dialogs/sheets/popovers/dropdowns -> `design-rules/components/overlays.md`
+- badges/alerts/notices -> `design-rules/components/badges-and-alerts.md`
+- metrics/charts/legends -> `design-rules/components/metrics-and-charts.md`
 - page canvas/background -> `design-rules/patterns/page-background.md`
 - empty/loading/error/selected/disabled states -> `design-rules/patterns/states.md`
 - token setup -> `design-rules/core/token-system.md`

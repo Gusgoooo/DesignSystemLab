@@ -350,6 +350,11 @@ Easy-to-miss behaviors — follow them when the element appears:
 - Sidebar: if the scope contains a sidebar, normalize the whole sidebar in the same task. Do not ask an open-ended "should I also update the sidebar?"; include it by default and add: "Direct Confirmation: The selected scope contains a sidebar, so sidebar normalization/replacement is included by default. Please confirm the full plan if you want me to proceed." Preserve nav data, routes, permissions, and active states. See \`design-rules/components/sidebar.md\`.
 - Page heading: reuse the project's heading / action-bar composition with real product metadata. See \`design-rules/components/page-heading.md\`.
 - Cards & tables: open \`design-rules/components/card.md\` and \`table.md\` before changing them; show scannable previews, not dense paragraphs.
+- Forms & inputs: open \`design-rules/components/forms-and-inputs.md\`; preserve labels, validation, default values, submission, disabled/read-only, loading, success, and error behavior.
+- Tabs & switches: open \`design-rules/components/tabs.md\`; use Tabs for single-select view/state switching instead of primary/secondary button rows.
+- Overlays: open \`design-rules/components/overlays.md\`; preserve trigger, controlled open state, focus return, dismissal, form state, and destructive confirmation behavior.
+- Badges & alerts: open \`design-rules/components/badges-and-alerts.md\` plus \`design-rules/patterns/semantic-color.md\`; keep labels neutral unless real status/category/priority meaning exists.
+- Metrics & charts: open \`design-rules/components/metrics-and-charts.md\`; preserve calculations, units, filters, date ranges, chart transforms, and stable series color mapping.
 - Page background: only a quiet top ambient wash per \`design-rules/patterns/page-background.md\`; never tint structural surfaces.
 - Tags & status: see \`design-rules/patterns/semantic-color.md\` — neutral by default, status/chart tokens for meaning.`
 }

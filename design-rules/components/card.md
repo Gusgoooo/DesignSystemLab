@@ -1,39 +1,56 @@
 # Cards
 
-Cards are compressed previews of the next layer of content. They are not empty decorative containers.
+Use this rule for cards, clickable cards, metric cards, summary cards, preview
+cards, setting cards, and repeated card grids.
 
-## Content Rule
+## Intent
 
-If a card is clickable or opens a detail view, derive its content from that destination.
+Cards are compressed previews of the next layer of content. They are not empty
+decorative containers and should not be used only to add borders around loose
+content.
 
-Pull useful preview information forward:
+Use cards when the content represents a distinct object, module, decision area,
+or navigable destination.
 
-- title
-- status
-- type or category
-- owner or team
-- date or last activity
-- key metric
-- short outcome
-- next action
-- 2-4 important facts
+## Anatomy
 
-Do not show only a title, icon, and generic description when the destination contains richer useful information.
+A useful card usually has:
 
-## Hierarchy Rule
+- identity: title, object name, or module label
+- context: status, type, owner, team, date, or scope
+- evidence: key metric, latest activity, short outcome, or 2-4 important facts
+- action: primary click target or a quiet secondary action
 
-Card content should be rich but scannable.
+If a card opens a detail view, derive the card content from that destination. Do
+not show only a title, icon, and generic description when the destination
+contains richer useful information.
 
-Use:
+## Content
+
+Make card content rich but scannable:
 
 - compact facts
 - labels and values
-- chips
+- chips or badges only when they carry meaning
 - short snippets
 - one or two line summaries
 - clear primary, secondary, and tertiary text hierarchy
 
-Avoid long paragraphs.
+Avoid long paragraphs. Move deep reading into the destination, sheet, dialog, or
+detail region.
+
+## Layout
+
+Card grids should share a steady rhythm:
+
+- align card edges and internal gutters
+- keep repeated cards the same density unless one card is intentionally featured
+- keep heading, metadata, facts, and actions in predictable locations
+- avoid nested cards
+- avoid many equal-weight surfaces that make the page feel fragmented
+
+When a card contains a toolbar or menu, keep it visually quieter than the card's
+main content.
 
 ## Number-Heavy Cards
 
@@ -48,9 +65,34 @@ Each value should have:
 
 Do not leave many unrelated numbers floating in one flat stack.
 
+## Token Binding
+
+Structural card UI must use Theme Lab tokens:
+
+- shell: `bg-card text-card-foreground`
+- border: `border-border`
+- muted text: `text-muted-foreground`
+- focus: `ring-ring`
+- radius: `rounded-[var(--radius-card)]`
+- elevation when needed: `[box-shadow:var(--elevation-card)]`
+
+Do not keep old raw palette colors, one-off borders, one-off shadows, or legacy
+radius values after normalizing a card.
+
+## States
+
+Clickable cards need visible hover and focus-visible states. Selected cards need
+a state that is readable in light and dark mode and does not look like a primary
+button unless the whole card is the primary action.
+
+Disabled cards must communicate disabled state without hiding important content.
+Loading cards should preserve layout stability with skeletons or placeholder
+rows.
+
 ## Top Ambient Wash
 
-Cards may use a very subtle top ambient wash only when it communicates status, category, priority, product domain, or an important preview state.
+Cards may use a very subtle top ambient wash only when it communicates status,
+category, priority, product domain, or an important preview state.
 
 This ambient layer is a decorative exception:
 
@@ -58,7 +100,8 @@ This ambient layer is a decorative exception:
 - it may use non-token opacity, blur, and gradient stops
 - it must remain non-structural and sit behind content
 
-The card shell, text, border, focus state, actions, badges, metric cells, radius, spacing, and elevation must remain token-bound.
+The card shell, text, border, focus state, actions, badges, metric cells, radius,
+spacing, and elevation must remain token-bound.
 
 ### Shape
 
@@ -83,21 +126,25 @@ The card shell, text, border, focus state, actions, badges, metric cells, radius
 - no hard edge
 - one gentle hue, or two adjacent hues at most
 
-Good hue families include very pale cyan, blue, mint, and lavender when they fit the product meaning.
+Good hue families include very pale cyan, blue, mint, and lavender when they fit
+the product meaning.
 
-### Never
+## Do Not
 
-- reduce text contrast
-- hide dividers
-- wash over metrics
-- compete with primary actions
-- become a blob
-- become bokeh
-- become a rainbow gradient
-- become a strong brand-color strip
+- use cards as generic page-section wrappers
+- put cards inside cards unless the inner element is a real repeated item
+- create empty decorative icon cards
+- apply ambient wash to every card
+- use raw Tailwind palette colors for structural card UI
+- hide text contrast with decorative layers
+- make secondary actions compete with the card's main purpose
 
-Use the ambient treatment sparingly. Do not apply it to every basic card just to decorate the page.
+## Final Report
 
-## Actions
+State:
 
-The primary card click target should be clear. Secondary actions should be quiet and should not compete with the content preview.
+- which card types were found
+- how destination/detail content was previewed
+- which card token pairs, radius, elevation, hover, focus, selected, disabled,
+  and loading states were checked
+- whether any card rule was missing or intentionally not applied

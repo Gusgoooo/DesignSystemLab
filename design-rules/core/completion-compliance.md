@@ -30,6 +30,15 @@ The task is non-compliant if:
 - the agent changed cards without opening the card rule
 - the agent changed tables without opening the table rule
 - the agent changed a sidebar without opening the sidebar rule
+- the agent changed forms/inputs/validation without opening the forms-and-inputs
+  rule
+- the agent changed tabs or single-select switches without opening the tabs rule
+- the agent changed dialogs, sheets, popovers, dropdowns, or command palettes
+  without opening the overlays rule
+- the agent changed badges, alerts, chips, notices, or status indicators without
+  opening the badges-and-alerts rule and semantic-color rule
+- the agent changed metrics, charts, legends, or progress indicators without
+  opening the metrics-and-charts rule
 - the agent changed a dashboard without opening the dashboard rule
 - the agent changed page structure without opening the page-shell rule
 - the agent changed token-bearing UI without opening token-system and
@@ -61,7 +70,8 @@ Check that:
 - secondary actions are quieter
 - filters/controls are near the data they affect
 - horizontal control rows use consistent heights
-- cards/tables/states follow their matched rule files
+- cards/tables/forms/tabs/overlays/badges/alerts/metrics/charts/states follow
+  their matched rule files
 - responsive layouts do not overflow
 - empty/loading/error/disabled/selected states are readable
 

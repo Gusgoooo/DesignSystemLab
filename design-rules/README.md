@@ -46,7 +46,8 @@ say so instead of pretending the card rule was applied.
 - `core`: execution boundaries, token system installation, token binding,
   product alignment, visual QA, and completion compliance.
 - `blocks`: page-level compositions such as page shells and standard dashboards.
-- `components`: cards, tables, page headings, sidebars, buttons/actions, filters.
+- `components`: cards, tables, page headings, sidebars, buttons/actions,
+  filters, forms/inputs, tabs, overlays, badges/alerts, metrics/charts.
 - `patterns`: page backgrounds and UI states.
 
 The rules are intentionally detailed. Do not compress them into a single prompt.

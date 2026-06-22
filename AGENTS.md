@@ -114,7 +114,8 @@ Do not compress all UI rules into a single prompt. Before UI normalization:
 
 The distributed rule library currently covers page shell/layout routing,
 standard dashboard blocks, cards, tables, page headings, sidebars,
-actions/buttons, filters/controls, page backgrounds, UI states, token system
+actions/buttons, filters/controls, forms/inputs, tabs, overlays,
+badges/alerts, metrics/charts, page backgrounds, UI states, token system
 installation, token binding, product alignment, visual QA, completion
 compliance, and the rule router itself.
 

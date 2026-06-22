@@ -36,7 +36,10 @@ Use this file before changing UI.
    - buttons and action groups
    - filters, search, sort, and view controls
    - forms and inputs
-   - dialogs, sheets, popovers, dropdowns, and tabs
+   - tabs and single-select switches
+   - dialogs, sheets, popovers, dropdowns, and command palettes
+   - badges, alerts, tags, chips, and notices
+   - metrics, charts, legends, and progress indicators
    - page canvas and background
    - empty, loading, error, success, selected, hover, focus, and disabled states
 6. Match each page structure and element type to `rules[].appliesTo`.
@@ -97,8 +100,8 @@ opened and used as the completion gate.
 
 If the selected scope is a standard dashboard, `design-rules/blocks/dashboard.md`
 must be opened and listed. Dashboard work usually includes matched sidebar,
-page-heading, card, table, filters, states, page-background, and token-binding
-rules too.
+page-heading, card, table, filters, forms, tabs, overlays, badges/alerts,
+metrics/charts, states, page-background, and token-binding rules too.
 
 If a tool cannot access local files or URLs, say so explicitly and ask the user
 to provide the rule files or a raw URL. Do not hallucinate rule contents.
