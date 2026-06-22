@@ -72,8 +72,8 @@ for (const requiredPath of [indexPath, themeLabPath]) {
 const indexHtml = readFileSync(indexPath, "utf8")
 const themeLabHtml = readFileSync(themeLabPath, "utf8")
 
-if (!indexHtml.includes('href="./theme-lab/"')) {
-  fail("home entry does not use the relative theme-lab directory URL")
+if (!indexHtml.includes('href="./theme-lab/index.html"')) {
+  fail("home entry does not use the CDN-safe theme-lab index.html URL")
 }
 
 if (!themeLabHtml.includes("self.__next_f.push")) {
