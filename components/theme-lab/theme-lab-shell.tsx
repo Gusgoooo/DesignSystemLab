@@ -15,6 +15,7 @@ import {
 import { SeedControlPanel } from "./seed-control-panel"
 import { BlocksPreview } from "./previews/blocks-preview"
 import { ComponentsPreview } from "./previews/components-preview"
+import { DocPreview } from "./previews/doc-preview"
 import { TooltipProvider } from "../ui/tooltip"
 import { getControlPanelStyle } from "./control-panel-theme"
 
@@ -31,6 +32,10 @@ function renderPreview(
     return <BlocksPreview />
   }
 
+  if (tab === "docs") {
+    return <DocPreview />
+  }
+
   return <ComponentsPreview seed={seed} theme={theme} />
 }
 
@@ -38,7 +43,7 @@ export function ThemeLabShell() {
   const [seed, setSeed] = useState<ThemeSeed>(() =>
     structuredClone(initialThemeSeed)
   )
-  const [activeTab, setActiveTab] = useState<ThemeLabTab>("components")
+  const [activeTab, setActiveTab] = useState<ThemeLabTab>("blocks")
   const [isDark, setIsDark] = useState(false)
   const theme = useMemo(() => deriveTheme(seed), [seed])
   const shellStyle = useMemo(
@@ -109,7 +114,7 @@ export function ThemeLabShell() {
             </div>
 
             <div className="min-h-0 flex-1 overflow-hidden bg-[var(--lab-panel-bg)]">
-              <PreviewCanvas dragEnabled={activeTab !== "blocks"}>
+              <PreviewCanvas dragEnabled={activeTab === "components"}>
                 <PreviewFrame theme={theme} isDark={isDark}>
                   {renderPreview(activeTab, seed, theme)}
                 </PreviewFrame>

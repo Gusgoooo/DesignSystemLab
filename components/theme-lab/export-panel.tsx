@@ -46,7 +46,7 @@ type ExportPanelProps = {
 const exportButtons = [
   { id: "css", label: "复制 global CSS block" },
   { id: "manifest", label: "复制 theme-lab.json" },
-  { id: "rules", label: "复制 AGENTS 区块" },
+  { id: "rules", label: "复制 AI 指令区块" },
   { id: "preset", label: "复制完整 theme.preset.json" },
   { id: "vibe", label: "复制完整 vibe.json" },
   { id: "algorithm", label: "复制完整 theme.algorithm.ts" },
@@ -64,13 +64,14 @@ const importModeOptions: readonly ImportModeOption[] = [
   {
     id: "persistent-project-contract",
     title: "长期视觉设计系统",
-    description: "推荐用于长期项目，写入主题合同、theme-lab.json 和 AGENTS.md 规则。",
+    description:
+      "适合长期项目，沉淀主题规则，并保持各页面体验一致。",
   },
   {
     id: "one-shot-page-polish",
-    title: "一次性优化页面",
+    title: "一次性优化",
     description:
-      "最小改造，只优化指定页面或组件，不写入长期规则。不优化其它页面样式和整体一致性",
+      "适合单次页面优化，快速生成可复制到项目的执行指令。",
   },
 ]
 
@@ -129,9 +130,9 @@ export function ExportPanel(props: ExportPanelProps) {
       return compileProjectImportPrompt({
         mode,
         task:
-          mode === "one-shot-page-polish"
-            ? "refactor-selected-scope"
-            : "install-theme-contract",
+          mode === "persistent-project-contract"
+            ? "refactor-product-wide"
+            : "refactor-selected-scope",
         theme: props.theme,
       })
     },

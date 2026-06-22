@@ -3,6 +3,8 @@ import { exportThemeCssFromOutput } from "./export-css"
 import {
   exportVibeJsonFromOutput,
   themeLabAiCodingRules,
+  themeLabAiInstructionTargets,
+  themeLabDesignRuleLibrary,
   themeLabTokenContract,
 } from "./export-json"
 import type { ThemeOutput } from "./schema"
@@ -15,33 +17,71 @@ export type ProjectImportMode =
 export type ProjectImportTask =
   | "install-theme-contract"
   | "refactor-selected-scope"
+  | "refactor-product-wide"
   | "visual-review"
 
 export type ProjectImportPromptOptions = {
   mode: ProjectImportMode
   task: ProjectImportTask
   targetScope?: string
+  userDesignRules?: string
   theme: ThemeOutput
 }
 
 const taskLabels: Record<ProjectImportTask, string> = {
   "install-theme-contract": "Install theme contract",
-  "refactor-selected-scope": "Refactor selected page/component scope",
+  "refactor-selected-scope": "Normalize selected page/component UI with existing content preserved",
+  "refactor-product-wide": "Align the product UI system across pages without redesigning from scratch",
   "visual-review": "Visual review only",
+}
+
+const modeLabels: Record<ProjectImportMode, string> = {
+  "one-shot-page-polish": "One-shot selected-scope UI normalization",
+  "persistent-project-contract": "Persistent project visual contract",
+  "full-reproducible-package": "Full reproducible Theme Lab package",
 }
 
 function markdownList(values: readonly string[]): string {
   return values.map((value) => `- ${value}`).join("\n")
 }
 
-function codeList(values: readonly string[]): string {
-  return values.map((value) => `- \`${value}\``).join("\n")
+function aiInstructionTargetList(): string {
+  return themeLabAiInstructionTargets
+    .map((target) => {
+      const fallback = "fallbackFile" in target ? `; fallback: \`${target.fallbackFile}\`` : ""
+      return `- ${target.tool}: \`${target.primaryFile}\`${fallback}`
+    })
+    .join("\n")
+}
+
+function aiInstructionTargetResolverSection(): string {
+  return `## AI Instruction Target Resolver
+
+The third persistent touchpoint is the target tool's native AI instruction file, not always \`AGENTS.md\`.
+
+${aiInstructionTargetList()}
+
+Rules: use the named tool's file; if a supported file already exists, update it; if several exist, update each with the same Theme Lab section; if the tool is unknown and none exist, use \`AGENTS.md\`. Do not create every file by default. Only the filename changes — the section content stays the same.`
 }
 
 function runtimeCssBlock(theme: ThemeOutput): string {
   return `/* theme-lab:runtime:start */
 ${exportThemeCssFromOutput(theme)}
 /* theme-lab:runtime:end */`
+}
+
+function promptRouteSection(
+  options: ProjectImportPromptOptions,
+  targetScope: string,
+  promptTemplate: string
+): string {
+  return `## Prompt Route
+
+- promptTemplate: \`${promptTemplate}\`
+- selectedMode: \`${options.mode}\` (${modeLabels[options.mode]})
+- selectedTask: \`${options.task}\` (${taskLabels[options.task]})
+- targetScope: \`${targetScope || "(not provided)"}\`
+- designRuleRouter: \`${themeLabDesignRuleLibrary.entrypoint}\` (raw: ${themeLabDesignRuleLibrary.rawEntrypoint})`
 }
 
 const oneShotThemeTokenNames = [
@@ -95,7 +135,7 @@ function pickThemeVariables(
 function oneShotThemeReferenceJson(theme: ThemeOutput): string {
   return JSON.stringify(
     {
-      source: "Theme Lab compact UI polish reference",
+      source: "Theme Lab compact UI normalization reference",
       name: theme.vibe.name,
       keywords: theme.vibe.keywords,
       visualIntent: theme.vibe.visualContract.summary,
@@ -126,7 +166,16 @@ function oneShotThemeReferenceJson(theme: ThemeOutput): string {
   )
 }
 
-function projectImportManifestJson(theme: ThemeOutput): string {
+function normalizeUserDesignRules(userDesignRules?: string): string {
+  return userDesignRules?.trim() ?? ""
+}
+
+function projectImportManifestJson(
+  theme: ThemeOutput,
+  userDesignRules?: string
+): string {
+  const normalizedUserDesignRules = normalizeUserDesignRules(userDesignRules)
+
   return JSON.stringify(
     {
       schemaVersion: 1,
@@ -145,6 +194,14 @@ function projectImportManifestJson(theme: ThemeOutput): string {
         avoid: theme.vibe.avoid,
       },
       tokenContract: themeLabTokenContract,
+      designRuleLibrary: themeLabDesignRuleLibrary,
+      userAuthoredDesignRules: normalizedUserDesignRules
+        ? {
+            source: "Theme Lab export panel",
+            format: "markdown",
+            body: normalizedUserDesignRules,
+          }
+        : undefined,
       aiCoding: {
         defaultProjectMode: "existing-product-project",
         rules: themeLabAiCodingRules,
@@ -155,252 +212,302 @@ function projectImportManifestJson(theme: ThemeOutput): string {
   )
 }
 
-function agentsMarkerBlock(): string {
+function userDesignRulesSection(userDesignRules?: string): string {
+  const normalizedUserDesignRules = normalizeUserDesignRules(userDesignRules)
+
+  if (!normalizedUserDesignRules) {
+    return ""
+  }
+
+  return `## User-Authored Design Rules
+
+\`\`\`md
+${normalizedUserDesignRules}
+\`\`\`
+
+Treat these as higher priority than generic UI taste.
+
+`
+}
+
+function designRuleRawUrl(file: string): string {
+  return `${themeLabDesignRuleLibrary.rawBaseUrl}/${file}`
+}
+
+function designRuleRawFileList(): string {
+  return themeLabDesignRuleLibrary.files
+    .map((value) => `- \`${value}\` -> ${designRuleRawUrl(value)}`)
+    .join("\n")
+}
+
+function colorTokenVocabularySection(): string {
+  return `## Color & Token Vocabulary
+
+This is the complete sanctioned vocabulary for structural UI. Everything you need is here, so do not reach for raw Tailwind palette colors or hex.
+
+Canonical structural classes (shadcn semantic — the primary vocabulary):
+
+- Surfaces: \`bg-background\`, \`bg-card\`, \`bg-popover\`, \`bg-muted\`, \`bg-secondary\`, \`bg-sidebar\`
+- Text: \`text-foreground\`, \`text-muted-foreground\`, and each surface's matching \`*-foreground\`
+- Borders / focus: \`border-border\`, \`ring-ring\`
+- Actions: \`bg-primary text-primary-foreground\`, \`bg-secondary text-secondary-foreground\`, \`bg-destructive text-destructive-foreground\`
+- Radius: \`rounded-[var(--radius-control)]\`, \`rounded-[var(--radius-card)]\`, \`rounded-[var(--radius-panel)]\`
+- Spacing / density: \`h-[var(--control-height-sm)]\` / \`-md\` / \`-lg\`, \`p-[var(--panel-padding)]\`, \`gap-[var(--section-gap)]\`
+- Elevation: \`[box-shadow:var(--elevation-card)]\`, \`[box-shadow:var(--elevation-popover)]\`
+- Motion: \`duration-[var(--duration-base)]\`, \`ease-[var(--ease-standard)]\`
+
+Status color (use only for real success / warning / info / danger meaning):
+
+- soft: \`bg-success-bg text-success-foreground\` (same for warning / info / danger)
+- solid: \`bg-success text-success-foreground\` (same for warning / info / danger)
+
+Categorical color (non-status types, chart and legend series): \`bg-chart-1\`..\`bg-chart-5\`, \`text-chart-1\`..\`text-chart-5\`, \`border-chart-1\`..\`border-chart-5\`
+
+- Assign a stable category-to-index mapping; the same category always uses the same chart color across tables, charts, and legends.
+- Keep to about five meaningful hues; group or neutralize the long tail.
+
+Neutral by default: tags, badges, and labels stay neutral (\`bg-muted\` or the \`outline\` variant) unless they carry real status, type, priority, or category meaning. Do not give every label its own color — that is the rainbow failure to avoid.
+
+Pairing rule (mandatory): every filled background uses its matching \`-foreground\` token (e.g. \`bg-primary text-primary-foreground\`, \`bg-success text-success-foreground\`). Never use a same-role pair such as \`bg-primary text-primary\`.
+
+Optional finer tokens: \`var(--surface-canvas|panel|raised|overlay)\` and \`var(--content-primary|secondary|tertiary)\` exist for finer hierarchy but are not required. Prefer the shadcn classes above and do not duplicate them.
+
+Forbidden for structural UI:
+
+- raw Tailwind palette classes (e.g. \`text-pink-600\`, \`bg-emerald-100\`)
+- hardcoded hex or arbitrary OKLCH values
+- one-off shadows, one-off border colors, mixed or legacy radius scales
+- random gradient utilities
+- new color scales beyond the sanctioned \`--status-*\` and \`--chart-1..5\` families
+
+See \`design-rules/patterns/semantic-color.md\` for when to apply color versus staying neutral.`
+}
+
+function craftParadigmSection(theme: ThemeOutput): string {
+  return `## Craft Paradigm
+
+Normalization makes the UI consistent; craft makes it look good. Do both. Beauty here comes from hierarchy, spacing, restraint, and consistency — not decoration.
+
+Good looks like:
+
+- A calm, mostly neutral canvas with one confident brand accent on the primary action.
+- Clear type hierarchy: one dominant page title, obvious section headings, quiet supporting text.
+- Generous, even spacing and aligned edges; whitespace groups content before borders do.
+- A few strong groups instead of many shallow cards.
+- Status and category color used sparingly and meaningfully (status tokens, chart palette), never as rainbow decoration.
+- Scannable tables and lists: aligned columns, restrained dividers, steady row rhythm.
+- Consistent radius, elevation, and motion across every surface.
+
+Theme-specific craft directives for this seed:
+
+${markdownList(theme.vibe.visualContract.craft)}
+
+Do not add decorative gradients, glassmorphism, random shadows, or ornament. The aesthetic is the result of disciplined hierarchy and token consistency, not added effects.`
+}
+
+function preservationContractSection(): string {
+  return `## Preservation Contract
+
+This is existing-product work. Preserve, across every file you touch:
+
+- routes, navigation model, and information architecture
+- APIs, data loading, mutations, event handlers, and state
+- form schemas, validation, permissions, feature flags, and business logic
+- workflow order and required domain copy
+
+Do not:
+
+- scaffold a new app, replace the component library, or create a parallel design-system folder
+- overwrite global CSS wholesale or rewrite unrelated pages
+- change APIs or data contracts, or leave handlers, validation, or state disconnected
+- install dependencies without approval
+
+After normalizing UI, reconnect existing APIs, data, handlers, validation, permissions, and state. This prompt is not the source of truth — the seed, the runtime CSS variables, and \`theme-lab.json\` are.`
+}
+
+function designRulesSection(): string {
+  return `## Design Rules
+
+Detailed rules live in separate files; this packet only routes to them. Do not inline or invent rules.
+
+- Entrypoint: \`${themeLabDesignRuleLibrary.entrypoint}\` (raw fallback: ${themeLabDesignRuleLibrary.rawEntrypoint}).
+- Load every \`requiredAlways\` rule: rule-router, ui-normalization, token-system, token-binding, visual-qa, completion-compliance.
+- Detect page structure, inventory elements by type, then open only matched files from \`rules[].source\` (local first, raw URL otherwise).
+- Apply matched rules before generic taste. Do not browse or imitate external visual references unless the user explicitly provides one. If a needed rule is missing, make the smallest safe normalization and report it.
+
+Before editing, output a Rule Read Confirmation listing \`ruleIndexRead\`, \`requiredRuleFilesLoaded\`, \`matchedRuleFilesLoaded\` (each with \`source\`, \`elementType\`, \`firstHeading\`), and \`missingRuleFiles\`. Do not claim a rule was applied unless its file was opened.
+
+Raw rule URLs:
+
+${designRuleRawFileList()}`
+}
+
+function criticalRuleNotesSection(): string {
+  return `## Critical Rule Notes
+
+Easy-to-miss behaviors — follow them when the element appears:
+
+- Sidebar: if the scope contains a sidebar, normalize the whole sidebar in the same task. Do not ask an open-ended "should I also update the sidebar?"; include it by default and add: "Direct Confirmation: The selected scope contains a sidebar, so sidebar normalization/replacement is included by default. Please confirm the full plan if you want me to proceed." Preserve nav data, routes, permissions, and active states. See \`design-rules/components/sidebar.md\`.
+- Page heading: reuse the project's heading / action-bar composition with real product metadata. See \`design-rules/components/page-heading.md\`.
+- Cards & tables: open \`design-rules/components/card.md\` and \`table.md\` before changing them; show scannable previews, not dense paragraphs.
+- Forms & inputs: open \`design-rules/components/forms-and-inputs.md\`; preserve labels, validation, default values, submission, disabled/read-only, loading, success, and error behavior.
+- Tabs & switches: open \`design-rules/components/tabs.md\`; use Tabs for single-select view/state switching instead of primary/secondary button rows.
+- Overlays: open \`design-rules/components/overlays.md\`; preserve trigger, controlled open state, focus return, dismissal, form state, and destructive confirmation behavior.
+- Badges & alerts: open \`design-rules/components/badges-and-alerts.md\` plus \`design-rules/patterns/semantic-color.md\`; keep labels neutral unless real status/category/priority meaning exists.
+- Metrics & charts: open \`design-rules/components/metrics-and-charts.md\`; preserve calculations, units, filters, date ranges, chart transforms, and stable series color mapping.
+- Page background: only a quiet top ambient wash per \`design-rules/patterns/page-background.md\`; never tint structural surfaces.
+- Tags & status: see \`design-rules/patterns/semantic-color.md\` — neutral by default, status/chart tokens for meaning.`
+}
+
+function workflowSection(
+  mode: ProjectImportMode,
+  isProductWideTask: boolean
+): string {
+  const isPersistent = mode !== "one-shot-page-polish"
+
+  const planTokenLine = isPersistent
+    ? "- Plan the persistent contract install (the three touchpoints in stage 3)."
+    : "- Plan the minimal complete one-shot token bridge (no persistent files)."
+
+  const implementSetup = isPersistent
+    ? `- Install exactly three persistent touchpoints, updating only marker blocks when they already exist:
+  1. Runtime CSS variables in the existing global CSS file (\`/* theme-lab:runtime:start|end */\`).
+  2. \`theme-lab.json\` at the project root.
+  3. The target tool's native AI instruction file Theme Lab section (\`<!-- theme-lab:agents:start|end -->\`); resolve the file via the AI Instruction Target Resolver.
+- Do not create \`theme.seed.json\`, \`vibe.manifest.json\`, \`theme.algorithm.ts\`, prompt files, or a design-system folder. Do not install local \`design-rules/\` files unless explicitly requested; read raw URLs instead.${
+        isProductWideTask
+          ? "\n- Establish one product layout grammar (app shell, header rhythm, content width, action placement, state design, responsive behavior) before normalizing individual pages."
+          : ""
+      }`
+    : `- Do not create persistent files (no \`theme-lab.json\`, no AI instruction file, no design-system folder, no \`design-rules/\`). Modify only the selected scope.
+- Ensure tokens are available: prefer the project's existing token system; otherwise add the smallest complete runtime CSS variable bridge to the existing global CSS, covering every touched family (surfaces, text, borders, focus, radius, control height, spacing, elevation, status, motion). No partial primary-only bridge.`
+
+  const analyzeScope = isPersistent
+    ? "route/page inventory"
+    : "selected scope"
+
+  return `## Workflow
+
+Work in four stages. Do not start by swapping class values.
+
+### 1. Analyze
+
+- Inspect the repo: framework, CSS strategy, component system, global CSS path, existing tokens/shadcn, and the ${analyzeScope}. Output a compact Project Mode record (\`projectMode\`, \`framework\`, \`cssStrategy\`, \`componentSystem\`, \`globalCssPath\`, \`hasExistingTokens\`, \`hasShadcn\`, \`safeFilesToChange\`, \`filesNotToTouch\`).
+- Global CSS detection order: \`components.json\` tailwind.css path -> \`app/globals.css\` -> \`src/app/globals.css\` -> \`styles/globals.css\` -> \`src/styles/globals.css\` -> root-imported global CSS. Never create a new global CSS file when one exists.
+- Load the design rules and emit the Rule Read Confirmation.
+- Inventory UI by element type: cards, tables, buttons/actions, filters, sidebar/nav, page heading, forms/inputs, tabs/dialogs/popovers, badges/status/alerts, states, metrics/charts, page canvas.
+- Extract the business logic and data flows named in the Preservation Contract.
+
+### 2. Beautify Plan
+
+- Name the top problems (hierarchy, component consistency, token/state/contrast).
+- State the normalization boundary: what content and workflow stay unchanged, which components/classes get standardized, which token pairs apply.
+- Apply the Craft Paradigm: heading hierarchy, spacing rhythm, surface/elevation, restrained accent, stable categorical color mapping.
+${planTokenLine}
+
+### 3. Implement
+
+${implementSetup}
+- Normalize components with existing project components and shadcn/ui primitives; keep the product recognizable.
+- Bind surfaces, text, borders, focus, states, radius, spacing, elevation, and motion to tokens; apply status and chart color per the vocabulary.
+- Reconnect existing APIs, data, handlers, validation, permissions, and state.
+
+### 4. Review
+
+- Token audit on changed files: no raw palette / hex / arbitrary OKLCH; matching foreground/background pairs; token-backed radius, elevation, spacing, focus, and motion; status and chart color used correctly.
+- Beauty review (before -> after): is it calmer, clearer, and more scannable? Is hierarchy stronger and the primary action obvious? Were the craft directives applied? If a change added noise, simplify it before finishing.
+- Run the \`design-rules/core/completion-compliance.md\` gate and available checks (typecheck, lint, build).`
+}
+
+function finalReportSection(mode: ProjectImportMode): string {
+  if (mode === "one-shot-page-polish") {
+    return `## Final Report
+
+\`\`\`md
+## Files Changed
+## Rule Read Confirmation (index, required, matched, missing)
+## Preservation (logic/APIs/data/state preserved + reconnected)
+## Normalization (top hierarchy / consistency / token problems solved; components standardized)
+## Beautify (craft directives applied; hierarchy/spacing/color decisions)
+## Token Bridge & Audit (bridge created/reused; fg/bg pairs; radius/elevation/spacing/focus/motion; status/chart)
+## Better-Than-Before (calmer / clearer / more scannable; simplifications made)
+## QA (typecheck / lint / build / manual)
+## Risks
+\`\`\``
+  }
+
+  return `## Final Report
+
+\`\`\`md
+## Project Mode
+## Files Changed
+## Rule Read Confirmation (index, required, matched, missing)
+## Contract Installed (global CSS block / theme-lab.json / AI instruction file)
+## Preservation (logic/APIs/data/state preserved + reconnected)
+## Normalization (components standardized; shadcn/primitives used; product layout grammar)
+## Beautify (craft directives applied; hierarchy/spacing/color decisions)
+## Token Audit (fg/bg pairs; radius/elevation/spacing/focus/motion; status/chart)
+## Visual QA (before -> after: calmer / clearer / scannable; pages still needing alignment)
+## QA (typecheck / lint / build / manual)
+## Risks / Follow-ups
+\`\`\``
+}
+
+function agentsMarkerBlock(userDesignRules?: string): string {
   return `<!-- theme-lab:agents:start -->
 
 # Theme Lab Contract
 
 This project uses a Theme Lab generated visual system.
 
+## Language Rule
+
+All AI-facing instructions, theme manifests, vibe descriptors, task packets, and final implementation reports must be written in English. Preserve code identifiers, file paths, route paths, API names, and user-provided business copy literally when needed.
+
 ## Source of Truth
 
 - \`theme-lab.json\` contains the theme DNA, algorithm version, vibe, token contract, and AI coding rules.
+- \`design-rules/index.json\` routes element types to detailed markdown rule files.
 - The global CSS file contains the runtime CSS variables.
 - One-time prompts are not the source of truth.
 
 ## Theme Change Rule
 
-Do not manually invent new structural visual values.
+Do not invent new structural visual values. When changing UI, consume the compiled CSS variables and token classes. When changing theme direction, update the Theme Lab seed in \`theme-lab.json\` and regenerate the compiled CSS variables.
 
-When changing UI, consume the compiled CSS variables and token classes.
+${userDesignRulesSection(userDesignRules)}## UI Normalization Rule
 
-When changing the theme direction, update the Theme Lab seed in \`theme-lab.json\` and regenerate the compiled CSS variables.
+Before UI changes, read \`design-rules/index.json\` when it exists, load \`requiredAlways\` rules, inventory the scope by element type, and open only matched files from \`rules[].source\`. Output a Rule Read Confirmation before editing; do not claim a rule was applied unless its file was opened.
 
-## Existing Project Rule
-
-Default to existing-product-project unless the repository is clearly empty or the user explicitly requests a new project.
-
-Preserve:
-
-- routes
-- API calls
-- data loading
-- state management
-- event handlers
-- form schemas
-- validation
-- permissions
-- feature flags
-- business logic
-- domain copy
-
-Do not:
-
-- scaffold a new app inside this project
-- replace the component system
-- create a parallel design-system folder
-- overwrite global CSS wholesale
-- install dependencies unless explicitly approved
-- rewrite unrelated pages
-- change APIs or data contracts
+Treat redesign/optimize/rebuild/refactor requests as UI normalization by default, not a full redesign. Preserve existing content, information architecture, workflow order, routes, APIs, state, validation, permissions, and domain copy. Do not wipe the UI tree or move major content regions unless the user asks for a full redesign. Prefer existing project components and shadcn/ui primitives. Do not browse external visual references unless the user provides one. Reconnect APIs, data, handlers, validation, navigation, permissions, and state after normalizing.
 
 ## Styling Rule
 
 Allowed:
 
-- shadcn adapter tokens
-- semantic CSS variables
-- token-bound Tailwind classes
-- existing component variants
+- shadcn semantic classes and token-backed Tailwind utilities
+- the \`--status-*\` families (\`bg-success-bg text-success-foreground\`, \`bg-success text-success-foreground\`, and warning/info/danger)
+- the categorical palette \`bg-chart-1..5\` / \`text-chart-1..5\` with a stable category-to-index mapping
+- token-backed radius such as \`rounded-[var(--radius-card)]\`, \`rounded-[var(--radius-control)]\`, \`rounded-[var(--radius-panel)]\`
+
+Tags and labels stay neutral unless they carry real status or category meaning. Every filled background uses its matching \`-foreground\` token; never use same-role pairs such as \`bg-primary text-primary\`.
 
 Forbidden for structural UI:
 
-- raw Tailwind palette classes
-- hardcoded hex colors
-- arbitrary OKLCH values
-- one-off shadows
-- one-off border colors
-- unapproved color scales
+- raw Tailwind palette classes, hardcoded hex, arbitrary OKLCH values
+- one-off shadows or border colors, legacy/mixed radius scales, random gradients
+- new color scales beyond the sanctioned \`--status-*\` and \`--chart-1..5\` families
 
 ## Workflow
 
-Before UI changes:
-
-1. Read \`theme-lab.json\`.
-2. Locate the global CSS theme block.
-3. Identify the selected page/component scope.
-4. Preserve business logic.
-5. Refactor only the selected scope unless broader rollout is approved.
-6. Report files changed, QA, and risks.
+1. Read \`theme-lab.json\` and \`design-rules/index.json\` (when present); load required and matched rules.
+2. Locate the global CSS theme block and the selected scope.
+3. Preserve business logic, API contracts, data loading, handlers, validation, and permissions.
+4. Normalize the scope with project components, shadcn/ui primitives, matched rules, and Theme Lab tokens.
+5. Verify semantic foreground/background pairs and reconnect APIs and interactions.
+6. Report files changed, rule files loaded, QA, and risks.
 
 <!-- theme-lab:agents:end -->`
-}
-
-function selectedStrategySection(mode: ProjectImportMode): string {
-  if (mode === "one-shot-page-polish") {
-    return `Mode: One-shot page polish
-
-This is the smallest-change option.
-
-File strategy:
-- Do not create \`theme-lab.json\`.
-- Do not create or update \`AGENTS.md\`.
-- Do not create \`theme.seed.json\`.
-- Do not create \`vibe.manifest.json\`.
-- Do not create \`theme.algorithm.ts\`.
-- Do not create a design-system folder.
-- Do not install dependencies.
-- Modify only the selected page/component scope.
-- If no selected scope is provided, stop after project inspection and ask the user for a target scope.
-
-Tradeoff:
-This option has the smallest project footprint, but it does not persist the Theme Lab DNA or AI rules. Future AI coding tasks may not follow this visual system unless the user provides the prompt again.`
-  }
-
-  if (mode === "full-reproducible-package") {
-    return `Mode: Full reproducible package
-
-This is the advanced option for teams or long-term projects that want local theme regeneration.
-
-File strategy:
-Start with the persistent project contract:
-
-1. Existing global CSS theme block
-2. \`theme-lab.json\`
-3. \`AGENTS.md\` Theme Lab section
-
-Additionally, the AI may create:
-
-- \`theme.seed.json\`
-- \`vibe.manifest.json\`
-- \`theme.algorithm.ts\` or a local \`deriveTheme\` file, depending on existing project structure
-
-Rules:
-- Do not add dependencies.
-- Do not create a large enterprise design system.
-- Do not create prompt files unless explicitly requested.
-- Do not create a duplicate component library.
-- Do not rewrite unrelated app files.
-- If the project is not TypeScript/JavaScript based, ask before creating algorithm files.
-
-## Theme Change Rule
-
-When changing UI, consume the existing compiled CSS variables and token contract.
-
-When changing theme direction, update the seed, then regenerate compiled CSS variables through Theme Lab or the available local theme generation pipeline.
-
-Do not manually invent new structural visual values.
-
-Limitation:
-Do not invent algorithm internals. Use the provided seed, algorithmVersion, runtime CSS variables, and included algorithm handoff only when it fits the local project structure.`
-  }
-
-  return `Mode: Persistent project contract
-
-This is the recommended option for existing projects.
-
-File strategy:
-Create or update exactly these persistent touchpoints:
-
-1. Existing global CSS theme block
-2. \`theme-lab.json\`
-3. \`AGENTS.md\` Theme Lab section
-
-Do not create additional theme files unless the user explicitly requests the full reproducible package.
-
-Global CSS marker:
-
-\`\`\`css
-/* theme-lab:runtime:start */
-/* generated runtime variables */
-/* theme-lab:runtime:end */
-\`\`\`
-
-AGENTS.md marker:
-
-\`\`\`md
-<!-- theme-lab:agents:start -->
-...
-<!-- theme-lab:agents:end -->
-\`\`\`
-
-If marker blocks already exist, update only the marker block.
-Do not rewrite entire files.
-
-## Persistent Theme Contract
-
-Use the stable three-file contract:
-
-1. Runtime CSS variables in the existing global CSS file.
-2. \`theme-lab.json\` at the project root.
-3. \`AGENTS.md\` Theme Lab section.
-
-Do not create:
-
-- \`theme.seed.json\`
-- \`vibe.manifest.json\`
-- prompt files
-- design-system folder
-- duplicate component library
-- \`theme.algorithm.ts\`
-
-Exception:
-Create \`theme.algorithm.ts\` only if the user explicitly requests local deterministic regeneration.`
-}
-
-function taskInstructionSection(
-  task: ProjectImportTask,
-  targetScope: string
-): string {
-  if (task === "visual-review") {
-    return `Task: ${taskLabels[task]}
-
-Do not modify files. Only inspect and report.
-Do not create files.
-Do not edit CSS.
-Do not run formatters that change files.
-You may read files, run non-mutating checks, and produce recommendations.`
-  }
-
-  if (task === "refactor-selected-scope") {
-    return `Task: ${taskLabels[task]}
-
-Refactor only the selected page/component scope.
-The selected scope is required for this task.
-If the selected scope cannot be found, stop and ask the user before changing files.`
-  }
-
-  return `Task: ${taskLabels[task]}
-
-Install the selected Theme Lab contract.
-Target scope is optional for this task.
-If no selected scope is provided, install the allowed contract files only and do not perform broad UI refactors.`
-}
-
-function selectedScopeSection(targetScope: string): string {
-  return `Selected scope:
-\`${targetScope || "(not provided)"}\`
-
-If no selected scope is provided, inspect the project but do not perform broad UI changes. Ask the user to provide a route, page, component, or feature area before refactoring UI.`
-}
-
-function aiUiOptimizationSection(): string {
-  return `## AI UI Optimization Guidance
-
-This packet can be used with AI UI tools such as v0, Codex, Cursor, or Claude Code.
-
-When optimizing UI:
-
-- Be specific about the screen, component, user role, and desired interaction state.
-- Treat uploaded screenshots, selected elements, or selected files as the target scope.
-- Keep existing routes, data fetching, event handlers, validation, permissions, and business logic.
-- Improve visual hierarchy, spacing, typography, responsive behavior, and interaction states before adding new features.
-- Add or improve empty, loading, error, disabled, hover, focus, selected, and success states when relevant.
-- Prefer existing project components and shadcn/ui primitives such as Button, Card, Dialog, Tabs, Table, DropdownMenu, Sheet, Tooltip, Badge, Input, and Label.
-- Use standard product UI compositions: Settings = Tabs + Card + Form; dashboard = Card + Badge + Table; CRUD = Table + DropdownMenu + Sheet; auth/onboarding = Card + Label + Input + Button.
-- Use the exported theme tokens for surfaces, text, borders, rings, radius, shadows, and states.
-- Avoid decorative gradients, random shadows, raw palette classes, hardcoded colors, mixed radii, nested cards, and unrelated rewrites.
-- After changes, normalize the output: replace ad-hoc controls with project components, align typography and density, and remove one-off visual effects.`
 }
 
 function themeArtifactsSection(
@@ -440,12 +547,12 @@ ${runtimeCssBlock(theme)}
 
 \`theme-lab.json\` content:
 \`\`\`json
-${projectImportManifestJson(theme)}
+${projectImportManifestJson(theme, options.userDesignRules)}
 \`\`\`
 
-\`AGENTS.md\` Theme Lab section content:
+Target AI instruction file Theme Lab section content:
 \`\`\`md
-${agentsMarkerBlock()}
+${agentsMarkerBlock(options.userDesignRules)}
 \`\`\`
 
 Vibe summary:
@@ -484,109 +591,45 @@ function compileOneShotPagePolishPrompt(
   options: ProjectImportPromptOptions,
   targetScope: string
 ): string {
-  return `# One-Shot UI Polish Task
+  return `# One-Shot Selected-Scope UI Normalization Task
+
+${promptRouteSection(options, targetScope, "one-shot-selected-scope-ui-normalization")}
+
+## Language
+
+Write all task instructions, plans, notes, and reports in English. Preserve code identifiers, file paths, route paths, API names, and user-provided business copy literally.
 
 ## Goal
 
-Optimize the selected page or component once. Make the current interface feel more polished, clearer, and easier to use without turning this into a long-term design-system migration.
+Normalize and beautify one selected page or component, once, with no persistent files. Preserve its behavior, content, information architecture, and workflow order. This is neither a blind token swap nor a redesign from scratch: make the existing UI more consistent and more polished by standardizing components and binding styles to Theme Lab tokens.
 
-## Vercel Skill Lens
-
-Use a v0-style workflow for UI generation: selected files or screenshots define the target, the output is a scoped code change, and shadcn/ui + Tailwind tokens are the default implementation language.
-
-Use shadcn/ui guidance for component composition: prefer existing Button, Card, Dialog, Tabs, Table, DropdownMenu, Sheet, Tooltip, Badge, Input, Label, Separator, and similar primitives before creating custom controls.
+${preservationContractSection()}
 
 ## Hard Scope
 
-Selected scope:
-\`${targetScope || "(not provided)"}\`
+Selected scope: \`${targetScope || "(not provided)"}\`
 
-If no selected scope is provided, inspect the project and ask for a route, page, component, or screenshot target before editing.
+If no scope is provided, inspect the project and ask for a route, page, component, or screenshot before editing. Modify only the selected scope; do not optimize other pages or broad cross-page consistency, and do not create \`theme-lab.json\`, any AI instruction file, \`theme.seed.json\`, \`vibe.manifest.json\`, \`theme.algorithm.ts\`, a design-system folder, or \`design-rules/\` files.
 
-Do not:
-
-- create or update \`theme-lab.json\`
-- create or update \`AGENTS.md\`
-- create \`theme.seed.json\`
-- create \`vibe.manifest.json\`
-- create \`theme.algorithm.ts\`
-- create a design-system folder
-- install dependencies
-- rewrite unrelated pages
-- optimize other page styling or broad cross-page visual consistency
-- change routes, APIs, data loading, state machines, validation, permissions, or business logic
+${colorTokenVocabularySection()}
 
 ## Compact Theme Lab Reference
 
-Use this as visual direction and token context only. Do not persist it as a project contract.
+Use this as token and visual-direction context. Do not persist it as a project contract.
 
 \`\`\`json
 ${oneShotThemeReferenceJson(options.theme)}
 \`\`\`
 
-## Styling Work
+${craftParadigmSection(options.theme)}
 
-Spend most effort on the current interface:
+${designRulesSection()}
 
-- Clarify hierarchy: make primary actions, section titles, active states, and supporting text obvious.
-- Clean layout: align edges, normalize gaps, avoid cramped groups, and keep density consistent.
-- Improve surfaces: use standard cards/panels/dialogs with restrained borders, radius, and elevation.
-- Improve typography: use balanced headings, readable line-height, consistent caption/body sizes, and no orphaned labels.
-- Improve controls: make buttons, tabs, menus, inputs, toggles, and cards feel like one system.
-- Improve states: add or refine hover, active, focus-visible, selected, disabled, loading, empty, error, and success states where relevant.
-- Improve responsiveness: check mobile and desktop layouts, prevent overflow, and keep long text readable.
-- Improve dark mode only if the selected scope already supports it or the issue is visible in the selected scope.
+${criticalRuleNotesSection()}
 
-## Interface Quality Checklist
+${workflowSection(options.mode, false)}
 
-Apply this Web Interface Guidelines subset while editing:
-
-- Use semantic interactive elements: \`button\` for actions and \`a\`/\`Link\` for navigation.
-- Icon-only buttons need \`aria-label\`; decorative icons need \`aria-hidden="true"\`.
-- Form controls need labels or \`aria-label\`; labels should share a comfortable hit target with their control.
-- Every interactive element needs a visible \`focus-visible\` state.
-- Do not use \`transition-all\`; list animated properties such as color, background-color, border-color, box-shadow, opacity, transform, or width.
-- Prefer transform/opacity animation and respect reduced-motion when adding meaningful motion.
-- Text containers should handle long content with \`min-w-0\`, \`truncate\`, \`line-clamp\`, or \`break-words\`.
-- Use \`text-wrap: balance\` or \`text-pretty\` on prominent headings when supported by the existing stack.
-- Avoid raw palette classes, hardcoded hex, arbitrary OKLCH, random gradients, and one-off shadows for structural UI.
-- Keep copy concise, action-oriented, and specific.
-
-## Execution
-
-1. Inspect the selected files and nearby components.
-2. Identify the smallest set of files needed for the visual improvement.
-3. Preserve behavior and data flow.
-4. Make the scoped UI polish using existing components and the compact Theme Lab reference.
-5. Run available typecheck, lint, build, or route-level checks.
-6. Report changed files, visual improvements, checks run, and any risk.
-
-## Final Response Format
-
-\`\`\`md
-## Files Changed
-
-...
-
-## UI Polish
-
-...
-
-## Preserved
-
-...
-
-## QA
-
-- typecheck:
-- lint:
-- build:
-- manual/browser check:
-
-## Risks
-
-...
-\`\`\`
+${finalReportSection(options.mode)}
 `
 }
 
@@ -599,309 +642,49 @@ export function compileProjectImportPrompt(
     return compileOneShotPagePolishPrompt(options, targetScope)
   }
 
+  const isProductWideTask = options.task === "refactor-product-wide"
+
   return `# Theme Lab AI Task Packet
+
+${promptRouteSection(
+  options,
+  targetScope,
+  isProductWideTask
+    ? "persistent-product-wide-ui-alignment"
+    : "persistent-selected-scope-ui-normalization"
+)}
+
+## Language
+
+Write all task instructions, plans, notes, and reports in English. Preserve code identifiers, file paths, route paths, API names, and user-provided business copy literally.
 
 ## Mission
 
-This is a Theme Lab AI Task Packet.
-
-Default assumption: this is an existing product project unless the repository is clearly empty or the user explicitly asks for a new project.
-
-Default task posture: existing project theme integration / UI refactor, not a new project scaffold.
-
-First inspect the project. Do not create or modify any files until you understand the project mode, CSS strategy, component system, global CSS location, and selected scope.
-
-${taskInstructionSection(options.task, targetScope)}
-
-## Source of Truth
-
-Do not treat this prompt as the source of truth. The source of truth is the Theme Lab seed, algorithm version, and exported runtime CSS variables.
-
-- seed / \`theme-lab.json\` seed = portable design intent.
-- algorithmVersion = deterministic generation reference.
-- theme.css / global CSS variables = runtime styling source.
-- vibe manifest = visual guidance, not CSS source.
-- \`AGENTS.md\` = persistent AI coding rules when installed.
-
-## Project Mode Gate
-
-Before creating or modifying any files, inspect the repository and classify it as one of:
-
-- \`new-project\`
-- \`existing-small-project\`
-- \`existing-product-project\`
-- \`mature-product-project\`
-- \`unknown\`
-
-Default to \`existing-product-project\` unless the repository is clearly empty or the user explicitly requested a new project.
-
-Check:
-
-- \`package.json\`
-- lockfile
-- \`app/\`
-- \`src/app/\`
-- \`pages/\`
-- \`src/pages/\`
-- \`components/\`
-- \`components/ui\`
-- \`components.json\`
-- global CSS file
-- Tailwind setup
-- existing CSS variables
-- existing token files
-- existing component library
-- selected target file or route
-
-Before edits, output:
-
-\`\`\`json
-{
-  "projectMode": "existing-product-project",
-  "framework": "Next.js",
-  "cssStrategy": "Tailwind v4",
-  "componentSystem": "shadcn/ui",
-  "globalCssPath": "app/globals.css",
-  "hasExistingTokens": true,
-  "hasShadcn": true,
-  "recommendedAction": "install-theme-bridge-and-refactor-selected-scope",
-  "safeFilesToChange": [],
-  "filesNotToTouch": [],
-  "needsUserConfirmation": []
-}
-\`\`\`
-
-Global CSS detection priority:
-
-1. \`components.json\` \`tailwind.css\` path when available.
-2. \`app/globals.css\`
-3. \`src/app/globals.css\`
-4. \`styles/globals.css\`
-5. \`src/styles/globals.css\`
-6. \`app/layout\` or root entry imported global CSS.
-
-Do not create a new global CSS file when an existing one is present.
-If marker blocks already exist, update only the marker block.
-Do not rewrite the entire global CSS file.
-
-## Selected Import Strategy
-
-${selectedStrategySection(options.mode)}
-
-## Existing Project Rules
-
-For existing projects, preserve:
-
-- routes
-- API calls
-- data loading
-- state management
-- event handlers
-- form schemas
-- validation
-- permissions
-- feature flags
-- conditional rendering
-- business copy
-- domain logic
-
-Allowed changes:
-
-- theme variable mapping
-- CSS token bridge
-- selected page/component styling
-- layout hierarchy
-- surface hierarchy
-- spacing / density
-- borders / radius / elevation
-- focus / hover / selected states
-- empty / loading / error / success states
-- responsive behavior
-- component composition, only when safe
-
-Forbidden by default:
-
-- scaffold a new app
-- overwrite global CSS wholesale
-- install dependencies
-- replace component library
-- create a parallel design-system folder
-- rewrite unrelated pages
-- rewrite app shell globally
-- remove business logic
-- change APIs or data contracts
-- introduce raw Tailwind palette classes for structural UI
-- introduce hardcoded hex colors
-- introduce arbitrary OKLCH values
-
-## New Project Rules
-
-Only use these rules when the repository is clearly empty or the user explicitly requested a new project.
-
-For new projects:
-
-- create the minimum viable theme foundation
-- use Theme Lab runtime variables as the styling source
-- use shadcn-compatible tokens if shadcn exists or is explicitly requested
-- do not create an enterprise-scale design system
-- do not create unnecessary docs
-- do not create broad component libraries unless requested
-- keep file count small
-
-## Theme Integration Strategy
-
-If React + Tailwind + shadcn exists:
-
-- map Theme Lab shadcn adapter tokens into existing global CSS
-- keep existing shadcn component structure
-- replace raw structural palette classes with theme tokens inside selected scope
-
-If React + Tailwind exists but shadcn does not:
-
-- do not install shadcn by default
-- use existing local components first
-- map semantic CSS variables into global CSS only when selected strategy allows persistence
-- ask before introducing shadcn
-
-If MUI / Ant Design / Chakra / Mantine / other suite exists:
-
-- do not replace the suite
-- map Theme Lab tokens into existing theme provider or CSS variable bridge
-- preserve existing suite components
-
-If custom CSS / custom components exist:
-
-- create a minimal CSS variable bridge only when selected strategy allows persistence
-- refactor repeated structural styles gradually
-- do not create a second design system
-
-## Token Contract
-
-Allowed structural tokens/classes:
-
-${codeList(themeLabTokenContract.allowed)}
-
-Forbidden structural styling:
-
-${markdownList([
-  "bg-blue-600",
-  "bg-zinc-950",
-  "text-zinc-500",
-  "border-gray-200",
-  "hardcoded hex",
-  "arbitrary OKLCH",
-  "one-off shadow values",
-  "one-off border colors",
-  "random gradient utilities",
-  "unapproved new color scales",
-])}
-
-Raw Tailwind palette classes may be acceptable for non-structural one-off content only when explicitly justified, but they are forbidden for theme-bearing UI structure.
-
-## Visual Contract
-
-This theme is designed for product interfaces, not decorative marketing pages.
-
-Use the exported tokens to maintain:
-
-- clear surface hierarchy
-- consistent component styling
-- readable density
-- restrained brand emphasis
-- predictable interaction states
-- accessible contrast
-- stable dark mode
-
-Do not add decorative visual effects unless the user explicitly asks.
-
-Avoid:
-
-- raw Tailwind palette classes for structural UI
-- hardcoded hex colors
-- arbitrary OKLCH values
-- decorative gradients
-- random shadows
-- unapproved glassmorphism
-- copying Theme Lab preview fixtures into the user project
-
-${aiUiOptimizationSection()}
-
-## Selected Scope
-
-${selectedScopeSection(targetScope)}
-
-## Execution Plan
-
-1. Inspect project structure.
-2. Detect project mode.
-3. Find global CSS and token/component baseline.
-4. Decide integration strategy.
-5. Apply the selected file strategy.
-6. Inspect selected scope if provided.
-7. Preserve business logic.
-8. Refactor visual structure to use tokens if task allows modifications.
-9. Improve hierarchy, density, states, and responsive behavior if task allows modifications.
-10. Run available checks.
-11. Report changed files and risks.
-
-${options.task === "visual-review" ? "Do not modify files. Only inspect and report." : ""}
-
-## Final Response Format
-
-Use this final response structure:
-
-\`\`\`md
-## Project Mode Detected
-
-...
-
-## Files Inspected
-
-...
-
-## Files Changed
-
-...
-
-## File Strategy Applied
-
-...
-
-## Token Bridge
-
-Created / reused / skipped.
-
-## Component System
-
-...
-
-## Business Logic Preservation
-
-List preserved logic and any risky areas.
-
-## Visual Changes
-
-...
-
-## QA
-
-- typecheck:
-- lint:
-- build:
-- browser/manual check:
-
-## Dependencies
-
-Added: none / list
-
-## Risks / Follow-ups
-
-...
-\`\`\`
+This is an existing product project (assume so unless the repo is clearly empty or the user asks for a new one). Install the Theme Lab visual contract and ${
+    isProductWideTask
+      ? "align the product UI across routes into one coherent, token-bound system"
+      : "normalize the selected scope into the token-bound system"
+  } — normalizing inconsistent components and beautifying the result without redesigning workflows. Token replacement alone is not success. Inspect the project before changing any file; do not scaffold a new app.
+
+${preservationContractSection()}
+
+${colorTokenVocabularySection()}
 
 ## Theme Artifacts
 
 ${themeArtifactsSection(options, targetScope)}
+
+${craftParadigmSection(options.theme)}
+
+${designRulesSection()}
+
+${criticalRuleNotesSection()}
+
+${aiInstructionTargetResolverSection()}
+
+${workflowSection(options.mode, isProductWideTask)}
+
+${finalReportSection(options.mode)}
 `
 }
 
@@ -910,7 +693,7 @@ export function exportPersistentProjectContractFromOutput(
 ): string {
   return compileProjectImportPrompt({
     mode: "persistent-project-contract",
-    task: "install-theme-contract",
+    task: "refactor-product-wide",
     theme,
   })
 }

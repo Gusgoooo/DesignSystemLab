@@ -14,6 +14,8 @@ Current repository state:
 - Components: product UI lives in `components/theme-lab`; shadcn/ui base
   components live in `components/ui`.
 - Styles: Tailwind v4 and theme variables live in `app/globals.css`.
+- Distributed design rules: detailed AI UI rules live in `design-rules/`.
+  Start from `design-rules/index.json` and load only matched markdown rules.
 - Aliases: `@/*` is configured in `tsconfig.json` and `components.json`.
 - Static output: `next.config.ts` uses `output: "export"` and writes the
   publishable static artifact to `out/`.
@@ -42,6 +44,8 @@ mapping, shadcn adapter output, preview pages, and exportable theme artifacts.
 - `components/theme-lab`: theme lab UI, preview frame, control panel, preview
   tabs.
 - `components/ui`: shadcn/ui base components.
+- `design-rules`: distributed markdown rule library for AI UI normalization.
+  `design-rules/index.json` routes UI element types to detailed rule files.
 - `styles` or `app/globals.css`: Tailwind and shadcn theme integration.
 
 Prefer the repository's existing structure once it exists. If both `src/*` and
@@ -95,6 +99,62 @@ existing semantic tokens.
 Preview components should consume semantic classes, not raw palette values. Raw
 palette or map-token classes are acceptable only in pages or components that are
 explicitly displaying token swatches.
+
+## Design rule routing
+
+Do not compress all UI rules into a single prompt. Before UI normalization:
+
+1. Read `design-rules/index.json`.
+2. Load rules marked `requiredAlways`.
+3. Inventory the selected UI by element type.
+4. Match element types against `rules[].appliesTo`.
+5. Open only the matched `rules[].source` files.
+6. Apply matched rules before generic UI judgment.
+7. If no rule matches, keep changes conservative and report the missing rule.
+
+The distributed rule library currently covers page shell/layout routing,
+standard dashboard blocks, cards, tables, page headings, sidebars,
+actions/buttons, filters/controls, forms/inputs, tabs, overlays,
+badges/alerts, metrics/charts, page backgrounds, UI states, token system
+installation, token binding, product alignment, visual QA, completion
+compliance, and the rule router itself.
+
+## Design rule authoring
+
+Keep rule placement consistent:
+
+- The tool-native AI instruction file stores durable agent behavior, routing
+  policy, token contract boundaries, and rule authoring policy.
+- Detailed component, block, pattern, token, or QA rules live in dedicated
+  `design-rules/**/*.md` files.
+- `design-rules/index.json` registers every rule with `source`,
+  `requiredAlways`, and `appliesTo`.
+- Exported prompts should route to local files or raw GitHub URLs instead of
+  embedding long rule bodies.
+- Do not add detailed rules to the import dialog UI.
+
+When adding a new rule, update the dedicated rule file, `design-rules/index.json`,
+the export manifest/list if needed, and only add a short routing or authoring
+note to the tool-native AI instruction file. Do not expand it into a
+component-rule handbook.
+
+## AI instruction targets
+
+Use the target tool's native instruction file when installing Theme Lab guidance:
+
+- Claude Code: `CLAUDE.md`
+- Codex and generic coding agents: `AGENTS.md`
+- Cursor: `.cursor/rules/theme-lab.mdc` when Cursor rules exist; otherwise
+  `AGENTS.md` is acceptable for cross-agent compatibility.
+- GitHub Copilot: `.github/copilot-instructions.md`
+- Gemini CLI: `GEMINI.md`
+- Windsurf/Cascade: `.windsurfrules`
+- Qoder: `AGENTS.md` is compatible; native Qoder rules may override it.
+
+Do not create every supported instruction file by default. Detect the target AI
+tool or existing instruction files first, then update the matching native file.
+Create multiple instruction files only when the user explicitly requests
+multi-tool compatibility.
 
 ## Token architecture
 
