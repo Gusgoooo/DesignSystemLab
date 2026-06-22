@@ -109,7 +109,7 @@ to provide the rule files or a raw URL. Do not hallucinate rule contents.
 ## Do Not
 
 - Do not load every rule file unless the user asks for a full rule audit.
-- Do not invent a new visual system because a rule is missing.
+- Do not invent a new design system because a rule is missing.
 - Do not ignore local business logic, API behavior, permissions, state, or domain copy.
 - Do not copy demo content from referenced component examples.
 - Do not claim a rule file was read unless it was actually opened.

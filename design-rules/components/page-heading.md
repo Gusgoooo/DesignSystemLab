@@ -66,7 +66,7 @@ Use project or shadcn components for actions and menus:
 
 ## Token Binding
 
-Convert raw sample colors to Theme Lab tokens:
+Convert raw sample colors to Design System Lab tokens:
 
 - `text-foreground`
 - `text-muted-foreground`

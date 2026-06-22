@@ -67,7 +67,7 @@ Do not leave many unrelated numbers floating in one flat stack.
 
 ## Token Binding
 
-Structural card UI must use Theme Lab tokens:
+Structural card UI must use Design System Lab tokens:
 
 - shell: `bg-card text-card-foreground`
 - border: `border-border`

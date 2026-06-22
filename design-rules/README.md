@@ -1,6 +1,6 @@
-# Theme Lab Design Rules
+# Design System Lab Design Rules
 
-This directory is the distributed design rule library for Theme Lab.
+This directory is the distributed design rule library for Design System Lab.
 
 Agents should not read every file by default. Start from `design-rules/index.json`,
 inventory the selected UI scope, then open only the matched rule files.

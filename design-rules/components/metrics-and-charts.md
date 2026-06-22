@@ -79,7 +79,7 @@ Do not generate random series colors.
 
 ## Token Binding
 
-Use Theme Lab tokens:
+Use Design System Lab tokens:
 
 - metric card shell: `bg-card text-card-foreground`
 - page/chart surface: `bg-background` or `bg-card`
@@ -92,7 +92,7 @@ Use Theme Lab tokens:
 - status: status token families
 
 Hardcoded chart colors are allowed only inside a chart adapter if they are
-directly bound to Theme Lab CSS variables.
+directly bound to Design System Lab CSS variables.
 
 ## States
 

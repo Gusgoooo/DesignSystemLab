@@ -49,9 +49,9 @@ export function exportAgentsThemeRulesFromOutput(
   userDesignRules?: string
 ): string {
   return `<!-- theme-lab:agents:start -->
-## Theme Lab Contract
+## Design System Lab Contract
 
-This project uses Theme Lab as a persistent visual system contract.
+This project uses Design System Lab as a persistent design system contract.
 
 Theme name:
 ${theme.vibe.name}
@@ -69,10 +69,10 @@ Runtime source:
 
 - Read \`theme-lab.json\` before UI changes.
 - Read \`${themeLabDesignRuleLibrary.entrypoint}\` before UI normalization when it exists.
-- The existing global CSS Theme Lab marker block is the runtime source for CSS variables.
+- The existing global CSS Design System Lab marker block is the runtime source for CSS variables.
 - One-time prompts are not the source of truth.
 - When changing UI, consume the existing compiled CSS variables and token contract.
-- When changing theme direction, update the seed in \`theme-lab.json\`, then regenerate compiled CSS variables through Theme Lab or the available theme generation pipeline.
+- When changing theme direction, update the seed in \`theme-lab.json\`, then regenerate compiled CSS variables through Design System Lab or the available theme generation pipeline.
 - Do not manually invent new structural visual values.
 
 Distributed design rule router:
@@ -103,7 +103,7 @@ ${designRuleFileList()}
 
 AI instruction targets:
 
-Use the target tool's native instruction file for this Theme Lab section:
+Use the target tool's native instruction file for this Design System Lab section:
 
 ${aiInstructionTargetList()}
 
@@ -127,7 +127,7 @@ UI normalization rule:
 - Preserve existing page content, information architecture, workflow order, business rules, routes, APIs, data loading, state, handlers, forms, validation, permissions, feature flags, and domain copy.
 - Do not discard the old visible UI tree by default; normalize components, repeated style fragments, token usage, spacing, radius, elevation, and states around the existing product structure.
 - Prefer existing project components and shadcn/ui primitives for controls and repeated patterns when behavior can be preserved.
-- Use user-authored Theme Lab design rules as the design source; do not browse, import, or imitate external visual references unless the user explicitly asks.
+- Use user-authored Design System Lab design rules as the design source; do not browse, import, or imitate external visual references unless the user explicitly asks.
 - Before editing, identify which user-authored design rule applies to the selected UI pattern; if no rule exists, make the smallest safe normalization and report the missing rule.
 - Decorative exceptions explicitly defined by user-authored rules may use non-token colors or values only for non-structural ambient layers, never for text, primary surfaces, borders, focus rings, or actionable states.
 - For plain page canvases, a very subtle page-top ambient wash may be added as a non-structural background layer behind content.
@@ -145,7 +145,7 @@ UI normalization rule:
 - Page heading metadata should be compact icon + short text facts below the title, using actual product fields such as status, type, owner, team, location, date, amount, workspace, lifecycle stage, last updated, or due date.
 - Do not copy page heading demo content such as job titles, fake locations, fake salaries, or fake dates; preserve the product's real title, metadata, breadcrumbs, status, filters, and action semantics.
 - Do not add \`@heroicons/react\` or \`@headlessui/react\` for page headings unless the project already uses them; map icons to the existing icon library and menus/actions to existing shadcn or project components.
-- Convert page heading raw sample colors to Theme Lab tokens: \`text-foreground\`, \`text-muted-foreground\`, \`bg-background\`, \`bg-primary text-primary-foreground\`, \`border-border\`, \`ring-ring\`, and existing button variants.
+- Convert page heading raw sample colors to Design System Lab tokens: \`text-foreground\`, \`text-muted-foreground\`, \`bg-background\`, \`bg-primary text-primary-foreground\`, \`border-border\`, \`ring-ring\`, and existing button variants.
 - Keep page headings unframed by default; do not wrap the whole heading in a decorative card unless the product already uses framed headers.
 - Page heading actions must preserve behavior: keep the primary action visible, make secondary actions quieter, and collapse secondary actions into a More dropdown on small screens when horizontal space is limited.
 - Page headings must avoid overflow: long titles should use \`min-w-0\`, \`truncate\`, wrapping, or responsive stacking, and actions must not collide with the title.
@@ -161,14 +161,14 @@ UI normalization rule:
 - Do not copy shadcn demo content, fake teams, fake projects, fake users, or placeholder routes into the product; the block is only an implementation pattern.
 - Sidebar replacement must preserve existing route URLs, active route logic, permissions, badges/counts, account or workspace context, user menu actions, collapse behavior, and responsive behavior unless the user explicitly changes them.
 - Sidebar replacement must use shadcn sidebar primitives such as \`SidebarProvider\`, \`Sidebar\`, \`SidebarInset\`, \`SidebarHeader\`, \`SidebarContent\`, \`SidebarGroup\`, \`SidebarMenu\`, \`SidebarMenuItem\`, \`SidebarMenuButton\`, \`SidebarFooter\`, \`SidebarRail\`, and \`SidebarTrigger\` when they fit the project setup.
-- Sidebar styling must connect to Theme Lab tokens: use \`bg-sidebar text-sidebar-foreground\`, \`bg-sidebar-primary text-sidebar-primary-foreground\`, \`bg-sidebar-accent text-sidebar-accent-foreground\`, \`border-sidebar-border\` or \`border-border\`, \`ring-sidebar-ring\` or \`ring-ring\`, and token-backed radius, spacing, and elevation where applicable.
+- Sidebar styling must connect to Design System Lab tokens: use \`bg-sidebar text-sidebar-foreground\`, \`bg-sidebar-primary text-sidebar-primary-foreground\`, \`bg-sidebar-accent text-sidebar-accent-foreground\`, \`border-sidebar-border\` or \`border-border\`, \`ring-sidebar-ring\` or \`ring-ring\`, and token-backed radius, spacing, and elevation where applicable.
 - After replacing a sidebar, verify active, hover, focus-visible, selected, collapsed, expanded, mobile sheet/drawer, disabled, loading, and permission-hidden states.
 - For long-term projects, treat the work as product-wide UI alignment: preserve existing page workflows while unifying component grammar, page-header rhythm, content width system, action placement, state design, and responsive behavior.
 - Do not deliver isolated page makeovers in a long-term project; similar page types must share component and token patterns while preserving their workflows.
 - Do not produce a generic shadcn SaaS look; use shadcn primitives as implementation materials while creating product-specific rhythm through page headers, density, surface contrast, card grouping, navigation emphasis, primary action placement, state tone, and restrained brand color.
 - Before the final report, compare normalized UI against previous UI and explicitly report preserved content/workflow, unified component patterns, reduced UI debt, semantic token pairs checked, responsive states checked, and pages still needing alignment.
 - Normalize component hierarchy, responsive behavior, and interaction states before or while applying tokens.
-- Do not complete the task by only replacing raw classes, colors, spacing, or hardcoded values with Theme Lab tokens.
+- Do not complete the task by only replacing raw classes, colors, spacing, or hardcoded values with Design System Lab tokens.
 - Reject token-only outcomes when obvious ad hoc controls or inconsistent component patterns remain.
 - Cards and tables must follow progressive disclosure: they should preview useful destination/detail content, not act as empty decorative containers.
 - Clickable cards must pull a meaningful subset from their destination/detail content, such as title, status, owner, date, latest activity, key metric, next action, and 2-4 important facts.

@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "name": "Theme Lab Distributed Design Rules",
+  "name": "Design System Lab Distributed Design Rules",
   "basePath": "design-rules",
   "routing": {
     "instruction": "Read this index first. Load requiredAlways rules, inventory the selected UI by element type, then load only matched rule files from source.",
-    "missingRuleBehavior": "If no rule matches an element, make the smallest safe normalization with existing project components and Theme Lab tokens, then report the missing rule.",
+    "missingRuleBehavior": "If no rule matches an element, make the smallest safe normalization with existing project components and Design System Lab tokens, then report the missing rule.",
     "priorityOrder": [
       "user-authored project rules",
       "matched design-rules source files",
@@ -29,7 +29,7 @@
     },
     {
       "id": "token-binding",
-      "title": "Theme Lab Token Binding",
+      "title": "Design System Lab Token Binding",
       "source": "design-rules/core/token-binding.md",
       "requiredAlways": true,
       "appliesTo": ["tokens", "colors", "radius", "shadow", "focus", "state", "theme"]

@@ -37,8 +37,8 @@ const taskLabels: Record<ProjectImportTask, string> = {
 
 const modeLabels: Record<ProjectImportMode, string> = {
   "one-shot-page-polish": "One-shot selected-scope UI normalization",
-  "persistent-project-contract": "Persistent project visual contract",
-  "full-reproducible-package": "Full reproducible Theme Lab package",
+  "persistent-project-contract": "Persistent project design system contract",
+  "full-reproducible-package": "Full reproducible Design System Lab package",
 }
 
 function markdownList(values: readonly string[]): string {
@@ -61,7 +61,7 @@ The third persistent touchpoint is the target tool's native AI instruction file,
 
 ${aiInstructionTargetList()}
 
-Rules: use the named tool's file; if a supported file already exists, update it; if several exist, update each with the same Theme Lab section; if the tool is unknown and none exist, use \`AGENTS.md\`. Do not create every file by default. Only the filename changes — the section content stays the same.`
+Rules: use the named tool's file; if a supported file already exists, update it; if several exist, update each with the same Design System Lab section; if the tool is unknown and none exist, use \`AGENTS.md\`. Do not create every file by default. Only the filename changes — the section content stays the same.`
 }
 
 function runtimeCssBlock(theme: ThemeOutput): string {
@@ -109,8 +109,12 @@ const oneShotThemeTokenNames = [
   "--control-height-sm",
   "--control-height-md",
   "--control-height-lg",
+  "--control-padding-x",
+  "--control-gap",
   "--panel-padding",
   "--section-gap",
+  "--table-cell-padding-x",
+  "--table-cell-padding-y",
   "--elevation-card",
   "--elevation-popover",
   "--duration-base",
@@ -135,7 +139,7 @@ function pickThemeVariables(
 function oneShotThemeReferenceJson(theme: ThemeOutput): string {
   return JSON.stringify(
     {
-      source: "Theme Lab compact UI normalization reference",
+      source: "Design System Lab compact UI normalization reference",
       name: theme.vibe.name,
       keywords: theme.vibe.keywords,
       visualIntent: theme.vibe.visualContract.summary,
@@ -197,7 +201,7 @@ function projectImportManifestJson(
       designRuleLibrary: themeLabDesignRuleLibrary,
       userAuthoredDesignRules: normalizedUserDesignRules
         ? {
-            source: "Theme Lab export panel",
+            source: "Design System Lab export panel",
             format: "markdown",
             body: normalizedUserDesignRules,
           }
@@ -252,7 +256,7 @@ Canonical structural classes (shadcn semantic — the primary vocabulary):
 - Borders / focus: \`border-border\`, \`ring-ring\`
 - Actions: \`bg-primary text-primary-foreground\`, \`bg-secondary text-secondary-foreground\`, \`bg-destructive text-destructive-foreground\`
 - Radius: \`rounded-[var(--radius-control)]\`, \`rounded-[var(--radius-card)]\`, \`rounded-[var(--radius-panel)]\`
-- Spacing / density: \`h-[var(--control-height-sm)]\` / \`-md\` / \`-lg\`, \`p-[var(--panel-padding)]\`, \`gap-[var(--section-gap)]\`
+- Spacing / density: \`h-[var(--control-height-sm)]\` / \`-md\` / \`-lg\`, \`px-[var(--control-padding-x)]\`, \`gap-[var(--control-gap)]\`, \`p-[var(--panel-padding)]\`, \`gap-[var(--section-gap)]\`, table cells use \`px-[var(--table-cell-padding-x)]\` and \`py-[var(--table-cell-padding-y)]\`
 - Elevation: \`[box-shadow:var(--elevation-card)]\`, \`[box-shadow:var(--elevation-popover)]\`
 - Motion: \`duration-[var(--duration-base)]\`, \`ease-[var(--ease-standard)]\`
 
@@ -373,7 +377,7 @@ function workflowSection(
     ? `- Install exactly three persistent touchpoints, updating only marker blocks when they already exist:
   1. Runtime CSS variables in the existing global CSS file (\`/* theme-lab:runtime:start|end */\`).
   2. \`theme-lab.json\` at the project root.
-  3. The target tool's native AI instruction file Theme Lab section (\`<!-- theme-lab:agents:start|end -->\`); resolve the file via the AI Instruction Target Resolver.
+  3. The target tool's native AI instruction file Design System Lab section (\`<!-- theme-lab:agents:start|end -->\`); resolve the file via the AI Instruction Target Resolver.
 - Do not create \`theme.seed.json\`, \`vibe.manifest.json\`, \`theme.algorithm.ts\`, prompt files, or a design-system folder. Do not install local \`design-rules/\` files unless explicitly requested; read raw URLs instead.${
         isProductWideTask
           ? "\n- Establish one product layout grammar (app shell, header rhythm, content width, action placement, state design, responsive behavior) before normalizing individual pages."
@@ -456,9 +460,9 @@ function finalReportSection(mode: ProjectImportMode): string {
 function agentsMarkerBlock(userDesignRules?: string): string {
   return `<!-- theme-lab:agents:start -->
 
-# Theme Lab Contract
+# Design System Lab Contract
 
-This project uses a Theme Lab generated visual system.
+This project uses a Design System Lab generated design system.
 
 ## Language Rule
 
@@ -473,7 +477,7 @@ All AI-facing instructions, theme manifests, vibe descriptors, task packets, and
 
 ## Theme Change Rule
 
-Do not invent new structural visual values. When changing UI, consume the compiled CSS variables and token classes. When changing theme direction, update the Theme Lab seed in \`theme-lab.json\` and regenerate the compiled CSS variables.
+Do not invent new structural visual values. When changing UI, consume the compiled CSS variables and token classes. When changing theme direction, update the Design System Lab seed in \`theme-lab.json\` and regenerate the compiled CSS variables.
 
 ${userDesignRulesSection(userDesignRules)}## UI Normalization Rule
 
@@ -503,7 +507,7 @@ Forbidden for structural UI:
 1. Read \`theme-lab.json\` and \`design-rules/index.json\` (when present); load required and matched rules.
 2. Locate the global CSS theme block and the selected scope.
 3. Preserve business logic, API contracts, data loading, handlers, validation, and permissions.
-4. Normalize the scope with project components, shadcn/ui primitives, matched rules, and Theme Lab tokens.
+4. Normalize the scope with project components, shadcn/ui primitives, matched rules, and Design System Lab tokens.
 5. Verify semantic foreground/background pairs and reconnect APIs and interactions.
 6. Report files changed, rule files loaded, QA, and risks.
 
@@ -550,7 +554,7 @@ ${runtimeCssBlock(theme)}
 ${projectImportManifestJson(theme, options.userDesignRules)}
 \`\`\`
 
-Target AI instruction file Theme Lab section content:
+Target AI instruction file Design System Lab section content:
 \`\`\`md
 ${agentsMarkerBlock(options.userDesignRules)}
 \`\`\`
@@ -601,7 +605,7 @@ Write all task instructions, plans, notes, and reports in English. Preserve code
 
 ## Goal
 
-Normalize and beautify one selected page or component, once, with no persistent files. Preserve its behavior, content, information architecture, and workflow order. This is neither a blind token swap nor a redesign from scratch: make the existing UI more consistent and more polished by standardizing components and binding styles to Theme Lab tokens.
+Normalize and beautify one selected page or component, once, with no persistent files. Preserve its behavior, content, information architecture, and workflow order. This is neither a blind token swap nor a redesign from scratch: make the existing UI more consistent and more polished by standardizing components and binding styles to Design System Lab tokens.
 
 ${preservationContractSection()}
 
@@ -613,7 +617,7 @@ If no scope is provided, inspect the project and ask for a route, page, componen
 
 ${colorTokenVocabularySection()}
 
-## Compact Theme Lab Reference
+## Compact Design System Lab Reference
 
 Use this as token and visual-direction context. Do not persist it as a project contract.
 
@@ -644,7 +648,7 @@ export function compileProjectImportPrompt(
 
   const isProductWideTask = options.task === "refactor-product-wide"
 
-  return `# Theme Lab AI Task Packet
+  return `# Design System Lab AI Task Packet
 
 ${promptRouteSection(
   options,
@@ -660,7 +664,7 @@ Write all task instructions, plans, notes, and reports in English. Preserve code
 
 ## Mission
 
-This is an existing product project (assume so unless the repo is clearly empty or the user asks for a new one). Install the Theme Lab visual contract and ${
+This is an existing product project (assume so unless the repo is clearly empty or the user asks for a new one). Install the Design System Lab design system contract and ${
     isProductWideTask
       ? "align the product UI across routes into one coherent, token-bound system"
       : "normalize the selected scope into the token-bound system"

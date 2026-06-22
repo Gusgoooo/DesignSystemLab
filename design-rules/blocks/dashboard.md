@@ -115,7 +115,7 @@ Each dashboard section should have a job:
 
 ## Token Binding
 
-Every structural part of the dashboard must use Theme Lab tokens:
+Every structural part of the dashboard must use Design System Lab tokens:
 
 - page shell: `bg-background text-foreground`
 - sidebar: `bg-sidebar text-sidebar-foreground`

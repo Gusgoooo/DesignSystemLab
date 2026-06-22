@@ -99,7 +99,7 @@ const steps: Array<{ label: string; body: string }> = [
   },
   {
     label: "验证。",
-    body: "在组件和模块预览里看真实 UI 场景：按钮、表单、卡片、表格、图表、dashboard、AI chat、设置页等是否仍然像同一个系统。",
+    body: "在组件和模块预览里看真实 UI 场景；在 Spec 视图里检查规则来源、引用条件和交互语义是否覆盖当前产品需求。",
   },
   {
     label: "导出。",
@@ -227,7 +227,7 @@ function UsageChapter() {
         </Lead>
       </header>
       <P>
-        你先定义 token，再预览真实组件和模块，最后导出一份 AI
+        你先定义 token，再预览真实组件、模块和 Spec，最后导出一份 AI
         能执行的项目契约。之后 AI 修改页面时，不是凭感觉重做 UI，而是先识别页面结构，再读取匹配规则。
       </P>
       <ol className="list-decimal space-y-3 pl-5 text-[15px] leading-7 text-foreground marker:font-medium marker:text-muted-foreground">
@@ -314,25 +314,30 @@ function VisionChapter() {
       <header className="space-y-3 border-b border-border pb-6">
         <ChapterTitle>GenUI 愿景</ChapterTitle>
         <Lead>
-          未来不应该依赖固定组件库清单，而应该让 AI 在设计约束内生成当前问题的最优组件。
+          GenUI 不应该是一锤子买卖，也不应该被固定 registry 变成新的边界。
         </Lead>
       </header>
       <blockquote className="border-l-2 border-[var(--primary)] pl-5 text-base leading-7 text-foreground">
-        组件库是材料，不是未来 GenUI 的边界。
+        Registry 是今天的脚手架，Spec 才是长期的设计治理层。
       </blockquote>
       <P>
-        传统前端里，人类开发者在组件库里选择组件、组合组件、魔改组件。AI coding
-        早期也会自然依赖 registry：antd、shadcn、Tailwind UI、各种 blocks 都是很好的材料。但长期看，AI
-        一定可以根据当前产品、当前数据结构、当前交互约束，写出更贴合当前问题的组件。
+        我不认为 GenUI 能靠一次性生成解决。真实产品里的 UI
+        不是一个孤立页面，而是长期演进的界面系统。与其把 AI
+        固定在某个 registry 或组件清单里，不如先在具体场景中限定 UI
+        规则：视觉 token 负责一致性，component / block spec
+        负责交互语义、页面职责和信息层级。AI
+        可以在合适的产品上下文中自行判断应该写什么 UI，而不是只能从预设 registry
+        里挑一个组件再魔改。
       </P>
       <P>
-        所以我不想把设计系统做成另一个固定组件库。我要限定的是设计优解，而不是限定 AI
-        必须从某个清单里选一个组件。一个未来的 GenUI 组件，可以来自 shadcn，可以来自项目已有组件，也可以由
-        AI 临场生成；只要它符合 token、组件语义、页面职责、状态规则、可访问性和长期一致性，它就是可接受的解。
+        Registry 在今天仍然有价值，它提供了可复用结构和实现参考；但它不应该成为
+        GenUI 的边界。随着大模型能力增强，AI 会越来越懂得参考什么样的 registry
+        结构、什么样的组件模式，以及如何为当前问题生成更优解。真正需要被长期管理的，不是某一个组件库，而是产品的设计规则、交互原则和视觉约束。
       </P>
       <P>
-        这也是这套系统的价值：它不和模型比“谁更会生成”。模型越强，越能写出丰富的实现；设计约束越清楚，这些实现就越容易被收束到同一个产品系统里。AI
-        负责生成可能性，我负责定义哪些可能性是长期可维护的优解。
+        所以我的方向不是做一个新的组件货架，而是做一个基于 Spec 的 AI
+        设计系统：把设计判断沉淀成可被 AI 读取、路由和执行的规则，让 AI
+        在长期 coding 中保持一致，同时保留生成最适合当前产品场景 UI 的自由度。
       </P>
     </div>
   )
@@ -353,8 +358,8 @@ export const DocPreview = memo(function DocPreview() {
     chapters.find((chapter) => chapter.id === active)?.render ?? UsageChapter
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl min-w-0 flex-col gap-8 px-[var(--page-padding)] pt-12 pb-16 md:flex-row md:gap-10">
-      <nav className="shrink-0 md:sticky md:top-12 md:h-max md:w-44">
+    <div className="mx-auto flex w-full max-w-7xl min-w-0 flex-col gap-8 px-[var(--page-padding)] pt-12 pb-16 md:flex-row md:gap-12">
+      <nav className="shrink-0 md:sticky md:top-12 md:h-max md:w-48">
         <ul className="flex gap-1 overflow-x-auto md:flex-col [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {chapters.map((chapter) => (
             <li key={chapter.id}>
@@ -375,7 +380,7 @@ export const DocPreview = memo(function DocPreview() {
         </ul>
       </nav>
 
-      <div className="min-w-0 max-w-2xl flex-1">
+      <div className="min-w-0 max-w-5xl flex-1">
         <ActiveChapter />
       </div>
     </div>

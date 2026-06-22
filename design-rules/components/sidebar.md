@@ -7,7 +7,7 @@ contains a sidebar, app navigation rail, or sidebar-like navigation shell.
 
 The sidebar is part of the product shell, not a decorative side panel. It should
 preserve navigation, route logic, account/workspace context, permissions, and
-responsive behavior while aligning with the Theme Lab token system.
+responsive behavior while aligning with the Design System Lab token system.
 
 ## Approved Reference
 

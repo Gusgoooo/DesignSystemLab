@@ -1,6 +1,6 @@
 # Token System Installation
 
-Use this rule whenever Theme Lab tokens are installed, bridged, or audited.
+Use this rule whenever Design System Lab tokens are installed, bridged, or audited.
 
 ## Goal
 
@@ -11,14 +11,14 @@ partial surface systems.
 ## Long-Term Project Contract
 
 For persistent or long-term projects, the token system lands through the three
-Theme Lab contract touchpoints. Do not create extra token-system files by
+Design System Lab contract touchpoints. Do not create extra token-system files by
 default.
 
 Required persistent touchpoints:
 
 - existing global CSS theme block
 - `theme-lab.json`
-- tool-native AI instruction file Theme Lab section
+- tool-native AI instruction file Design System Lab section
 
 Use the target tool's native AI instruction file:
 
@@ -96,8 +96,12 @@ the one-shot bridge must cover at least:
 - `--control-height-sm`
 - `--control-height-md`
 - `--control-height-lg`
+- `--control-padding-x`
+- `--control-gap`
 - `--panel-padding`
 - `--section-gap`
+- `--table-cell-padding-x`
+- `--table-cell-padding-y`
 - `--elevation-card`
 - `--elevation-popover`
 - `--duration-base`
@@ -134,7 +138,7 @@ If the selected scope contains a sidebar, also include:
 
 ## Existing Token Systems
 
-If the project already has a token system, map Theme Lab semantics into that
+If the project already has a token system, map Design System Lab semantics into that
 system instead of creating a parallel one.
 
 Use this order:

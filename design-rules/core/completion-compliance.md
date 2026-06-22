@@ -1,6 +1,6 @@
 # Completion Compliance Gate
 
-Use this rule before final response for every UI normalization or Theme Lab
+Use this rule before final response for every UI normalization or Design System Lab
 token task.
 
 ## Required Evidence

@@ -73,7 +73,7 @@ with the `TabsList`.
 
 ## Token Binding
 
-Tabs should use Theme Lab tokens:
+Tabs should use Design System Lab tokens:
 
 - list surface: `bg-muted` or a token-backed quiet surface
 - trigger text: `text-muted-foreground`

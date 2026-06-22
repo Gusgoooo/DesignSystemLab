@@ -58,8 +58,8 @@ const tourSteps: readonly TourStep[] = [
   },
   {
     target: "preview-mode",
-    title: "切换两种预览模式",
-    description: "切换组件和模块，检查不同场景下的表现。",
+    title: "切换预览模式",
+    description: "切换模块、组件、Spec 和说明，检查主题与规则的落地效果。",
     radius: "999px",
   },
   {
@@ -355,7 +355,7 @@ export function OnboardingTour(props: OnboardingTourProps) {
             <span
               key={item.target}
               className={cn(
-                "h-1.5 rounded-full bg-muted transition-colors",
+                "h-1.5 rounded-[var(--radius-control)] bg-muted transition-colors",
                 index <= stepIndex && "bg-primary"
               )}
             />

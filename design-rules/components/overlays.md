@@ -88,7 +88,7 @@ viewport requires it.
 
 ## Token Binding
 
-Overlays should use Theme Lab tokens:
+Overlays should use Design System Lab tokens:
 
 - surface: `bg-popover text-popover-foreground` or `bg-card text-card-foreground`
 - page scrim when present: existing shadcn overlay tokens or token-compatible

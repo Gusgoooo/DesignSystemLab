@@ -2,7 +2,7 @@ import type { CSSProperties } from "react"
 import { defaultThemeSeed } from "../../lib/theme/defaults"
 import { deriveTheme } from "../../lib/theme/derive-theme"
 
-// Visual System Lab 的产品外壳刻意使用纯中性灰(R=G=B,无任何色相),
+// Design System Lab 的产品外壳刻意使用纯中性灰(R=G=B,无任何色相),
 // 与预览区注入的用户主题完全解耦,确保切换任意色相主题时框架都不冲突。
 const baseTheme = deriveTheme(defaultThemeSeed)
 const lightControlVariables = baseTheme.cssVariables

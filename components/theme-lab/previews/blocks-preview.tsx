@@ -854,14 +854,23 @@ function DashboardAreaChart() {
         </CardDescription>
         <CardAction className="col-start-1 row-start-3 mt-2 justify-self-start @[620px]/card:col-start-2 @[620px]/card:row-start-1 @[620px]/card:mt-0 @[620px]/card:justify-self-end">
           <Tabs value={timeRange} onValueChange={setTimeRange}>
-            <TabsList className="h-8 max-w-full">
-              <TabsTrigger className="px-3 text-xs" value="90d">
+            <TabsList className="h-[var(--control-height-sm)] max-w-full">
+              <TabsTrigger
+                className="px-[calc(var(--control-padding-x)*0.75)] text-xs"
+                value="90d"
+              >
                 90 天
               </TabsTrigger>
-              <TabsTrigger className="px-3 text-xs" value="30d">
+              <TabsTrigger
+                className="px-[calc(var(--control-padding-x)*0.75)] text-xs"
+                value="30d"
+              >
                 30 天
               </TabsTrigger>
-              <TabsTrigger className="px-3 text-xs" value="7d">
+              <TabsTrigger
+                className="px-[calc(var(--control-padding-x)*0.75)] text-xs"
+                value="7d"
+              >
                 7 天
               </TabsTrigger>
             </TabsList>
