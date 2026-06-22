@@ -58,12 +58,13 @@ type ImportModeOption = {
   id: ProjectImportMode
   title: string
   description: string
+  disabled?: boolean
 }
 
 const importModeOptions: readonly ImportModeOption[] = [
   {
     id: "persistent-project-contract",
-    title: "长期视觉设计系统",
+    title: "长期设计系统",
     description:
       "适合长期项目，沉淀主题规则，并保持各页面体验一致。",
   },
@@ -72,6 +73,7 @@ const importModeOptions: readonly ImportModeOption[] = [
     title: "一次性优化",
     description:
       "适合单次页面优化，快速生成可复制到项目的执行指令。",
+    disabled: true,
   },
 ]
 
@@ -148,6 +150,12 @@ export function ExportPanel(props: ExportPanelProps) {
   }
 
   function chooseMode(nextMode: ProjectImportMode): void {
+    const nextOption = importModeOptions.find((option) => option.id === nextMode)
+
+    if (nextOption?.disabled) {
+      return
+    }
+
     setMode(nextMode)
     setCopiedPrompt(false)
   }
@@ -248,29 +256,39 @@ export function ExportPanel(props: ExportPanelProps) {
             <div className="grid gap-5 sm:grid-cols-2">
               {importModeOptions.map((option) => {
                 const selected = option.id === mode
+                const disabled = option.disabled ?? false
 
                 return (
                   <button
                     key={option.id}
                     type="button"
                     aria-pressed={selected}
+                    aria-disabled={disabled}
                     data-state={selected ? "checked" : "unchecked"}
+                    disabled={disabled}
                     className={cn(
                       "group relative min-h-[210px] overflow-hidden rounded-[24px] border border-border bg-card p-6 text-left text-card-foreground shadow-sm transition-[background-color,border-color,box-shadow,color,opacity,transform] duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                       "hover:-translate-y-px hover:border-border hover:bg-muted/30 hover:[box-shadow:var(--elevation-card)] active:translate-y-0",
-                      "data-[state=checked]:translate-y-0 data-[state=checked]:border-primary data-[state=checked]:bg-card data-[state=checked]:ring-2 data-[state=checked]:ring-primary/15 data-[state=checked]:[box-shadow:var(--elevation-card)] data-[state=checked]:hover:translate-y-0 data-[state=checked]:hover:bg-card"
+                      "data-[state=checked]:translate-y-0 data-[state=checked]:border-primary data-[state=checked]:bg-card data-[state=checked]:ring-2 data-[state=checked]:ring-primary/15 data-[state=checked]:[box-shadow:var(--elevation-card)] data-[state=checked]:hover:translate-y-0 data-[state=checked]:hover:bg-card",
+                      "disabled:cursor-not-allowed disabled:opacity-55 disabled:hover:translate-y-0 disabled:hover:border-border disabled:hover:bg-card disabled:hover:[box-shadow:none]"
                     )}
                     onClick={() => chooseMode(option.id)}
                   >
-                    <span
-                      aria-hidden="true"
-                      className={cn(
-                        "absolute right-5 top-5 flex size-7 items-center justify-center rounded-full bg-primary text-primary-foreground opacity-0 transition-opacity",
-                        selected && "opacity-100"
-                      )}
-                    >
-                      <CheckCircle2 className="size-4" aria-hidden="true" />
-                    </span>
+                    {disabled ? (
+                      <span className="absolute right-5 top-5 rounded-[var(--radius-pill)] border border-border bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground">
+                        正在建设
+                      </span>
+                    ) : (
+                      <span
+                        aria-hidden="true"
+                        className={cn(
+                          "absolute right-5 top-5 flex size-7 items-center justify-center rounded-full bg-primary text-primary-foreground opacity-0 transition-opacity",
+                          selected && "opacity-100"
+                        )}
+                      >
+                        <CheckCircle2 className="size-4" aria-hidden="true" />
+                      </span>
+                    )}
                     <span className="relative flex h-full min-h-[162px] flex-col">
                       <span className="min-w-0 text-pretty text-lg font-semibold leading-6">
                         {option.title}
@@ -279,7 +297,7 @@ export function ExportPanel(props: ExportPanelProps) {
                         {option.description}
                       </span>
                       <span className="mt-auto pt-6 text-sm font-medium leading-6 text-muted-foreground transition-colors group-data-[state=checked]:text-foreground">
-                        {selected ? "已选择" : "点击选择"}
+                        {disabled ? "正在建设" : selected ? "已选择" : "点击选择"}
                       </span>
                     </span>
                   </button>

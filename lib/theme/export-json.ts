@@ -137,8 +137,12 @@ export const themeLabTokenContract = {
     "h-[var(--control-height-sm)]",
     "h-[var(--control-height-md)]",
     "h-[var(--control-height-lg)]",
+    "px-[var(--control-padding-x)]",
+    "gap-[var(--control-gap)]",
     "gap-[var(--section-gap)]",
     "p-[var(--panel-padding)]",
+    "px-[var(--table-cell-padding-x)]",
+    "py-[var(--table-cell-padding-y)]",
     "[box-shadow:var(--elevation-card)]",
     "[box-shadow:var(--elevation-popover)]",
     "duration-[var(--duration-base)]",
@@ -223,7 +227,7 @@ export const themeLabAiCodingRules = [
   "Preserve existing page content, information architecture, workflow order, business rules, routes, APIs, data loading, state, handlers, forms, validation, permissions, feature flags, and domain copy.",
   "Do not discard the old visible UI tree by default; normalize components, repeated style fragments, token usage, spacing, radius, elevation, and states around the existing product structure.",
   "Prefer existing project components and shadcn/ui primitives for controls and repeated patterns when behavior can be preserved.",
-  "Use user-authored Theme Lab design rules as the design source; do not browse, import, or imitate external visual references unless the user explicitly asks.",
+  "Use user-authored Design System Lab design rules as the design source; do not browse, import, or imitate external visual references unless the user explicitly asks.",
   "Before editing, identify which user-authored design rule applies to the selected UI pattern; if no rule exists, make the smallest safe normalization and report the missing rule.",
   "Decorative exceptions explicitly defined by user-authored rules may use non-token colors or values only for non-structural ambient layers, never for text, primary surfaces, borders, focus rings, or actionable states.",
   "For plain page canvases, a very subtle page-top ambient wash may be added as a non-structural background layer behind content.",
@@ -245,7 +249,7 @@ export const themeLabAiCodingRules = [
   "Page heading metadata should be compact icon + short text facts below the title, using actual product fields such as status, type, owner, team, location, date, amount, workspace, lifecycle stage, last updated, or due date.",
   "Do not copy page heading demo content such as job titles, fake locations, fake salaries, or fake dates; preserve the product's real title, metadata, breadcrumbs, status, filters, and action semantics.",
   "Do not add @heroicons/react or @headlessui/react for page headings unless the project already uses them; map icons to the existing icon library and menus/actions to existing shadcn or project components.",
-  "Convert page heading raw sample colors to Theme Lab tokens: text-foreground, text-muted-foreground, bg-background, bg-primary text-primary-foreground, border-border, ring-ring, and existing button variants.",
+  "Convert page heading raw sample colors to Design System Lab tokens: text-foreground, text-muted-foreground, bg-background, bg-primary text-primary-foreground, border-border, ring-ring, and existing button variants.",
   "Keep page headings unframed by default; do not wrap the whole heading in a decorative card unless the product already uses framed headers.",
   "Page heading actions must preserve behavior: keep the primary action visible, make secondary actions quieter, and collapse secondary actions into a More dropdown on small screens when horizontal space is limited.",
   "Page headings must avoid overflow: long titles should use min-w-0, truncate, wrapping, or responsive stacking, and actions must not collide with the title.",
@@ -263,7 +267,7 @@ export const themeLabAiCodingRules = [
   "Do not copy shadcn demo content, fake teams, fake projects, fake users, or placeholder routes into the product; the block is only an implementation pattern.",
   "Sidebar replacement must preserve existing route URLs, active route logic, permissions, badges/counts, account or workspace context, user menu actions, collapse behavior, and responsive behavior unless the user explicitly changes them.",
   "Sidebar replacement must use shadcn sidebar primitives such as SidebarProvider, Sidebar, SidebarInset, SidebarHeader, SidebarContent, SidebarGroup, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter, SidebarRail, and SidebarTrigger when they fit the project setup.",
-  "Sidebar styling must connect to Theme Lab tokens: use bg-sidebar text-sidebar-foreground, bg-sidebar-primary text-sidebar-primary-foreground, bg-sidebar-accent text-sidebar-accent-foreground, border-sidebar-border or border-border, ring-sidebar-ring or ring-ring, and token-backed radius, spacing, and elevation where applicable.",
+  "Sidebar styling must connect to Design System Lab tokens: use bg-sidebar text-sidebar-foreground, bg-sidebar-primary text-sidebar-primary-foreground, bg-sidebar-accent text-sidebar-accent-foreground, border-sidebar-border or border-border, ring-sidebar-ring or ring-ring, and token-backed radius, spacing, and elevation where applicable.",
   "After replacing a sidebar, verify active, hover, focus-visible, selected, collapsed, expanded, mobile sheet/drawer, disabled, loading, and permission-hidden states.",
   "For long-term projects, treat the work as product-wide UI alignment: preserve existing page workflows while unifying component grammar, page-header rhythm, content width system, action placement, state design, and responsive behavior.",
   "Do not deliver isolated page makeovers in a long-term project; similar page types must share component and token patterns while preserving their workflows.",
@@ -290,7 +294,7 @@ export const themeLabAiCodingRules = [
   "Never use same-role filled background/text pairs such as bg-primary text-primary, bg-secondary text-secondary, bg-accent text-accent, bg-destructive text-destructive, bg-card text-card, or bg-popover text-popover.",
   "Before final report, audit changed product UI for raw palette classes, hardcoded color functions, legacy radius/shadow utilities, same-role filled surface pairs, missing foreground tokens, and missing focus-visible rings.",
   "Token binding is incomplete if old radius or shadow values remain in normalized product components, if filled actions have invisible text, or if token audit hits are ignored silently.",
-  "When changing theme direction, update the seed in theme-lab.json, then regenerate compiled CSS variables through Theme Lab or the available theme generation pipeline.",
+  "When changing theme direction, update the seed in theme-lab.json, then regenerate compiled CSS variables through Design System Lab or the available theme generation pipeline.",
 ] as const
 
 export function exportPresetJsonFromOutput(theme: ThemeOutput): string {
@@ -353,7 +357,7 @@ export function exportThemeLabManifestJsonFromOutput(
       designRuleLibrary: themeLabDesignRuleLibrary,
       userAuthoredDesignRules: normalizedUserDesignRules
         ? {
-            source: "Theme Lab export panel",
+            source: "Design System Lab export panel",
             format: "markdown",
             body: normalizedUserDesignRules,
           }

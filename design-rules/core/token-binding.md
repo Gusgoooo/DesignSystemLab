@@ -1,6 +1,6 @@
-# Theme Lab Token Binding
+# Design System Lab Token Binding
 
-Theme Lab tokens are mandatory for structural UI.
+Design System Lab tokens are mandatory for structural UI.
 
 ## Required Semantic Pairs
 
@@ -99,7 +99,7 @@ rg -n -P "bg-primary[^\\n]*text-primary(?!-foreground)|bg-secondary[^\\n]*text-s
 For each hit:
 
 - replace with a semantic token class
-- replace with a Theme Lab variable-backed utility
+- replace with a Design System Lab variable-backed utility
 - or explicitly justify why it is non-structural decorative code allowed by a matched rule
 
 Do not ignore hits silently.

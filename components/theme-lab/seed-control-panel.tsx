@@ -86,16 +86,16 @@ const densityPresetByMode: Record<
   Pick<ThemeSeed["density"], "controlHeight" | "densityRatio">
 > = {
   compact: {
-    controlHeight: 2.25,
-    densityRatio: 0.94,
+    controlHeight: 1.8,
+    densityRatio: 0.78,
   },
   default: {
     controlHeight: 2.5,
     densityRatio: 1,
   },
   comfortable: {
-    controlHeight: 2.75,
-    densityRatio: 1.06,
+    controlHeight: 3,
+    densityRatio: 1.2,
   },
 }
 
@@ -914,10 +914,14 @@ export function SeedControlPanel(props: SeedControlPanelProps) {
           "--control-height-sm",
           "--control-height-md",
           "--control-height-lg",
+          "--control-padding-x",
+          "--control-gap",
           "--field-gap",
           "--section-gap",
           "--panel-padding",
           "--page-padding",
+          "--table-cell-padding-x",
+          "--table-cell-padding-y",
           "--list-row-height",
         ].includes(name)
       ),
@@ -930,7 +934,7 @@ export function SeedControlPanel(props: SeedControlPanelProps) {
         <div className="flex items-center justify-between gap-2.5">
           <div className="flex min-w-0 items-center gap-2">
             <h1 className="truncate text-lg font-extrabold leading-6 tracking-normal text-foreground">
-              Visual System Lab
+              Design System Lab
             </h1>
           </div>
           <div className="flex items-center gap-1.5">
@@ -1051,8 +1055,8 @@ export function SeedControlPanel(props: SeedControlPanelProps) {
           <NumberSlider
             label="controlHeight"
             value={seed.density.controlHeight}
-            min={2}
-            max={3.25}
+            min={1.6}
+            max={3.4}
             step={0.05}
             unit="rem"
             onChange={(controlHeight) =>

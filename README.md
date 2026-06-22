@@ -2,166 +2,250 @@
 
 # Design System Lab
 
-**面向长期 AI coding 项目的设计归一化系统**
+**面向长期 AI Coding 项目的 Spec-driven 设计系统生成器**
 
-它不试图回答“这个页面能不能更酷炫”，而是回答另一个更长期的问题：
-当一个产品由 AI 持续生成、修改、扩展时，设计系统如何不漂移。
+Design System Lab 不是组件库，也不是传统主题编辑器。它生成一套轻量的设计系统契约，让 AI Coding Agent 能在用户已有项目中持续遵守 token、spec 和页面规则。
 
 </div>
 
 ---
 
-AI coding 项目需要长期管理的不只是前端工程，还有设计本身。工程侧会管理目录、依赖、测试、接口和代码风格；设计侧同样需要管理 token、组件语法、交互规则、页面结构和状态表达。否则页面做着做着就会越来越不像同一个产品：视觉还在，但主色、圆角、密度、状态色开始漂移；组件还在，但 Button 被拿来做 Tabs，Card 变成空装饰容器，Table 堆满字段，Dialog 丢掉 focus、open state、提交状态和错误反馈。
+## 问题定义
 
-Design System Lab 的目标不是让单个页面变得更炫，而是让长期 AI coding 项目的 UI 进入同一套系统。
+设计系统发展到今天，常见资产仍然是三件套：
 
-它通过两层契约做归一化：
+1. Design Token
+2. 某种组件库或 registry
+3. 视觉风格指南
 
-- **Token Contract**：限制视觉一致性。颜色、语义色、圆角、密度、字体、阴影、动效、状态色和明暗主题，都从 seed 确定性生成，并导出为 CSS 变量、JSON 与主题 manifest。
-- **Component / Block Spec**：限制组件使用、交互逻辑和页面逻辑。Button 是命令，不是单选切换；Tabs 才适合 view / mode / status switch；Card 是下一层内容预览，不是空壳；Table 要保留身份、状态、关键事实和行操作；Overlay 要保留 trigger、open state、focus return、dismiss、表单状态和 destructive confirmation。
+这套三件套对人类团队仍然有效。shadcn/ui、Ant Design 主题能力、SAP Fiori、IBM Carbon、Material Design 都已经在组件实现、主题能力、交互规范上做得很成熟。
 
-这些规则不会被塞进一个巨大的 prompt。AI 会先读取 `design-rules/index.json`，识别当前页面包含哪些元素，再按需读取本地规则或 raw GitHub URL：先分析，再分别加载匹配的 token、component、block、state 和 QA spec。这样 prompt 不会无限膨胀，规则也能随着项目长期演进。
+但在 AI Coding 项目里，问题并没有被真正解决。AI 可以把单个页面做得不错，却很容易在多轮修改后把产品做散：
 
-## 同类产品解决了什么
+- 页面之间的密度、圆角、阴影、状态色开始漂移
+- 同一种交互在不同页面出现不同表达
+- `Button` 被拿来模拟 tabs 或状态切换
+- `Card` 变成只有图标、标题和描述的装饰容器
+- `Table` 堆满后端字段，但丢掉身份、状态、关键事实和行操作
+- `Dialog` / `Sheet` 丢掉 open state、focus return、提交状态和错误反馈
 
-现有方案都解决了重要问题，但它们大多不是为“长期 AI coding 项目的设计治理”设计的。
+所以 Design System Lab 解决的不是“如何生成一个更酷的页面”，而是：
 
-组件库解决“人类开发者如何快速搭出稳定 UI”。主题系统解决“组件库内部如何统一视觉”。规范文档解决“团队如何描述设计原则”。但长期 AI coding 项目还需要另一层：**让 AI 在每次改页面时，都能识别当前 UI 结构，读取正确规则，并在不破坏业务逻辑的前提下做设计归一化。**
+> 如何让 AI 在长期项目里持续遵守同一套设计系统。
 
-### 与 shadcn 的区别
+## 核心判断
 
-shadcn 是很好的实现材料：它提供可复制、可拥有源码的组件和 blocks。Design System Lab 不替代 shadcn，而是在 AI coding 场景里补上“长期设计治理层”。
+AI 时代的设计系统，重点会从“定义组件长什么样”，转向“定义组件背后的场景语义”。
 
-| 维度 | shadcn 主要解决 | 美中不足 | Design System Lab 的解法 |
-| --- | --- | --- | --- |
-| 组件来源 | 提供高质量组件源码和 registry blocks | registry 是材料库，不是项目长期规则系统 | 把组件使用规则写成 spec，让 AI 知道何时用、怎么用、不能怎么用 |
-| 视觉一致性 | 依赖 CSS variables 与主题配置 | 能统一基础样式，但不负责跨页面设计漂移治理 | seed → token 确定性生成，形成可复现、可审计的视觉契约 |
-| AI 决策 | AI 可以引用 shadcn 组件 | 仍可能机械套组件、复制 demo、把 Button 当 Tabs、把 Card 当装饰 | rule router 先识别页面元素，再加载匹配 spec，约束 AI 的组件决策 |
-| 页面结构 | 提供 blocks 作为起点 | block 本身不保证业务结构、权限、状态和交互被保留 | block spec 要求保留 API、状态、权限、验证、loading/error/empty 等行为 |
-| 长期项目 | 适合作为组件实现基础 | 不直接管理多轮 AI 修改后的风格漂移 | 契约写入 `AGENTS.md` / `CLAUDE.md`，让规则进入长期协作上下文 |
-| 未来 GenUI | registry 列出已有组件 | AI 可能被固定在已有组件清单里做魔改 | 只限定优解标准，不强制固定组件形态，允许 AI 为当前问题生成更合适的组件 |
+一个 tab 不一定要永远来自某个固定 registry。它可以有不同视觉表达，但必须承担单选视图状态，保留 selected value、keyboard navigation、panel state，并且不能被当成 save/export/delete 这类命令按钮。
 
-### 与 antd 的区别
+一个 card 也不是圆角矩形。它的本质是下一层内容的数据 preview，帮助用户在点击前预判内容，在并列展示时比较对象差异。
 
-antd 是成熟的企业级组件体系，强在完整组件、交互默认值和库内一致性。Design System Lab 借鉴“设计可以算法化派生”的思路，但目标不同：它不是绑定某个运行时组件库，而是把设计规则编译成 AI 可执行的项目契约。
+这就是 Design System Lab 的方向：淡化 registry，强化 spec。组件库、blocks、项目已有组件、AI 现场生成的组件都可以作为实现材料；真正需要长期稳定的是 token contract 和 component / block spec。
 
-| 维度 | antd 主要解决 | 美中不足 | Design System Lab 的解法 |
-| --- | --- | --- | --- |
-| 设计系统形态 | 完整企业级组件库和设计语言 | 设计决策主要绑定 antd 组件体系 | token 与 spec 独立存在，可迁移到任意 Tailwind / shadcn-like 项目 |
-| 主题生成 | 库内主题算法与 token | 主要服务 antd runtime 和组件实现 | 输出 CSS variables、JSON、AI rules，不要求项目运行时绑定 antd |
-| 组件选择 | 给出固定组件和交互默认值 | AI 容易围绕固定组件做适配，而不是为当前问题找最优结构 | component / block spec 描述设计优解，允许 AI 自己生成符合规则的实现 |
-| 使用对象 | 主要面向人类开发者 | AI 长期执行规则不是核心目标 | 面向 Codex / Cursor / Claude Code 等 AI coding 工具导出可执行契约 |
-| 长期一致性 | 在 antd 生态内稳定 | 跨库、跨项目、跨 AI 多轮修改时治理能力有限 | 通过 token、spec、rule router、completion gate 管理长期漂移 |
-| prompt 管理 | 不是 prompt 路由系统 | 无法解决“大 prompt 一次性塞满”的问题 | `index.json` 路由规则，本地优先，缺失时读取 raw GitHub spec |
+## 默认只落 3 个文件
 
-## 我的归一化解法
+长期接入时，Design System Lab 默认只在用户项目里落三类文件。
 
-Design System Lab 把“设计系统”拆成四层可执行资产。
+| 文件 | 作用 | 默认安装 |
+| --- | --- | --- |
+| `globals.css` 或 `app/globals.css` 中的 token block | 运行时视觉契约。提供 surface、foreground、status、chart、radius、density、typography、elevation、motion，以及 shadcn adapter tokens。 | 是 |
+| `theme-lab.json` | 机器可读设计系统 manifest。记录 seed、token contract、vibe、AI rules、rule index URL、raw spec base URL。 | 是 |
+| AI 工具原生指令文件 | 长期执行协议。根据工具写入 `AGENTS.md`、`CLAUDE.md`、`.cursor/rules/theme-lab.mdc`、`.github/copilot-instructions.md`、`GEMINI.md` 或 `.windsurfrules`。 | 是 |
 
-```
+可选项不会默认安装：
+
+| 可选项 | 使用场景 |
+| --- | --- |
+| `design-rules/` | 只有用户需要本地、离线、内网或深度定制 spec 时才复制。默认通过 raw GitHub URL 按需读取。 |
+| `theme.preset.json` | 需要分享、复现或版本化某套 seed preset 时导出。 |
+| `theme.algorithm.ts` | 目标项目需要拥有、审计或二次开发 token 生成算法时导出。 |
+
+默认路径不复制组件源码，不安装运行时 SDK，不创建新的组件货架。它安装的是设计治理层。
+
+## 技术架构
+
+```text
 Seed
-  ↓
-Token Contract
-  ↓
-Component / Block Spec
-  ↓
-Rule Router
-  ↓
-AI Project Contract
+  -> Token Compiler
+  -> Runtime CSS Token Block
+  -> theme-lab.json
+  -> Rule Router
+  -> Component / Block Spec
+  -> Tool-native AI Instruction
+  -> AI Coding Execution
 ```
 
-### 1. Token 归一化：限制视觉漂移
+### 1. Seed 到 Token Compiler
 
-Token Contract 负责“长什么样”。
+Seed 是一组较小的产品级设计输入：
 
-- seed 确定主题方向
-- OKLCH 算法生成可感知均匀的明暗色阶
-- semantic token 决定 primary、background、card、popover、muted、accent、destructive、border、ring
-- status token 统一 success、warning、info、danger
-- chart token 统一数据系列色
-- radius、density、typography、elevation、motion 统一组件触感
-- shadcn adapter 把语义 token 映射到 shadcn/ui CSS variables
+- `color`: primary、neutral、status、background、foreground
+- `shape`: radius、radiusRatio
+- `density`: mode、controlHeight、densityRatio
+- `typography`: font family、scaleRatio、heading/body weight、trackingBias
+- `material`: elevation、shadowAlpha、borderContrast、surfaceContrast
+- `motion`: motion level、durationBase
+- `vibe`: domain、tone、temperature、expression
 
-结果是：AI 不需要凭感觉重新挑颜色、圆角、阴影和状态色。它只消费已经确定的视觉合同。
+Token Compiler 会确定性生成：
 
-### 2. Spec 归一化：限制组件与页面逻辑漂移
+- map tokens：OKLCH 色阶、radius、density、typography、elevation、motion
+- semantic tokens：`--surface-canvas`、`--content-primary`、`--action-primary`、`--status-success-bg`、`--border-default`
+- shadcn adapter tokens：`--background`、`--foreground`、`--card`、`--primary`、`--muted`、`--border`、`--ring`、`--sidebar`
+- density primitives：`--control-height-md`、`--control-padding-x`、`--section-gap`、`--panel-padding`、`--table-cell-padding-x`、`--list-row-height`
 
-Component / Block Spec 负责“怎么用”。
+AI 后续改 UI 时不需要重新发明颜色、圆角、阴影、密度和状态色，只需要消费这套运行时 token。
 
-规则库位于 `design-rules/`，当前覆盖：
+### 2. Component / Block Spec
+
+Spec 不是样式清单，也不是组件源码。它描述的是 UI 元素在产品中的职责、引用条件、执行重点和禁止事项。
+
+当前规则库覆盖：
 
 - Core：rule router、UI normalization、token binding、token system、visual QA、completion compliance、product alignment
 - Blocks：page shell、dashboard
 - Components：cards、tables、page headings、sidebars、actions/buttons、filters/controls、forms/inputs、tabs、overlays、badges/alerts、metrics/charts
 - Patterns：page background、UI states、semantic/category color
 
-这些 spec 不只是样式建议，而是 AI 修改 UI 时必须遵守的产品规则：保留业务逻辑、API、状态、权限、验证、数据加载、错误状态、空状态、loading、focus、selected、disabled、responsive behavior，再做视觉和组件结构归一化。
+例如：
 
-### 3. Rule Router：分散加载 prompt
+- `card.md` 定义 card 是数据 preview 和渐进探索入口，不是装饰容器
+- `table.md` 定义 table 是调查入口，必须保留身份、状态、关键事实、排序、选择、分页和行操作
+- `tabs.md` 定义 tabs 是单选视图状态，不是命令按钮
+- `overlays.md` 定义 overlay 必须保留 trigger、open state、focus trap/return、dismiss、scroll、form state 和 async error
 
-规则入口是 `design-rules/index.json`。
+### 3. Rule Router
 
-AI 的流程是：
+规则不会一次性塞进一个巨大 prompt。AI 先分析，再按需读取。
 
-1. 读取 rule index。
-2. 加载 `requiredAlways` 核心规则。
-3. 识别页面结构和元素类型。
-4. 根据 `rules[].appliesTo` 匹配 component / block / pattern spec。
-5. 本地规则优先；目标项目没有本地文件时读取 raw GitHub URL。
-6. 修改前输出 Rule Read Confirmation，列出实际打开的规则。
-7. 修改后通过 completion compliance gate 检查。
+执行流程：
 
-这样做的重点是：prompt 不需要一次性很长。AI 先分析，再读取当前页面真正需要的规则。
+1. 读取 `design-rules/index.json`
+2. 加载所有 `requiredAlways` 核心规则
+3. 识别当前页面或 scope 中的元素类型
+4. 根据 `rules[].appliesTo` 匹配 component / block / pattern spec
+5. 只打开匹配到的 `rules[].source`
+6. 如果目标项目有本地 `design-rules/`，优先读本地
+7. 如果没有本地规则，读取 raw GitHub URL
+8. 修改前输出 Rule Read Confirmation，列出实际读取的规则
+9. 修改后通过 completion compliance gate 检查
 
-### 4. Project Contract：把规则带进真实项目
+这样可以避免 prompt 无限膨胀，也能让 spec 随项目长期演进。
 
-导出时可以选择一次性页面优化，也可以选择长期项目契约。
+### 4. AI Project Contract
 
-长期项目契约会落到三个触点：
+AI 指令文件把设计系统变成长期项目规则。
 
-- 全局 CSS token block
-- `theme-lab.json`
-- AI 工具原生指令文件，例如 `AGENTS.md`、`CLAUDE.md`、Cursor rules
+它会要求 AI：
 
-这让设计系统不只是这一次 prompt 的上下文，而是长期项目的一部分。
+- 修改 UI 前读取 `theme-lab.json`
+- 把 global CSS token block 当作视觉 source of truth
+- 通过 `design-rules/index.json` 路由 component / block spec
+- 保留 routes、navigation、API、data loading、mutations、event handlers、state、validation、permissions、feature flags、domain copy
+- 不使用 raw Tailwind palette、hardcoded hex、arbitrary OKLCH、one-off shadow、随机渐变和无关重设计
+- 最终报告实际读取的规则、保留的业务行为、token audit、状态检查和剩余风险
 
-## 为什么不依赖组件库
+## 应用模式
 
-组件库仍然有价值，但它不应该成为未来 GenUI 的边界。
+| 模式 | 当前状态 | 说明 |
+| --- | --- | --- |
+| 长期设计系统 | 推荐 | 安装三文件契约：global CSS token block、`theme-lab.json`、AI 工具原生指令文件。 |
+| 一次性优化 | 建设中 | 计划用于单个 scope 的短期 UI 规整，不落长期文件。当前 UI 中已禁用，因为治理效果有限。 |
 
-在传统前端里，组件库提供固定组件，人类开发者在这些组件里选择和组合。AI coding 早期也会自然依赖 registry：antd、shadcn、Tailwind UI、各种 blocks 都是很好的材料。但长期看，AI 一定可以为当前问题写出更贴合的组件，而不是永远被限制在某个组件库列出的清单里。
+Design System Lab 更推荐长期模式。没有文件落到目标项目里，AI 的项目记忆就会变弱，设计漂移很快会回来。
 
-未来的 GenUI 更像是：AI 根据当前产品、当前任务、当前数据结构、当前交互约束，生成一个最适合当下问题的组件。设计系统需要规定的不是“必须用哪一个现成组件”，而是“什么样的解法是优解”：
+## 使用流程
 
-- 是否保留业务流程
-- 是否符合视觉 token
-- 是否符合组件使用规则
-- 是否保留状态、权限、验证和可访问性
-- 是否在页面结构中承担正确职责
-- 是否能跨页面长期保持一致
+1. 选择场景 preset，或手动调整 seed
+2. 在模块、组件、Spec、说明四个视图中检查结果
+3. 导出 Project Import Prompt
+4. 在 Codex、Claude Code、Cursor、Qoder 等 AI Coding 工具中运行 prompt
+5. AI 在目标项目中安装三文件契约
+6. 后续 UI 修改都通过同一套 token vocabulary 和 spec routing protocol 执行
 
-这也是 Design System Lab 不把自己做成另一个组件库的原因。它更像设计视角的约束层：告诉 AI 哪些方向是对的，哪些行为会造成长期 UI 债务。至于具体组件实现，可以来自 shadcn，可以来自已有项目组件，也可以由 AI 为当前问题重新生成。
+## 与现有系统的关系
 
-## 核心特性
+### shadcn/ui
 
-- **确定性 token 生成** — 同一组 seed 永远导出同一套结果，可复现、可审计、可版本化。
-- **Component / Block Spec** — 把组件使用、交互逻辑、页面逻辑写成 AI 可执行规则。
-- **Rule Router** — 根据页面元素按需读取本地规则或 raw GitHub URLs，避免超长 prompt。
-- **shadcn 兼容但不绑定** — 可消费 shadcn/ui token 和组件，也允许项目自有组件或 AI 生成组件。
-- **两类实时预览** — 组件级预览与模块级预览同时验证主题在真实 UI 中是否站得住。
-- **九套场景预设** — AI、SaaS、后台、金融、内容、客服、电商、营销、开发。
-- **项目导入契约** — 支持一次性页面优化，也支持长期项目契约。
+shadcn/ui 是很好的源码 registry 和实现材料。Design System Lab 兼容 shadcn 的 CSS variables 和组件语义，但不把 shadcn registry 当作 GenUI 的边界。
 
-## 快速开始
+### Ant Design
+
+Ant Design 的主题算法和企业组件体系非常成熟。Design System Lab 借鉴“设计可以算法化派生”的思路，但输出的是 CSS variables、JSON、spec 和 AI 指令，不要求目标项目运行时绑定 antd。
+
+### SAP Fiori / IBM Carbon / Material Design
+
+这些系统沉淀了成熟的人类团队交互规范。Design System Lab 更关注如何把类似规则变成 AI 可读取、可路由、可执行、可验收的项目契约。
+
+## 导出产物
+
+| 产物 | 作用 |
+| --- | --- |
+| global CSS block | 运行时 token 层，写入用户项目已有全局 CSS 文件。 |
+| `theme-lab.json` | 机器可读设计系统 manifest 和 AI rule entrypoint。 |
+| AI instruction block | 写入 `AGENTS.md`、`CLAUDE.md`、Cursor rules 等工具原生指令文件。 |
+| Project import prompt | 让 AI 在目标项目安装并应用契约的执行包。 |
+| `theme.preset.json` | 可分享、可复现的 seed preset。 |
+| `vibe.json` | 风格描述符和 AI context。 |
+| `theme.algorithm.ts` | 可选的确定性 token compiler 源码。 |
+
+## 仓库结构
+
+```text
+app/
+  page.tsx
+  theme-lab/
+  dashboard/
+  globals.css
+
+components/theme-lab/
+  theme-lab-shell.tsx
+  seed-control-panel.tsx
+  export-panel.tsx
+  preview-tabs.tsx
+  previews/
+    blocks-preview.tsx
+    components-preview.tsx
+    spec-preview.tsx
+    doc-preview.tsx
+
+components/ui/
+  shadcn/ui base components
+
+lib/theme/
+  schema.ts
+  defaults.ts
+  presets.ts
+  derive-theme.ts
+  algorithms/
+  semantic.ts
+  shadcn-adapter.ts
+  vibe.ts
+  export-css.ts
+  export-json.ts
+  export-prompt.ts
+  export-agents.ts
+  export-algorithm.ts
+
+design-rules/
+  index.json
+  core/
+  blocks/
+  components/
+  patterns/
+```
+
+## 本地开发
 
 ```bash
 npm install
 npm run dev
 ```
 
-打开 [http://localhost:3000](http://localhost:3000)，进入 Theme Lab 后调整 seed、查看预览并导出契约。
+打开 [http://localhost:3000](http://localhost:3000)，进入 Design System Lab。
 
-常用命令：
+常用检查：
 
 ```bash
 npm run typecheck
@@ -169,81 +253,31 @@ npm run build
 npm run build:static
 ```
 
-## 工作流
-
-1. **定义视觉系统**：选择预设或调整 seed，生成 token。
-2. **检查真实场景**：在 components / blocks 预览中验证按钮、表单、卡片、表格、图表、dashboard 等模式。
-3. **导出契约**：复制 CSS、JSON、AI task prompt 或长期项目契约。
-4. **交给 AI 执行**：Codex / Cursor / Claude Code 读取 token 与 design rules，对现有项目做 UI normalization。
-
-## 导出产物
-
-| 产物 | 用途 |
-| --- | --- |
-| **global CSS block** | `:root` 与 `.dark` CSS 变量，可放入现有 `globals.css` |
-| **theme-lab.json** | 主题 DNA、seed、token contract、design rule library 与 AI coding rules |
-| **theme.preset.json** | 可分享、可复现的 seed 预设 |
-| **vibe.json** | 风格描述符：关键词、视觉语言、AI prompt context |
-| **theme.algorithm.ts** | 生成算法源码，便于迁移或审计 |
-| **AI instruction block** | 可写入 `AGENTS.md` / `CLAUDE.md` 等工具原生指令文件 |
-| **Project import prompt** | 面向 AI coding 工具的执行任务包，含 raw GitHub rule URLs |
-
-## 静态发布
-
 项目使用 Next.js static export：
 
 - `next.config.ts` 使用 `output: "export"`
-- 构建产物输出到 `out/`
-- `postbuild` 会处理静态 HTML，保留 hydration marker 并把 `/_next/` 路径改为相对路径
-- `vercel.json` 已配置 `outputDirectory: "out"`
+- 静态产物输出到 `out/`
+- `postbuild` 会处理静态路径并验证导出结果
 
-生成静态产物：
+## 当前边界
 
-```bash
-npm run build:static
-```
+Design System Lab 当前重点解决：
 
-## 项目结构
+- 确定性 token 生成
+- shadcn-compatible semantic token 输出
+- spec-driven component / block rules
+- raw GitHub rule routing
+- 面向 AI Coding 工具的长期项目契约
+- 用真实 UI preview 检查 token 在不同场景、密度和状态下是否稳定
 
-```
-app/
-  page.tsx               落地页
-  theme-lab/             主应用
-  dashboard/             shadcn dashboard 示例
-  globals.css            Tailwind 与主题变量
-lib/theme/
-  schema.ts              seed 与 token 类型
-  defaults.ts            默认 seed
-  presets.ts             九套场景预设
-  derive-theme.ts        生成流程
-  algorithms/            color / type / radius / density / elevation / motion
-  semantic.ts            语义 token 映射
-  shadcn-adapter.ts      shadcn 兼容层
-  vibe.ts                vibe 描述符
-  export-*.ts            CSS / JSON / prompt / AGENTS / algorithm 导出
-design-rules/
-  index.json             AI 规则路由入口
-  core/                  执行边界、token、QA、completion gate
-  blocks/                page shell、dashboard 等 block spec
-  components/            cards、tables、forms、tabs、overlays 等 component spec
-  patterns/              states、semantic color、page background
-components/theme-lab/
-  theme-lab-shell.tsx
-  seed-control-panel.tsx
-  preview-*.tsx
-  previews/
-  export-panel.tsx
-components/ui/            shadcn/ui 基础组件
-```
+它暂时不解决：
 
-## 技术栈
-
-- **框架** — Next.js 16 · React 19 · TypeScript
-- **样式** — Tailwind CSS v4 · shadcn/ui · Radix UI
-- **预览与交互** — Recharts · TanStack Table · dnd-kit · assistant-ui · Sonner · Lucide
-- **工具** — Zod · date-fns
+- 在用户项目里安装完整组件库
+- 替换用户已有 UI 技术栈
+- 在不落文件的情况下保证长期治理效果
+- 后端持久化、账号体系或多人协作
 
 ## 贡献者
 
-- **Gus**
-- **Alibaba**
+- Gus
+- Alibaba

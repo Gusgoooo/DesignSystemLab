@@ -104,7 +104,7 @@ actions and should use confirmation when data loss is possible.
 
 ## Token Binding
 
-Controls should use Theme Lab tokens:
+Controls should use Design System Lab tokens:
 
 - field surface: `bg-background text-foreground`
 - popover surface: `bg-popover text-popover-foreground`

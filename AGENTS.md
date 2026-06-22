@@ -42,7 +42,7 @@ mapping, shadcn adapter output, preview pages, and exportable theme artifacts.
   vibe descriptor generation.
 - `app/theme-lab` or equivalent route: UI for seed controls and preview.
 - `components/theme-lab`: theme lab UI, preview frame, control panel, preview
-  tabs.
+  tabs, and spec browser.
 - `components/ui`: shadcn/ui base components.
 - `design-rules`: distributed markdown rule library for AI UI normalization.
   `design-rules/index.json` routes UI element types to detailed rule files.
@@ -140,7 +140,7 @@ component-rule handbook.
 
 ## AI instruction targets
 
-Use the target tool's native instruction file when installing Theme Lab guidance:
+Use the target tool's native instruction file when installing Design System Lab guidance:
 
 - Claude Code: `CLAUDE.md`
 - Codex and generic coding agents: `AGENTS.md`
@@ -171,7 +171,7 @@ decisions. shadcn adapter guarantees compatibility.
 
 ## Preview architecture
 
-Theme lab has three tabs:
+Theme lab has four tabs:
 
 1. Components:
    - buttons
@@ -192,7 +192,18 @@ Theme lab has three tabs:
    - AI chat / command
    - pricing / marketing
 
-3. Aesthetic:
+3. Spec:
+   - rule router
+   - page shell / dashboard / page heading / sidebar specs
+   - component interaction specs such as cards as data previews, tables as
+     investigation surfaces, actions as commands, filters as data-scope
+     controls, forms as data mutation contracts, tabs as view-state controls,
+     overlays as focused workflows, badges/alerts as meaning and feedback,
+     metrics/charts as analytical answers
+   - state, semantic color, and page background specs
+   - source paths and conditions for when AI should load each spec
+
+4. Aesthetic:
    - mood cards
    - material samples
    - typography samples

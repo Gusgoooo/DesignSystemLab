@@ -413,7 +413,7 @@ function UIElements() {
               <DialogHeader>
                 <DialogTitle>预览弹窗</DialogTitle>
                 <DialogDescription>
-                  这个弹层会使用 Theme Lab 当前激活的主题变量。
+                  这个弹层会使用 Design System Lab 当前激活的主题变量。
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
@@ -984,14 +984,14 @@ function GithubProfile() {
             <AvatarFallback>SC</AvatarFallback>
           </Avatar>
           <div>
-            <CardTitle>Theme Lab</CardTitle>
+            <CardTitle>Design System Lab</CardTitle>
             <CardDescription>@theme-lab</CardDescription>
           </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm text-muted-foreground">
-          组件现在通过 Theme Lab token 渲染。
+          组件现在通过 Design System Lab token 渲染。
         </p>
         <div className="flex gap-2">
           <Badge variant="secondary">117k 星标</Badge>
@@ -1215,7 +1215,7 @@ function Visitors() {
         {[
           ["落地页", 84],
           ["仪表盘", 62],
-          ["Theme Lab", 46],
+          ["Design System Lab", 46],
         ].map(([label, value]) => (
           <div key={label} className="space-y-2">
             <div className="flex justify-between text-sm">

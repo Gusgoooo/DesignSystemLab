@@ -88,8 +88,8 @@ export const themePresets: ThemePreset[] = [
         primary: { hex: "#6366f1", alpha: 1 },
       },
       shape: { radius: 1, radiusRatio: 1.25 },
-      density: { mode: "comfortable", controlHeight: 2.75, densityRatio: 1.08 },
-      typography: { scaleRatio: 1.28, headingWeight: 620 },
+      density: { mode: "comfortable", controlHeight: 2.95, densityRatio: 1.16 },
+      typography: { scaleRatio: 1.3, headingWeight: 620 },
       material: {
         elevation: "soft",
         shadowAlpha: 0.1,
@@ -140,8 +140,8 @@ export const themePresets: ThemePreset[] = [
         primary: { hex: "#2563eb", alpha: 1 },
       },
       shape: { radius: 0.25, radiusRatio: 0.85 },
-      density: { mode: "compact", controlHeight: 2, densityRatio: 0.85 },
-      typography: { scaleRatio: 1.13, headingWeight: 600, trackingBias: -0.005 },
+      density: { mode: "compact", controlHeight: 1.8, densityRatio: 0.76 },
+      typography: { scaleRatio: 1.1, headingWeight: 600, trackingBias: -0.008 },
       material: {
         elevation: "flat",
         shadowAlpha: 0.03,
@@ -166,9 +166,9 @@ export const themePresets: ThemePreset[] = [
         primary: { hex: "#1e3a8a", alpha: 1 },
         success: { hex: "#059669", alpha: 1 },
       },
-      shape: { radius: 0.125, radiusRatio: 0.8 },
-      density: { mode: "compact", controlHeight: 1.9, densityRatio: 0.8 },
-      typography: { scaleRatio: 1.1, headingWeight: 640, trackingBias: -0.01 },
+      shape: { radius: 0.0625, radiusRatio: 0.7 },
+      density: { mode: "compact", controlHeight: 1.7, densityRatio: 0.72 },
+      typography: { scaleRatio: 1.08, headingWeight: 640, trackingBias: -0.012 },
       material: {
         elevation: "flat",
         shadowAlpha: 0,
@@ -194,8 +194,8 @@ export const themePresets: ThemePreset[] = [
         background: { hex: "#fffdf9", alpha: 1 },
       },
       shape: { radius: 0.875, radiusRatio: 1.15 },
-      density: { mode: "comfortable", controlHeight: 2.875, densityRatio: 1.12 },
-      typography: { scaleRatio: 1.32, headingWeight: 700, trackingBias: 0.005 },
+      density: { mode: "comfortable", controlHeight: 3.1, densityRatio: 1.24 },
+      typography: { scaleRatio: 1.36, headingWeight: 720, trackingBias: 0.006 },
       material: {
         elevation: "soft",
         shadowAlpha: 0.09,
@@ -220,7 +220,7 @@ export const themePresets: ThemePreset[] = [
         primary: { hex: "#16a34a", alpha: 1 },
       },
       shape: { radius: 0.75, radiusRatio: 1.05 },
-      density: { mode: "default", controlHeight: 2.625, densityRatio: 1.02 },
+      density: { mode: "comfortable", controlHeight: 2.8, densityRatio: 1.1 },
       typography: { scaleRatio: 1.22, headingWeight: 660 },
       material: {
         elevation: "soft",
@@ -247,7 +247,7 @@ export const themePresets: ThemePreset[] = [
         background: { hex: "#fffdf8", alpha: 1 },
       },
       shape: { radius: 0.5, radiusRatio: 0.95 },
-      density: { mode: "default", controlHeight: 2.375, densityRatio: 0.95 },
+      density: { mode: "default", controlHeight: 2.35, densityRatio: 0.92 },
       typography: { scaleRatio: 1.18, headingWeight: 680 },
       material: {
         elevation: "floating",
@@ -273,8 +273,8 @@ export const themePresets: ThemePreset[] = [
         primary: { hex: "#7c3aed", alpha: 1 },
       },
       shape: { radius: 0.9375, radiusRatio: 1.1 },
-      density: { mode: "comfortable", controlHeight: 2.55, densityRatio: 1.05 },
-      typography: { scaleRatio: 1.26, headingWeight: 670, trackingBias: 0.005 },
+      density: { mode: "comfortable", controlHeight: 2.9, densityRatio: 1.18 },
+      typography: { scaleRatio: 1.3, headingWeight: 690, trackingBias: 0.006 },
       material: {
         elevation: "floating",
         shadowAlpha: 0.11,
@@ -299,7 +299,7 @@ export const themePresets: ThemePreset[] = [
         primary: { hex: "#475569", alpha: 1 },
       },
       shape: { radius: 0.375, radiusRatio: 0.9 },
-      density: { mode: "compact", controlHeight: 2.1, densityRatio: 0.9 },
+      density: { mode: "compact", controlHeight: 1.85, densityRatio: 0.78 },
       typography: { scaleRatio: 1.16, headingWeight: 580, trackingBias: -0.005 },
       material: {
         elevation: "flat",

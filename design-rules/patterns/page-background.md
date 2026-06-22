@@ -49,7 +49,7 @@ It should feel like air or light, not:
 
 The ambient layer is a decorative exception. It may use non-token colors, opacity, blur, and gradient stops because it is non-structural atmosphere.
 
-All real UI surfaces, text, borders, focus rings, actions, states, radius, and elevation must still use Theme Lab tokens.
+All real UI surfaces, text, borders, focus rings, actions, states, radius, and elevation must still use Design System Lab tokens.
 
 ## Dark Mode
 

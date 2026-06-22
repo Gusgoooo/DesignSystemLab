@@ -69,7 +69,7 @@ should be visible as chips or readable control state.
 
 ## Token Binding
 
-Structural table UI must use Theme Lab tokens:
+Structural table UI must use Design System Lab tokens:
 
 - page/card surface around the table: `bg-background` or `bg-card`
 - table text: `text-foreground`

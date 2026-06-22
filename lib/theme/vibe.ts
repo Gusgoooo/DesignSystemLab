@@ -279,7 +279,7 @@ function deriveVisualContract(
       "Hardcoded hex colors and arbitrary OKLCH values",
       "Decorative gradients and random shadows",
       "Unapproved glassmorphism",
-      "Copying Theme Lab preview fixtures directly into the project",
+      "Copying Design System Lab preview fixtures directly into the project",
     ],
     tokenUsage: [
       "Structural color uses the shadcn semantic classes (bg-background/text-foreground, bg-card/text-card-foreground, bg-muted/text-muted-foreground, border-border, ring-ring). This is the canonical vocabulary.",

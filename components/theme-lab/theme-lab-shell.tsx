@@ -16,6 +16,7 @@ import { SeedControlPanel } from "./seed-control-panel"
 import { BlocksPreview } from "./previews/blocks-preview"
 import { ComponentsPreview } from "./previews/components-preview"
 import { DocPreview } from "./previews/doc-preview"
+import { SpecPreview } from "./previews/spec-preview"
 import { TooltipProvider } from "../ui/tooltip"
 import { getControlPanelStyle } from "./control-panel-theme"
 
@@ -36,6 +37,10 @@ function renderPreview(
     return <DocPreview />
   }
 
+  if (tab === "specs") {
+    return <SpecPreview />
+  }
+
   return <ComponentsPreview seed={seed} theme={theme} />
 }
 
@@ -49,7 +54,6 @@ export function ThemeLabShell() {
   const shellStyle = useMemo(
     () => ({
       ...getControlPanelStyle(isDark),
-      background: isDark ? "rgb(18 18 18)" : "rgb(255 255 255)",
     }),
     [isDark]
   )

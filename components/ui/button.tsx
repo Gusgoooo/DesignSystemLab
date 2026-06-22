@@ -5,7 +5,7 @@ import { Slot } from "radix-ui"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex shrink-0 items-center justify-center gap-2 rounded-[var(--radius-control)] text-sm font-medium whitespace-nowrap transition-[background-color,border-color,color,box-shadow,opacity,transform] [transition-duration:var(--duration-base)] [transition-timing-function:var(--ease-standard)] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "inline-flex shrink-0 items-center justify-center gap-[var(--control-gap)] rounded-[var(--radius-control)] text-sm font-medium whitespace-nowrap transition-[background-color,border-color,color,box-shadow,opacity,transform] [transition-duration:var(--duration-base)] [transition-timing-function:var(--ease-standard)] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
@@ -21,10 +21,11 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
-        default: "h-[var(--control-height-md)] px-4 py-2 has-[>svg]:px-3",
+        default:
+          "h-[var(--control-height-md)] px-[var(--control-padding-x)] py-0 has-[>svg]:px-[calc(var(--control-padding-x)*0.85)]",
         xs: "h-6 gap-1 rounded-md px-2 text-xs has-[>svg]:px-1.5 [&_svg:not([class*='size-'])]:size-3",
-        sm: "h-[var(--control-height-sm)] gap-1.5 rounded-md px-3 has-[>svg]:px-2.5",
-        lg: "h-[var(--control-height-lg)] rounded-md px-6 has-[>svg]:px-4",
+        sm: "h-[var(--control-height-sm)] gap-[calc(var(--control-gap)*0.75)] rounded-md px-[calc(var(--control-padding-x)*0.78)] has-[>svg]:px-[calc(var(--control-padding-x)*0.68)]",
+        lg: "h-[var(--control-height-lg)] rounded-md px-[calc(var(--control-padding-x)*1.35)] has-[>svg]:px-[calc(var(--control-padding-x)*1.1)]",
         icon: "h-[var(--control-height-md)] w-[var(--control-height-md)]",
         "icon-xs": "size-6 rounded-md [&_svg:not([class*='size-'])]:size-3",
         "icon-sm": "h-[var(--control-height-sm)] w-[var(--control-height-sm)]",
