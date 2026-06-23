@@ -1,0 +1,291 @@
+{
+  "schemaVersion": 1,
+  "name": "Design System Lab External Knowledge Assets",
+  "retrievalPolicy": {
+    "default": "Load local rules first, then open only external raw assets required by the current task.",
+    "durability": "Prefer pinned commit or tag URLs for exported durable prompts. The main-branch URLs below are live source references.",
+    "copyright": "Summarize external content and route to raw URLs; do not paste long external bodies into prompts or final responses."
+  },
+  "sources": {
+    "impeccable": {
+      "repo": "pbakaus/impeccable",
+      "branch": "main",
+      "rawBase": "https://raw.githubusercontent.com/pbakaus/impeccable/main/.agents/skills/impeccable",
+      "purpose": "Design language, commands, QA, anti-pattern detection, and project context patterns.",
+      "assetFamilies": {
+        "entry": [
+          {
+            "id": "impeccable-skill",
+            "kind": "skill-entry",
+            "url": "https://raw.githubusercontent.com/pbakaus/impeccable/main/.agents/skills/impeccable/SKILL.md",
+            "useWhen": "A task invokes Impeccable-like design, critique, polish, audit, shape, or hardening behavior."
+          },
+          {
+            "id": "impeccable-command-metadata",
+            "kind": "command-index",
+            "url": "https://raw.githubusercontent.com/pbakaus/impeccable/main/.agents/skills/impeccable/scripts/command-metadata.json",
+            "useWhen": "A command list or command-to-reference routing map is needed."
+          }
+        ],
+        "projectContext": [
+          {
+            "id": "product-register",
+            "kind": "register",
+            "url": "https://raw.githubusercontent.com/pbakaus/impeccable/main/.agents/skills/impeccable/reference/product.md",
+            "useWhen": "Working on dashboards, settings, app shells, tables, tools, command surfaces, or product UI."
+          },
+          {
+            "id": "brand-register",
+            "kind": "register",
+            "url": "https://raw.githubusercontent.com/pbakaus/impeccable/main/.agents/skills/impeccable/reference/brand.md",
+            "useWhen": "Working on marketing, landing, portfolio, brand, campaign, or first-impression surfaces."
+          },
+          {
+            "id": "init-context",
+            "kind": "context-setup",
+            "url": "https://raw.githubusercontent.com/pbakaus/impeccable/main/.agents/skills/impeccable/reference/init.md",
+            "useWhen": "Local PRODUCT.md or DESIGN.md is missing and context structure is needed."
+          },
+          {
+            "id": "shape-brief",
+            "kind": "design-brief",
+            "url": "https://raw.githubusercontent.com/pbakaus/impeccable/main/.agents/skills/impeccable/reference/shape.md",
+            "useWhen": "A feature needs design discovery before implementation."
+          }
+        ],
+        "language": [
+          {
+            "id": "layout",
+            "kind": "spatial-design",
+            "url": "https://raw.githubusercontent.com/pbakaus/impeccable/main/.agents/skills/impeccable/reference/layout.md"
+          },
+          {
+            "id": "typeset",
+            "kind": "typography",
+            "url": "https://raw.githubusercontent.com/pbakaus/impeccable/main/.agents/skills/impeccable/reference/typeset.md"
+          },
+          {
+            "id": "colorize",
+            "kind": "color-strategy",
+            "url": "https://raw.githubusercontent.com/pbakaus/impeccable/main/.agents/skills/impeccable/reference/colorize.md"
+          },
+          {
+            "id": "interaction-design",
+            "kind": "interaction-states",
+            "url": "https://raw.githubusercontent.com/pbakaus/impeccable/main/.agents/skills/impeccable/reference/interaction-design.md"
+          },
+          {
+            "id": "bolder",
+            "kind": "amplification",
+            "url": "https://raw.githubusercontent.com/pbakaus/impeccable/main/.agents/skills/impeccable/reference/bolder.md"
+          },
+          {
+            "id": "quieter",
+            "kind": "restraint",
+            "url": "https://raw.githubusercontent.com/pbakaus/impeccable/main/.agents/skills/impeccable/reference/quieter.md"
+          },
+          {
+            "id": "distill",
+            "kind": "simplification",
+            "url": "https://raw.githubusercontent.com/pbakaus/impeccable/main/.agents/skills/impeccable/reference/distill.md"
+          },
+          {
+            "id": "polish",
+            "kind": "final-craft",
+            "url": "https://raw.githubusercontent.com/pbakaus/impeccable/main/.agents/skills/impeccable/reference/polish.md"
+          }
+        ],
+        "quality": [
+          {
+            "id": "audit",
+            "kind": "technical-audit",
+            "url": "https://raw.githubusercontent.com/pbakaus/impeccable/main/.agents/skills/impeccable/reference/audit.md"
+          },
+          {
+            "id": "critique",
+            "kind": "design-critique",
+            "url": "https://raw.githubusercontent.com/pbakaus/impeccable/main/.agents/skills/impeccable/reference/critique.md"
+          },
+          {
+            "id": "harden",
+            "kind": "edge-case-hardening",
+            "url": "https://raw.githubusercontent.com/pbakaus/impeccable/main/.agents/skills/impeccable/reference/harden.md"
+          },
+          {
+            "id": "detector-cli",
+            "kind": "detector-script",
+            "url": "https://raw.githubusercontent.com/pbakaus/impeccable/main/.agents/skills/impeccable/scripts/detect.mjs"
+          },
+          {
+            "id": "antipattern-registry",
+            "kind": "detector-rules",
+            "url": "https://raw.githubusercontent.com/pbakaus/impeccable/main/.agents/skills/impeccable/scripts/detector/registry/antipatterns.mjs"
+          },
+          {
+            "id": "checks",
+            "kind": "detector-checks",
+            "url": "https://raw.githubusercontent.com/pbakaus/impeccable/main/.agents/skills/impeccable/scripts/detector/rules/checks.mjs"
+          }
+        ]
+      }
+    },
+    "uiuxpromax": {
+      "repo": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "branch": "main",
+      "rawBase": "https://raw.githubusercontent.com/nextlevelbuilder/ui-ux-pro-max-skill/main/src/ui-ux-pro-max",
+      "purpose": "Searchable UI/UX datasets, design-system generation scripts, style library, and cross-stack implementation rules.",
+      "assetFamilies": {
+        "datasets": [
+          {
+            "id": "styles",
+            "kind": "style-library",
+            "url": "https://raw.githubusercontent.com/nextlevelbuilder/ui-ux-pro-max-skill/main/src/ui-ux-pro-max/data/styles.csv",
+            "columns": ["Style Category", "Type", "Keywords", "Best For", "Do Not Use For", "Implementation Checklist", "Design System Variables"]
+          },
+          {
+            "id": "colors",
+            "kind": "color-palettes",
+            "url": "https://raw.githubusercontent.com/nextlevelbuilder/ui-ux-pro-max-skill/main/src/ui-ux-pro-max/data/colors.csv",
+            "columns": ["Product Type", "Primary", "On Primary", "Secondary", "Accent", "Background", "Foreground", "Card", "Border"]
+          },
+          {
+            "id": "typography",
+            "kind": "font-pairings",
+            "url": "https://raw.githubusercontent.com/nextlevelbuilder/ui-ux-pro-max-skill/main/src/ui-ux-pro-max/data/typography.csv",
+            "columns": ["Font Pairing Name", "Category", "Heading Font", "Body Font", "Mood/Style Keywords", "Best For"]
+          },
+          {
+            "id": "charts",
+            "kind": "chart-guidance",
+            "url": "https://raw.githubusercontent.com/nextlevelbuilder/ui-ux-pro-max-skill/main/src/ui-ux-pro-max/data/charts.csv",
+            "columns": ["Data Type", "Best Chart Type", "When to Use", "When NOT to Use", "Accessibility Grade", "Library Recommendation"]
+          },
+          {
+            "id": "products",
+            "kind": "product-type-mapping",
+            "url": "https://raw.githubusercontent.com/nextlevelbuilder/ui-ux-pro-max-skill/main/src/ui-ux-pro-max/data/products.csv",
+            "columns": ["Product Type", "Keywords", "Primary Style Recommendation", "Landing Page Pattern", "Dashboard Style (if applicable)", "Key Considerations"]
+          },
+          {
+            "id": "ui-reasoning",
+            "kind": "decision-rules",
+            "url": "https://raw.githubusercontent.com/nextlevelbuilder/ui-ux-pro-max-skill/main/src/ui-ux-pro-max/data/ui-reasoning.csv",
+            "columns": ["UI_Category", "Recommended_Pattern", "Style_Priority", "Decision_Rules", "Anti_Patterns", "Severity"]
+          },
+          {
+            "id": "ux-guidelines",
+            "kind": "ux-guidelines",
+            "url": "https://raw.githubusercontent.com/nextlevelbuilder/ui-ux-pro-max-skill/main/src/ui-ux-pro-max/data/ux-guidelines.csv"
+          },
+          {
+            "id": "app-interface",
+            "kind": "mobile-interface-rules",
+            "url": "https://raw.githubusercontent.com/nextlevelbuilder/ui-ux-pro-max-skill/main/src/ui-ux-pro-max/data/app-interface.csv"
+          },
+          {
+            "id": "landing",
+            "kind": "landing-patterns",
+            "url": "https://raw.githubusercontent.com/nextlevelbuilder/ui-ux-pro-max-skill/main/src/ui-ux-pro-max/data/landing.csv"
+          },
+          {
+            "id": "react-performance",
+            "kind": "react-performance-rules",
+            "url": "https://raw.githubusercontent.com/nextlevelbuilder/ui-ux-pro-max-skill/main/src/ui-ux-pro-max/data/react-performance.csv"
+          }
+        ],
+        "generator": [
+          {
+            "id": "search-script",
+            "kind": "search-engine",
+            "url": "https://raw.githubusercontent.com/nextlevelbuilder/ui-ux-pro-max-skill/main/src/ui-ux-pro-max/scripts/search.py"
+          },
+          {
+            "id": "design-system-generator",
+            "kind": "generator",
+            "url": "https://raw.githubusercontent.com/nextlevelbuilder/ui-ux-pro-max-skill/main/src/ui-ux-pro-max/scripts/design_system.py"
+          },
+          {
+            "id": "core-script",
+            "kind": "script-core",
+            "url": "https://raw.githubusercontent.com/nextlevelbuilder/ui-ux-pro-max-skill/main/src/ui-ux-pro-max/scripts/core.py"
+          }
+        ],
+        "crossStack": [
+          {
+            "id": "nextjs",
+            "kind": "stack-rules",
+            "url": "https://raw.githubusercontent.com/nextlevelbuilder/ui-ux-pro-max-skill/main/src/ui-ux-pro-max/data/stacks/nextjs.csv"
+          },
+          {
+            "id": "react",
+            "kind": "stack-rules",
+            "url": "https://raw.githubusercontent.com/nextlevelbuilder/ui-ux-pro-max-skill/main/src/ui-ux-pro-max/data/stacks/react.csv"
+          },
+          {
+            "id": "shadcn",
+            "kind": "stack-rules",
+            "url": "https://raw.githubusercontent.com/nextlevelbuilder/ui-ux-pro-max-skill/main/src/ui-ux-pro-max/data/stacks/shadcn.csv"
+          },
+          {
+            "id": "html-tailwind",
+            "kind": "stack-rules",
+            "url": "https://raw.githubusercontent.com/nextlevelbuilder/ui-ux-pro-max-skill/main/src/ui-ux-pro-max/data/stacks/html-tailwind.csv"
+          },
+          {
+            "id": "vue",
+            "kind": "stack-rules",
+            "url": "https://raw.githubusercontent.com/nextlevelbuilder/ui-ux-pro-max-skill/main/src/ui-ux-pro-max/data/stacks/vue.csv"
+          },
+          {
+            "id": "flutter",
+            "kind": "stack-rules",
+            "url": "https://raw.githubusercontent.com/nextlevelbuilder/ui-ux-pro-max-skill/main/src/ui-ux-pro-max/data/stacks/flutter.csv"
+          },
+          {
+            "id": "swiftui",
+            "kind": "stack-rules",
+            "url": "https://raw.githubusercontent.com/nextlevelbuilder/ui-ux-pro-max-skill/main/src/ui-ux-pro-max/data/stacks/swiftui.csv"
+          },
+          {
+            "id": "jetpack-compose",
+            "kind": "stack-rules",
+            "url": "https://raw.githubusercontent.com/nextlevelbuilder/ui-ux-pro-max-skill/main/src/ui-ux-pro-max/data/stacks/jetpack-compose.csv"
+          }
+        ]
+      }
+    }
+  },
+  "loadRecipes": [
+    {
+      "id": "existing-product-ui-normalization",
+      "stages": [
+        "Read local PRODUCT.md, DESIGN.md, AGENTS.md, and design-rules/index.json.",
+        "Load page-type-workflow and classify the route.",
+        "Use Impeccable product or brand register only after the local register is known.",
+        "Use UIUXPROMAX product/style rows only as candidate inputs to Design System Lab tokens.",
+        "Implement through local shadcn primitives and semantic tokens.",
+        "Run local completion compliance plus Impeccable-style critique/audit/harden checks when requested."
+      ]
+    },
+    {
+      "id": "theme-style-generation",
+      "stages": [
+        "Search UIUXPROMAX products, styles, colors, typography, and charts for candidate rows.",
+        "Map selected rows to seed tokens, map tokens, semantic tokens, and shadcn adapter tokens.",
+        "Reject rows whose Do Not Use For conflicts with the page type.",
+        "Use Impeccable colorize/typeset/layout language to explain the design direction.",
+        "Preview through Design System Lab components before exporting guidance."
+      ]
+    },
+    {
+      "id": "quality-review",
+      "stages": [
+        "Run local visual QA and completion compliance.",
+        "Use Impeccable audit for measurable implementation checks.",
+        "Use Impeccable critique for design judgment with browser evidence.",
+        "Use Impeccable harden for long text, empty, error, loading, dense, responsive, and i18n edge cases.",
+        "Report missing external assets instead of guessing."
+      ]
+    }
+  ]
+}

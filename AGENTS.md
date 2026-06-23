@@ -16,6 +16,11 @@ Current repository state:
 - Styles: Tailwind v4 and theme variables live in `app/globals.css`.
 - Distributed design rules: detailed AI UI rules live in `design-rules/`.
   Start from `design-rules/index.json` and load only matched markdown rules.
+- Product context: `PRODUCT.md` and `DESIGN.md` store Impeccable-style local
+  context for product purpose, design register, page types, layout grammar, and
+  anti-patterns.
+- External design intelligence: `design-rules/external/knowledge-assets.json`
+  routes Impeccable and UIUXPROMAX assets through raw GitHub URLs.
 - Aliases: `@/*` is configured in `tsconfig.json` and `components.json`.
 - Static output: `next.config.ts` uses `output: "export"` and writes the
   publishable static artifact to `out/`.
@@ -46,6 +51,10 @@ mapping, shadcn adapter output, preview pages, and exportable theme artifacts.
 - `components/ui`: shadcn/ui base components.
 - `design-rules`: distributed markdown rule library for AI UI normalization.
   `design-rules/index.json` routes UI element types to detailed rule files.
+- `PRODUCT.md` and `DESIGN.md`: local product/design context used before
+  external references.
+- `design-rules/external`: raw GitHub asset indexes for Impeccable and
+  UIUXPROMAX knowledge families.
 - `styles` or `app/globals.css`: Tailwind and shadcn theme integration.
 
 Prefer the repository's existing structure once it exists. If both `src/*` and
@@ -106,18 +115,58 @@ Do not compress all UI rules into a single prompt. Before UI normalization:
 
 1. Read `design-rules/index.json`.
 2. Load rules marked `requiredAlways`.
-3. Inventory the selected UI by element type.
-4. Match element types against `rules[].appliesTo`.
-5. Open only the matched `rules[].source` files.
-6. Apply matched rules before generic UI judgment.
-7. If no rule matches, keep changes conservative and report the missing rule.
+3. Read `PRODUCT.md` and `DESIGN.md` when present.
+4. Classify page type first: dashboard, theme-lab, marketing, settings,
+   resource-index, detail, form-flow, AI command, or docs/spec.
+5. Normalize page shell, background, maximum width, grid, and spacing before
+   polishing components.
+6. Inventory the selected UI by element type.
+7. Match element types against `rules[].appliesTo`.
+8. Open only the matched `rules[].source` files.
+9. Apply matched rules before generic UI judgment.
+10. If no rule matches, keep changes conservative and report the missing rule.
 
 The distributed rule library currently covers page shell/layout routing,
 standard dashboard blocks, cards, tables, page headings, sidebars,
 actions/buttons, filters/controls, forms/inputs, tabs, overlays,
 badges/alerts, metrics/charts, page backgrounds, UI states, token system
 installation, token binding, product alignment, visual QA, completion
-compliance, and the rule router itself.
+compliance, page-type workflow, project context, external knowledge routing,
+and the rule router itself.
+
+## Page-type normalization flow
+
+Use this sequence for existing-product UI work:
+
+1. Classify the page type.
+2. Normalize page shell, background, maximum width, grid, and spacing.
+3. Audit token usage and remove raw structural Tailwind palette values.
+4. Adjust typography hierarchy and density.
+5. Apply radius, shadow/elevation, motion, and decorative details last.
+
+Do not start UI work by adding gradients, glassmorphism, shadows, radius, or
+animation. If the result still feels wrong, return to page type, information
+hierarchy, spacing, and token usage before adding ornament.
+
+## External design knowledge assets
+
+Use external raw GitHub assets only when the task explicitly asks for
+Impeccable, UIUXPROMAX, external style intelligence, raw GitHub routing,
+generators, or cross-stack rules.
+
+- Start from `design-rules/core/external-knowledge-routing.md`.
+- Use `design-rules/external/knowledge-assets.json` as the machine-readable
+  manifest.
+- Use Impeccable for language, commands, critique, QA, anti-pattern detection,
+  and project-context patterns.
+- Use UIUXPROMAX for datasets, style recipes, color and typography candidates,
+  chart guidance, generator scripts, and stack-specific rules.
+- Preserve local `PRODUCT.md`, `DESIGN.md`, `AGENTS.md`, route behavior, token
+  architecture, and shadcn components as the source of truth.
+- Translate external style rows into the chain `Seed Token -> Algorithmic Map
+  Token -> Semantic Token -> shadcn Adapter Token -> Preview Component`.
+- Do not copy external demo content, brand styling, or long rule bodies into
+  local prompts. Route to raw URLs and summarize decisions.
 
 ## Design rule authoring
 
@@ -194,6 +243,8 @@ Theme lab has four tabs:
 
 3. Spec:
    - rule router
+   - page type workflow
+   - project context and external knowledge routing
    - page shell / dashboard / page heading / sidebar specs
    - component interaction specs such as cards as data previews, tables as
      investigation surfaces, actions as commands, filters as data-scope

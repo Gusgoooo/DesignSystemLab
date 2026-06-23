@@ -81,7 +81,8 @@ function promptRouteSection(
 - selectedMode: \`${options.mode}\` (${modeLabels[options.mode]})
 - selectedTask: \`${options.task}\` (${taskLabels[options.task]})
 - targetScope: \`${targetScope || "(not provided)"}\`
-- designRuleRouter: \`${themeLabDesignRuleLibrary.entrypoint}\` (raw: ${themeLabDesignRuleLibrary.rawEntrypoint})`
+- designRuleRouter: \`${themeLabDesignRuleLibrary.entrypoint}\` (raw: ${themeLabDesignRuleLibrary.rawEntrypoint})
+- externalKnowledgeManifest: \`${themeLabDesignRuleLibrary.externalKnowledgeManifest}\``
 }
 
 const oneShotThemeTokenNames = [
@@ -335,8 +336,12 @@ function designRulesSection(): string {
 Detailed rules live in separate files; this packet only routes to them. Do not inline or invent rules.
 
 - Entrypoint: \`${themeLabDesignRuleLibrary.entrypoint}\` (raw fallback: ${themeLabDesignRuleLibrary.rawEntrypoint}).
-- Load every \`requiredAlways\` rule: rule-router, ui-normalization, token-system, token-binding, visual-qa, completion-compliance.
-- Detect page structure, inventory elements by type, then open only matched files from \`rules[].source\` (local first, raw URL otherwise).
+- External knowledge manifest: \`${themeLabDesignRuleLibrary.externalKnowledgeManifest}\`.
+- Load every \`requiredAlways\` rule: rule-router, page-type-workflow, project-context, external-knowledge-routing, ui-normalization, token-system, token-binding, visual-qa, completion-compliance.
+- Read local \`PRODUCT.md\` and \`DESIGN.md\` when present.
+- Classify page type, detect page structure, inventory elements by type, then open only matched files from \`rules[].source\` (local first, raw URL otherwise).
+- Follow the page-type workflow before cosmetic polish: page type -> shell/background/max-width/grid/spacing -> token audit -> typography/density -> shape/elevation/motion/decoration.
+- If the user explicitly asks for Impeccable, UIUXPROMAX, raw GitHub design assets, style datasets, generators, or cross-stack rules, load \`${themeLabDesignRuleLibrary.externalKnowledgeManifest}\` and only the relevant external raw GitHub asset family.
 - Apply matched rules before generic taste. Do not browse or imitate external visual references unless the user explicitly provides one. If a needed rule is missing, make the smallest safe normalization and report it.
 
 Before editing, output a Rule Read Confirmation listing \`ruleIndexRead\`, \`requiredRuleFilesLoaded\`, \`matchedRuleFilesLoaded\` (each with \`source\`, \`elementType\`, \`firstHeading\`), and \`missingRuleFiles\`. Do not claim a rule was applied unless its file was opened.
@@ -399,6 +404,9 @@ Work in four stages. Do not start by swapping class values.
 - Inspect the repo: framework, CSS strategy, component system, global CSS path, existing tokens/shadcn, and the ${analyzeScope}. Output a compact Project Mode record (\`projectMode\`, \`framework\`, \`cssStrategy\`, \`componentSystem\`, \`globalCssPath\`, \`hasExistingTokens\`, \`hasShadcn\`, \`safeFilesToChange\`, \`filesNotToTouch\`).
 - Global CSS detection order: \`components.json\` tailwind.css path -> \`app/globals.css\` -> \`src/app/globals.css\` -> \`styles/globals.css\` -> \`src/styles/globals.css\` -> root-imported global CSS. Never create a new global CSS file when one exists.
 - Load the design rules and emit the Rule Read Confirmation.
+- Read local PRODUCT.md and DESIGN.md when present, then output a compact context capsule.
+- Classify the page type before touching visual styles: dashboard, theme-lab, marketing, settings, resource-index, detail, form-flow, AI command, or docs/spec.
+- Normalize page shell, background, maximum width, grid, and spacing before token or component polish.
 - Inventory UI by element type: cards, tables, buttons/actions, filters, sidebar/nav, page heading, forms/inputs, tabs/dialogs/popovers, badges/status/alerts, states, metrics/charts, page canvas.
 - Extract the business logic and data flows named in the Preservation Contract.
 
@@ -414,6 +422,7 @@ ${planTokenLine}
 ${implementSetup}
 - Normalize components with existing project components and shadcn/ui primitives; keep the product recognizable.
 - Bind surfaces, text, borders, focus, states, radius, spacing, elevation, and motion to tokens; apply status and chart color per the vocabulary.
+- Apply typography and density before final shape, elevation, motion, or decorative treatment.
 - Reconnect existing APIs, data, handlers, validation, permissions, and state.
 
 ### 4. Review
@@ -483,7 +492,9 @@ ${userDesignRulesSection(userDesignRules)}## UI Normalization Rule
 
 Before UI changes, read \`design-rules/index.json\` when it exists, load \`requiredAlways\` rules, inventory the scope by element type, and open only matched files from \`rules[].source\`. Output a Rule Read Confirmation before editing; do not claim a rule was applied unless its file was opened.
 
-Treat redesign/optimize/rebuild/refactor requests as UI normalization by default, not a full redesign. Preserve existing content, information architecture, workflow order, routes, APIs, state, validation, permissions, and domain copy. Do not wipe the UI tree or move major content regions unless the user asks for a full redesign. Prefer existing project components and shadcn/ui primitives. Do not browse external visual references unless the user provides one. Reconnect APIs, data, handlers, validation, navigation, permissions, and state after normalizing.
+Read local \`PRODUCT.md\` and \`DESIGN.md\` when present. Classify page type before changing visual design, then normalize shell/background/max-width/grid/spacing, audit tokens, tune typography/density, and apply radius/elevation/motion/decoration last.
+
+Treat redesign/optimize/rebuild/refactor requests as UI normalization by default, not a full redesign. Preserve existing content, information architecture, workflow order, routes, APIs, state, validation, permissions, and domain copy. Do not wipe the UI tree or move major content regions unless the user asks for a full redesign. Prefer existing project components and shadcn/ui primitives. Do not browse external visual references unless the user provides one or explicitly asks for Impeccable/UIUXPROMAX/raw GitHub design assets. When external knowledge is requested, use \`${themeLabDesignRuleLibrary.externalKnowledgeManifest}\`, load only relevant raw GitHub files, and map decisions through local tokens. Reconnect APIs, data, handlers, validation, navigation, permissions, and state after normalizing.
 
 ## Styling Rule
 
@@ -505,11 +516,13 @@ Forbidden for structural UI:
 ## Workflow
 
 1. Read \`theme-lab.json\` and \`design-rules/index.json\` (when present); load required and matched rules.
-2. Locate the global CSS theme block and the selected scope.
-3. Preserve business logic, API contracts, data loading, handlers, validation, and permissions.
-4. Normalize the scope with project components, shadcn/ui primitives, matched rules, and Design System Lab tokens.
-5. Verify semantic foreground/background pairs and reconnect APIs and interactions.
-6. Report files changed, rule files loaded, QA, and risks.
+2. Read \`PRODUCT.md\` and \`DESIGN.md\` when present; classify page type.
+3. Locate the global CSS theme block and the selected scope.
+4. Preserve business logic, API contracts, data loading, handlers, validation, and permissions.
+5. Normalize shell/background/max-width/grid/spacing before component polish.
+6. Normalize the scope with project components, shadcn/ui primitives, matched rules, and Design System Lab tokens.
+7. Verify semantic foreground/background pairs and reconnect APIs and interactions.
+8. Report files changed, page type, rule files loaded, QA, and risks.
 
 <!-- theme-lab:agents:end -->`
 }

@@ -79,12 +79,17 @@ Distributed design rule router:
 
 - Entry point: \`${themeLabDesignRuleLibrary.entrypoint}\`
 - Raw fallback: \`${themeLabDesignRuleLibrary.rawEntrypoint}\`
-- Load requiredAlways rules first, including token-system, token-binding, visual QA, and completion compliance.
-- Detect page structure first.
+- External knowledge manifest: \`${themeLabDesignRuleLibrary.externalKnowledgeManifest}\`
+- Load requiredAlways rules first, including page-type workflow, project context, external knowledge routing, token-system, token-binding, visual QA, and completion compliance.
+- Read \`PRODUCT.md\` and \`DESIGN.md\` when present.
+- Classify page type before changing visual design.
+- Follow the five-step existing-product flow: page type -> shell/background/max-width/grid/spacing -> token audit -> typography/density -> shape/elevation/motion/decoration.
+- Detect page structure after page type.
 - Open matched page-structure/block rules before component rules.
 - Inventory components and blocks inside the selected structure.
 - Match element types against \`rules[].appliesTo\`.
 - Open only matched files from \`rules[].source\`, using local files first and raw GitHub URLs only when local files are unavailable.
+- When the user explicitly asks for Impeccable, UIUXPROMAX, raw GitHub assets, style datasets, generators, or cross-stack rules, use \`${themeLabDesignRuleLibrary.externalKnowledgeManifest}\` to load only the relevant external raw GitHub files.
 - Build the token-system plan before changing token-bearing UI.
 - Use completion compliance before final response.
 - Do not load every rule file by default.
@@ -128,6 +133,8 @@ UI normalization rule:
 - Do not discard the old visible UI tree by default; normalize components, repeated style fragments, token usage, spacing, radius, elevation, and states around the existing product structure.
 - Prefer existing project components and shadcn/ui primitives for controls and repeated patterns when behavior can be preserved.
 - Use user-authored Design System Lab design rules as the design source; do not browse, import, or imitate external visual references unless the user explicitly asks.
+- When the user explicitly asks for Impeccable or UIUXPROMAX, use them as routed knowledge assets: Impeccable for language, commands, critique, QA, and context patterns; UIUXPROMAX for datasets, style recipes, generators, and cross-stack rules. Local product context, local rules, and tokens still win.
+- Do not paste long external rule bodies into prompts. Route to raw GitHub URLs and summarize the design decisions.
 - Before editing, identify which user-authored design rule applies to the selected UI pattern; if no rule exists, make the smallest safe normalization and report the missing rule.
 - Decorative exceptions explicitly defined by user-authored rules may use non-token colors or values only for non-structural ambient layers, never for text, primary surfaces, borders, focus rings, or actionable states.
 - For plain page canvases, a very subtle page-top ambient wash may be added as a non-structural background layer behind content.

@@ -26,12 +26,16 @@ export const themeLabDesignRuleLibrary = {
     "https://raw.githubusercontent.com/Gusgoooo/DesignSystemLab/codex/distributed-design-rules",
   basePath: "design-rules",
   routing:
-    "Detect page structure first, load requiredAlways rules, open matched page-structure/block rules, then open only matched component, pattern, and token files from rules[].source. If the local design-rules directory is unavailable, read the raw GitHub rule URLs.",
+    "Detect page type first, load requiredAlways rules, open matched page-structure/block rules, then open only matched component, pattern, token, and external-knowledge files from rules[].source. If the local design-rules directory is unavailable, read the raw GitHub rule URLs.",
   readConfirmation:
     "Before editing, list ruleIndexRead, requiredRuleFilesLoaded, matchedRuleFilesLoaded with elementType/source/firstHeading, and missingRuleFiles. Do not claim a rule was applied unless the file was actually opened.",
+  externalKnowledgeManifest: "design-rules/external/knowledge-assets.json",
   files: [
     "design-rules/index.json",
     "design-rules/core/rule-router.md",
+    "design-rules/core/page-type-workflow.md",
+    "design-rules/core/project-context.md",
+    "design-rules/core/external-knowledge-routing.md",
     "design-rules/core/ui-normalization.md",
     "design-rules/core/token-binding.md",
     "design-rules/core/token-system.md",
@@ -54,6 +58,8 @@ export const themeLabDesignRuleLibrary = {
     "design-rules/patterns/page-background.md",
     "design-rules/patterns/states.md",
     "design-rules/patterns/semantic-color.md",
+    "design-rules/external/knowledge-assets.md",
+    "design-rules/external/knowledge-assets.json",
   ],
 } as const
 
@@ -207,7 +213,12 @@ export const themeLabAiCodingRules = [
   "When changing UI, consume the existing compiled CSS variables and token contract.",
   "Use design-rules/index.json as the distributed design rule router when it exists.",
   "If local design-rules/index.json is unavailable, read the raw GitHub rule index at https://raw.githubusercontent.com/Gusgoooo/DesignSystemLab/codex/distributed-design-rules/design-rules/index.json.",
-  "Before UI normalization, first detect page structure, then load requiredAlways rule files, then open only page-structure, block, component, pattern, and token rule files matched from rules[].source or the corresponding raw GitHub URL.",
+  "Before UI normalization, first classify page type, then detect page structure, then load requiredAlways rule files, then open only page-structure, block, component, pattern, token, and external-knowledge rule files matched from rules[].source or the corresponding raw GitHub URL.",
+  "Use the page-type workflow order for existing-product UI work: classify page type; normalize shell, background, max width, grid, and spacing; audit token usage; tune typography and density; apply radius, elevation, motion, and decoration last.",
+  "Read PRODUCT.md and DESIGN.md when present before product-wide UI work; local product context outranks external references.",
+  "When the user explicitly asks for Impeccable, UIUXPROMAX, raw GitHub design assets, style datasets, generators, or cross-stack rules, load design-rules/core/external-knowledge-routing.md and design-rules/external/knowledge-assets.json.",
+  "Use Impeccable raw assets for language, commands, project context patterns, critique, QA, and anti-pattern detection; do not copy Impeccable brand styling into the product.",
+  "Use UIUXPROMAX raw assets for datasets, style recipes, color and typography candidates, chart guidance, design-system generator references, and stack-specific rules; map every selected row through Design System Lab seed, semantic, and shadcn adapter tokens before implementation.",
   "Before editing, output a Rule Read Confirmation listing the exact rule files actually opened, including first headings for matched files.",
   "When changing a route, page, or app-level layout, open design-rules/blocks/page-shell.md or its raw GitHub URL before editing page structure.",
   "When installing or bridging tokens, open design-rules/core/token-system.md or its raw GitHub URL before editing token-bearing UI.",

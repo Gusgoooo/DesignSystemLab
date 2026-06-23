@@ -3,14 +3,17 @@
   "name": "Design System Lab Distributed Design Rules",
   "basePath": "design-rules",
   "routing": {
-    "instruction": "Read this index first. Load requiredAlways rules, inventory the selected UI by element type, then load only matched rule files from source.",
+    "instruction": "Read this index first. Load requiredAlways rules, classify page type, inventory the selected UI by element type, then load only matched rule files from source.",
     "missingRuleBehavior": "If no rule matches an element, make the smallest safe normalization with existing project components and Design System Lab tokens, then report the missing rule.",
     "priorityOrder": [
       "user-authored project rules",
+      "local PRODUCT.md and DESIGN.md project context",
       "matched design-rules source files",
+      "external raw GitHub knowledge assets when explicitly requested",
       "existing local product patterns",
       "generic UI judgment"
-    ]
+    ],
+    "externalKnowledgeManifest": "design-rules/external/knowledge-assets.json"
   },
   "rules": [
     {
@@ -19,6 +22,56 @@
       "source": "design-rules/core/rule-router.md",
       "requiredAlways": true,
       "appliesTo": ["all ui work", "rule selection", "design rule routing"]
+    },
+    {
+      "id": "page-type-workflow",
+      "title": "Page Type Workflow",
+      "source": "design-rules/core/page-type-workflow.md",
+      "requiredAlways": true,
+      "appliesTo": [
+        "all ui work",
+        "page type",
+        "dashboard",
+        "theme lab",
+        "marketing",
+        "settings",
+        "resource index",
+        "detail page",
+        "form flow",
+        "ai command",
+        "docs spec",
+        "ui normalization"
+      ]
+    },
+    {
+      "id": "project-context",
+      "title": "Project Context Contract",
+      "source": "design-rules/core/project-context.md",
+      "requiredAlways": true,
+      "appliesTo": [
+        "product context",
+        "design context",
+        "product-wide",
+        "long-term project",
+        "existing product",
+        "ui normalization"
+      ]
+    },
+    {
+      "id": "external-knowledge-routing",
+      "title": "External Knowledge Routing",
+      "source": "design-rules/core/external-knowledge-routing.md",
+      "requiredAlways": true,
+      "appliesTo": [
+        "impeccable",
+        "uiuxpromax",
+        "ui ux pro max",
+        "external design intelligence",
+        "raw github",
+        "style library",
+        "design knowledge assets",
+        "cross-stack rules"
+      ]
     },
     {
       "id": "ui-normalization",
@@ -61,6 +114,22 @@
       "source": "design-rules/core/product-alignment.md",
       "requiredAlways": false,
       "appliesTo": ["long-term project", "product-wide", "layout consistency", "app shell"]
+    },
+    {
+      "id": "external-knowledge-assets",
+      "title": "External Knowledge Assets",
+      "source": "design-rules/external/knowledge-assets.md",
+      "requiredAlways": false,
+      "appliesTo": [
+        "impeccable assets",
+        "uiuxpromax assets",
+        "ui ux pro max assets",
+        "raw github assets",
+        "external knowledge manifest",
+        "style datasets",
+        "generator scripts",
+        "cross-stack rules"
+      ]
     },
     {
       "id": "page-shell",

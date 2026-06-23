@@ -49,10 +49,90 @@ const rawGithubRuleBase =
 const rawSpecCache = new Map<string, string>()
 
 function getRawSpecUrl(source: string): string {
+  if (/^https?:\/\//.test(source)) {
+    return source
+  }
+
   return `${rawGithubRuleBase}/${source}`
 }
 
 const specGroups: SpecGroup[] = [
+  {
+    eyebrow: "Method",
+    title: "页面类型、上下文与外部知识资产",
+    description:
+      "先定页面类型和本地产品上下文，再按需读取 Impeccable / UIUXPROMAX 的 raw GitHub 资产。它让 AI 有流程、有词汇、有质检，也有数据源。",
+    cards: [
+      {
+        title: "Page Type Workflow",
+        source: "design-rules/core/page-type-workflow.md",
+        essence:
+          "把 UI 改造固定为页面类型、结构、token、文字密度、装饰的顺序。",
+        useWhen:
+          "任何 dashboard、theme lab、marketing、settings、表格、详情、表单或 AI command 页面改造前。",
+        aiRule:
+          "先输出 pageTypeRecord，再处理 shell、背景、最大宽度、网格和间距。",
+        avoid: "不要从渐变、阴影、圆角、动效或随机卡片美化开始。",
+      },
+      {
+        title: "Project Context",
+        source: "design-rules/core/project-context.md",
+        essence:
+          "把 Impeccable 的 PRODUCT / DESIGN 上下文模式本地化为产品约束。",
+        useWhen:
+          "产品级 UI 对齐、跨页面规范、长期项目、或需要判断 product/brand register 时。",
+        aiRule:
+          "读取 PRODUCT.md、DESIGN.md、AGENTS.md，并输出 context capsule。",
+        avoid: "不要用外部风格替代本地产品目标、业务流程和 token 合约。",
+      },
+      {
+        title: "External Knowledge Routing",
+        source: "design-rules/core/external-knowledge-routing.md",
+        essence:
+          "按需路由外部知识：Impeccable 负责语言/命令/质检，UIUXPROMAX 负责数据/生成器/跨栈规则。",
+        useWhen:
+          "用户明确要求 Impeccable、UIUXPROMAX、raw GitHub、风格库、生成器或跨栈规则。",
+        aiRule:
+          "从 external manifest 选择最小相关资产族，只读取需要的 raw URL。",
+        avoid: "不要一次加载整套外部知识库，也不要复制外部品牌样式。",
+      },
+      {
+        title: "External Asset Manifest",
+        source: "design-rules/external/knowledge-assets.md",
+        essence:
+          "以科学切分管理 raw GitHub 资产：context、pageType、structure、tokens、components、craft、QA、crossStack。",
+        useWhen:
+          "需要查找 Impeccable 或 UIUXPROMAX 的具体 raw 文件、数据集、脚本或 stack rule。",
+        aiRule:
+          "优先使用 JSON manifest 做机器路由，用 Markdown index 做人工解释。",
+        avoid: "不要把 CSV、脚本、参考文件全文塞进一个 prompt。",
+      },
+      {
+        title: "Impeccable Skill Entry",
+        source:
+          "https://raw.githubusercontent.com/pbakaus/impeccable/main/.agents/skills/impeccable/SKILL.md",
+        essence:
+          "Impeccable 的入口定义了设计语言、命令、register、上下文读取和 QA 基线。",
+        useWhen:
+          "需要借用 Impeccable 的 critique、polish、audit、shape、harden 等工作法。",
+        aiRule:
+          "只抽语言、命令、质检和上下文模式；实现仍走本项目 tokens 与规则。",
+        avoid: "不要复制 Impeccable 自身品牌方向或把它当成组件库。",
+      },
+      {
+        title: "UIUXPROMAX Style Dataset",
+        source:
+          "https://raw.githubusercontent.com/nextlevelbuilder/ui-ux-pro-max-skill/main/src/ui-ux-pro-max/data/styles.csv",
+        essence:
+          "UIUXPROMAX 的风格库可作为风格候选和禁用条件来源。",
+        useWhen:
+          "需要按产品类型选择风格 recipe、效果边界、适用/不适用场景或设计变量候选。",
+        aiRule:
+          "把选中的 style row 映射到 Seed Token -> Map Token -> Semantic Token -> shadcn Adapter Token。",
+        avoid: "不要直接把 CSV 里的颜色、阴影或 CSS 片段粘进结构性 UI。",
+      },
+    ],
+  },
   {
     eyebrow: "Routing",
     title: "规则读取与执行入口",
