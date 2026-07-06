@@ -80,6 +80,47 @@ function createThemeSeed(overrides: ThemeSeedOverrides): ThemeSeed {
 
 export const themePresets: ThemePreset[] = [
   {
+    id: "xiaotian-business-line",
+    name: "晓天业务线",
+    description: "对齐 skyvendorise 当前运行时的紫色品牌、低噪声后台表面和轻量状态体系",
+    seed: createThemeSeed({
+      color: {
+        primary: { hex: "#8645e8", alpha: 1 },
+        success: { hex: "#10b981", alpha: 1 },
+        warning: { hex: "#f59e0b", alpha: 1 },
+        info: { hex: "#3b82f6", alpha: 1 },
+        infoMatchesPrimary: false,
+        danger: { hex: "#ef4444", alpha: 1 },
+        background: { hex: "#ffffff", alpha: 1 },
+        foreground: { hex: "#09090b", alpha: 1 },
+        neutral: { hex: "#8d9293", alpha: 1 },
+      },
+      shape: { radius: 0.625, radiusRatio: 1 },
+      density: { mode: "default", controlHeight: 2.5, densityRatio: 1 },
+      typography: {
+        scaleRatio: 1.21,
+        bodyWeight: 400,
+        headingWeight: 500,
+        trackingBias: -0.002,
+      },
+      material: {
+        elevation: "flat",
+        shadowAlpha: 0.07,
+        borderContrast: 1,
+        surfaceContrast: 1.05,
+        glassOpacity: 0,
+        noiseOpacity: 0,
+      },
+      motion: { level: "subtle", durationBase: 180 },
+      vibe: {
+        temperature: "cool",
+        expression: "balanced",
+        domain: "saas",
+        tone: "calm",
+      },
+    }),
+  },
+  {
     id: "calm-ai-workspace",
     name: "AI 场景",
     description: "助手、对话与生成式界面",

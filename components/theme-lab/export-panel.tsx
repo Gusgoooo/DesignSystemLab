@@ -13,10 +13,8 @@ import {
 } from "../../lib/theme/export-json"
 import {
   compileProjectImportPrompt,
-  type ProjectImportMode,
 } from "../../lib/theme/export-prompt"
 import type { ThemeOutput, ThemeSeed } from "../../lib/theme/schema"
-import { cn } from "../../lib/utils"
 import { Button } from "../ui/button"
 import {
   Dialog,
@@ -53,31 +51,6 @@ const exportButtons = [
 ] as const
 
 type ExportButtonId = (typeof exportButtons)[number]["id"]
-
-type ImportModeOption = {
-  id: ProjectImportMode
-  title: string
-  description: string
-  disabled?: boolean
-}
-
-const importModeOptions: readonly ImportModeOption[] = [
-  {
-    id: "persistent-project-contract",
-    title: "长期设计系统",
-    description:
-      "适合长期项目，沉淀主题规则，并保持各页面体验一致。",
-  },
-  {
-    id: "one-shot-page-polish",
-    title: "一次性优化",
-    description:
-      "适合单次页面优化，快速生成可复制到项目的执行指令。",
-    disabled: true,
-  },
-]
-
-const defaultImportMode: ProjectImportMode = "persistent-project-contract"
 
 function getBlueprintDialogStyle(isDark: boolean): CSSProperties {
   const baseStyle = getControlFloatingStyle(isDark)
@@ -124,21 +97,17 @@ async function copyTextToClipboard(value: string): Promise<boolean> {
 export function ExportPanel(props: ExportPanelProps) {
   const [copiedId, setCopiedId] = useState<ExportButtonId | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [mode, setMode] = useState<ProjectImportMode>(defaultImportMode)
   const [copiedPrompt, setCopiedPrompt] = useState(false)
 
   const projectImportPrompt = useMemo(
     () => {
       return compileProjectImportPrompt({
-        mode,
-        task:
-          mode === "persistent-project-contract"
-            ? "refactor-product-wide"
-            : "refactor-selected-scope",
+        mode: "persistent-project-contract",
+        task: "refactor-product-wide",
         theme: props.theme,
       })
     },
-    [mode, props.theme]
+    [props.theme]
   )
 
   function handleDialogOpenChange(nextOpen: boolean): void {
@@ -147,17 +116,6 @@ export function ExportPanel(props: ExportPanelProps) {
     if (!nextOpen) {
       setCopiedPrompt(false)
     }
-  }
-
-  function chooseMode(nextMode: ProjectImportMode): void {
-    const nextOption = importModeOptions.find((option) => option.id === nextMode)
-
-    if (nextOption?.disabled) {
-      return
-    }
-
-    setMode(nextMode)
-    setCopiedPrompt(false)
   }
 
   async function copyProjectImportPrompt(): Promise<void> {
@@ -253,72 +211,38 @@ export function ExportPanel(props: ExportPanelProps) {
               </DialogDescription>
             </DialogHeader>
 
-            <div className="grid gap-5 sm:grid-cols-2">
-              {importModeOptions.map((option) => {
-                const selected = option.id === mode
-                const disabled = option.disabled ?? false
-
-                return (
-                  <button
-                    key={option.id}
-                    type="button"
-                    aria-pressed={selected}
-                    aria-disabled={disabled}
-                    data-state={selected ? "checked" : "unchecked"}
-                    disabled={disabled}
-                    className={cn(
-                      "group relative min-h-[210px] overflow-hidden rounded-[24px] border border-border bg-card p-6 text-left text-card-foreground shadow-sm transition-[background-color,border-color,box-shadow,color,opacity,transform] duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-                      "hover:-translate-y-px hover:border-border hover:bg-muted/30 hover:[box-shadow:var(--elevation-card)] active:translate-y-0",
-                      "data-[state=checked]:translate-y-0 data-[state=checked]:border-primary data-[state=checked]:bg-card data-[state=checked]:ring-2 data-[state=checked]:ring-primary/15 data-[state=checked]:[box-shadow:var(--elevation-card)] data-[state=checked]:hover:translate-y-0 data-[state=checked]:hover:bg-card",
-                      "disabled:cursor-not-allowed disabled:opacity-55 disabled:hover:translate-y-0 disabled:hover:border-border disabled:hover:bg-card disabled:hover:[box-shadow:none]"
-                    )}
-                    onClick={() => chooseMode(option.id)}
-                  >
-                    {disabled ? (
-                      <span className="absolute right-5 top-5 rounded-[var(--radius-pill)] border border-border bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground">
-                        正在建设
-                      </span>
-                    ) : (
-                      <span
-                        aria-hidden="true"
-                        className={cn(
-                          "absolute right-5 top-5 flex size-7 items-center justify-center rounded-full bg-primary text-primary-foreground opacity-0 transition-opacity",
-                          selected && "opacity-100"
-                        )}
-                      >
-                        <CheckCircle2 className="size-4" aria-hidden="true" />
-                      </span>
-                    )}
-                    <span className="relative flex h-full min-h-[162px] flex-col">
-                      <span className="min-w-0 text-pretty text-lg font-semibold leading-6">
-                        {option.title}
-                      </span>
-                      <span className="mt-4 block max-w-[24rem] text-sm leading-6 text-muted-foreground">
-                        {option.description}
-                      </span>
-                      <span className="mt-auto pt-6 text-sm font-medium leading-6 text-muted-foreground transition-colors group-data-[state=checked]:text-foreground">
-                        {disabled ? "正在建设" : selected ? "已选择" : "点击选择"}
-                      </span>
-                    </span>
-                  </button>
-                )
-              })}
+            <div className="rounded-[24px] border border-border bg-card p-6 text-card-foreground shadow-sm">
+              <div className="flex items-start gap-3">
+                <span
+                  aria-hidden="true"
+                  className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground"
+                >
+                  <CheckCircle2 className="size-4" aria-hidden="true" />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-lg font-semibold leading-6">
+                    长期设计系统
+                  </p>
+                  <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
+                    导入主题契约，并要求执行方先选择合适的 registry
+                    组件或 block，再把项目里的真实逻辑映射进去。
+                  </p>
+                </div>
+              </div>
             </div>
 
-            {mode ? (
-              <DialogFooter className="flex flex-col gap-3 sm:flex-col sm:items-stretch sm:justify-start">
-                <p className="text-sm leading-6 text-muted-foreground">
-                  复制指令到 Codex / Cursor / Claude Code / Qoder执行。
-                </p>
-                <Button
-                  type="button"
-                  className="h-11 w-full text-sm"
-                  onClick={() => void copyProjectImportPrompt()}
-                >
-                  {copiedPrompt ? "已复制" : "复制导入指令"}
-                </Button>
-              </DialogFooter>
-            ) : null}
+            <DialogFooter className="flex flex-col gap-3 sm:flex-col sm:items-stretch sm:justify-start">
+              <p className="text-sm leading-6 text-muted-foreground">
+                复制指令到 Codex / Cursor / Claude Code / Qoder 执行。
+              </p>
+              <Button
+                type="button"
+                className="h-11 w-full text-sm"
+                onClick={() => void copyProjectImportPrompt()}
+              >
+                {copiedPrompt ? "已复制" : "复制导入指令"}
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
         <DropdownMenu>

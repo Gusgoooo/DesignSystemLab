@@ -17,10 +17,10 @@ Use matching background and foreground pairs:
 - `bg-sidebar text-sidebar-foreground`
 - `bg-sidebar-primary text-sidebar-primary-foreground`
 - `bg-sidebar-accent text-sidebar-accent-foreground`
-- `bg-success-bg text-success-foreground` (also `bg-success text-success-foreground`)
-- `bg-warning-bg text-warning-foreground` (also `bg-warning text-warning-foreground`)
-- `bg-info-bg text-info-foreground` (also `bg-info text-info-foreground`)
-- `bg-danger-bg text-danger-foreground` (also `bg-danger text-danger-foreground`)
+- `bg-success-bg text-success-foreground`
+- `bg-warning-bg text-warning-foreground`
+- `bg-info-bg text-info-foreground`
+- `bg-danger-bg text-danger-foreground`
 
 Never use same-role filled pairs:
 
@@ -37,8 +37,8 @@ Never use same-role filled pairs:
 unapproved scales. Use them for status and category meaning instead of raw
 palette colors.
 
-- status (success/warning/info/danger): the soft `bg-*-bg text-*-foreground` or
-  solid `bg-* text-*-foreground` pairs above
+- status (success/warning/info/danger): the soft `bg-*-bg text-*-foreground`
+  pairs above
 - non-status categories, model types, chart and legend series: `bg-chart-1..5`,
   `text-chart-1..5`, `border-chart-1..5`, with a stable category-to-index mapping
 

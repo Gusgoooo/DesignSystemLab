@@ -24,17 +24,17 @@ tags with no shared system reads as noise.
 ## Status Colors
 
 Map real status meaning to the sanctioned `--status-*` families. Each family has
-a solid color, a soft `-bg`, and a paired `-fg`, generated for both light and
-dark themes.
+a solid reference color, a soft `-bg`, and a paired `-fg`, generated for both
+light and dark themes.
 
-- success → `bg-success-bg text-success-foreground` (soft) or `bg-success text-success-foreground` (solid)
-- warning → `bg-warning-bg text-warning-foreground` or `bg-warning text-warning-foreground`
-- info → `bg-info-bg text-info-foreground` or `bg-info text-info-foreground`
-- danger → `bg-danger-bg text-danger-foreground` or `bg-danger text-danger-foreground`
+- success → `bg-success-bg text-success-foreground`
+- warning → `bg-warning-bg text-warning-foreground`
+- info → `bg-info-bg text-info-foreground`
+- danger → `bg-danger-bg text-danger-foreground`
 
-Use the soft `-bg` pairing for badges and inline status. Reserve solid fills for
-emphasis. Always keep the matching `-foreground`; never put status text on a bare
-status fill without it.
+Use the soft `-bg` pairing for badges and inline status. Treat the solid
+`--status-*` values as reference colors for borders, icons, charts, or explicit
+component variants that have already handled foreground contrast.
 
 ## Categorical Colors
 

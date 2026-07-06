@@ -132,6 +132,10 @@ UI normalization rule:
 - Preserve existing page content, information architecture, workflow order, business rules, routes, APIs, data loading, state, handlers, forms, validation, permissions, feature flags, and domain copy.
 - Do not discard the old visible UI tree by default; normalize components, repeated style fragments, token usage, spacing, radius, elevation, and states around the existing product structure.
 - Prefer existing project components and shadcn/ui primitives for controls and repeated patterns when behavior can be preserved.
+- Before product UI edits, choose the closest fitting registry primitive or block as the implementation baseline and repair reference when a safe registry workflow is available.
+- Map the user's existing routes, data, permissions, actions, filters, tables, forms, charts, states, and responsive behavior into registry slots before styling.
+- Do not hand-write fake shadcn components, copy registry demo data, or invent a broad custom component suite when a registry or project component baseline should be used.
+- If no reliable component library or registry baseline exists for the requested scope, report the blocked component gap instead of fabricating UI.
 - Use user-authored Design System Lab design rules as the design source; do not browse, import, or imitate external visual references unless the user explicitly asks.
 - When the user explicitly asks for Impeccable or UIUXPROMAX, use them as routed knowledge assets: Impeccable for language, commands, critique, QA, and context patterns; UIUXPROMAX for datasets, style recipes, generators, and cross-stack rules. Local product context, local rules, and tokens still win.
 - Do not paste long external rule bodies into prompts. Route to raw GitHub URLs and summarize the design decisions.

@@ -896,6 +896,8 @@ export function SeedControlPanel(props: SeedControlPanelProps) {
             "--muted-foreground",
             "--accent",
             "--accent-foreground",
+            "--sidebar",
+            "--sidebar-accent",
             "--border",
             "--input",
           ].includes(name)

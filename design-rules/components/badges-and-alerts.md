@@ -84,8 +84,6 @@ Badges and alerts must use semantic tokens:
 
 - neutral: `bg-muted text-muted-foreground` or outline variant
 - status soft: `bg-success-bg text-success-foreground`, warning, info, danger
-- status solid only for strong emphasis: `bg-success text-success-foreground`,
-  warning, info, danger
 - destructive: `bg-destructive text-destructive-foreground` where the existing
   shadcn primitive expects destructive tokens
 - border: `border-border` or status border token if one exists

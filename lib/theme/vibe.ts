@@ -283,10 +283,10 @@ function deriveVisualContract(
     ],
     tokenUsage: [
       "Structural color uses the shadcn semantic classes (bg-background/text-foreground, bg-card/text-card-foreground, bg-muted/text-muted-foreground, border-border, ring-ring). This is the canonical vocabulary.",
-      "Status: bg-success-bg/text-success-foreground (soft) or bg-success/text-success-foreground (solid); the same pattern for warning, info, and danger.",
+      "Status: bg-success-bg/text-success-foreground, with the same soft pairing for warning, info, and danger.",
       "Categorical (non-status types, chart and legend series): bg-chart-1..5 / text-chart-1..5 with a stable category-to-index mapping.",
       "Tags and labels stay neutral (bg-muted or the outline variant) unless they carry real status, type, priority, or category meaning.",
-      "Radius, spacing, elevation, and motion use the variable-backed utilities (rounded-[var(--radius-*)], gap/padding tokens, [box-shadow:var(--elevation-*)], duration/ease tokens).",
+      "Radius, spacing, elevation, and motion use Design System Lab radius, gap, padding, elevation, duration, and easing tokens.",
       "Optional: var(--surface-*) and var(--content-*) exist for finer hierarchy but are not required; do not duplicate the shadcn tokens with them.",
     ],
     craft: deriveCraftDirectives(seed),

@@ -108,8 +108,8 @@ the one-shot bridge must cover at least:
 - `--ease-standard`
 
 If the selected scope shows status (success, warning, info, danger) on badges,
-alerts, or indicators, also include each status family as a solid plus soft
-background plus paired foreground:
+alerts, or indicators, also include each status family as a solid reference
+color plus soft background plus paired foreground:
 
 - `--status-success`, `--status-success-bg`, `--status-success-fg`
 - `--status-warning`, `--status-warning-bg`, `--status-warning-fg`

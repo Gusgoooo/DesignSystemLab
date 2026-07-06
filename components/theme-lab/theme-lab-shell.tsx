@@ -21,7 +21,7 @@ import { TooltipProvider } from "../ui/tooltip"
 import { getControlPanelStyle } from "./control-panel-theme"
 
 const initialThemeSeed =
-  themePresets.find((preset) => preset.id === "calm-ai-workspace")?.seed ??
+  themePresets.find((preset) => preset.id === "xiaotian-business-line")?.seed ??
   themePresets[0].seed
 
 function renderPreview(
