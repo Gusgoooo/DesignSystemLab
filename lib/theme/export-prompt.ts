@@ -109,7 +109,7 @@ function projectImportManifestJson(
       tokenContract:
         "Use runtime CSS variables plus shadcn semantic classes; see the AI instruction block for binding rules.",
       componentSource:
-        "Use existing project components first; use the closest fitting registry primitive/block as implementation and repair baseline; map product logic into registry slots.",
+        "Use shadcn/ui and Radix UI as mandatory component foundations; use the closest fitting registry primitive/block as implementation and repair baseline; map product logic into registry slots.",
       userAuthoredDesignRules: normalizedUserDesignRules
         ? {
             source: "Design System Lab export panel",
@@ -174,17 +174,17 @@ Make the UI calmer, clearer, and more scannable through registry-backed componen
 function preservationContractSection(): string {
   return `## Preservation Contract
 
-Preserve routes, information architecture, APIs, data loading, handlers, state, forms, validation, permissions, feature flags, workflow order, and domain copy. Do not scaffold a new app, replace the component library, overwrite unrelated pages, or install dependencies without approval.`
+Preserve routes, information architecture, APIs, data loading, handlers, state, forms, validation, permissions, feature flags, workflow order, and domain copy. Do not scaffold a new app or overwrite unrelated pages. Do not install dependencies without approval; shadcn/Radix setup changes still require the project's established workflow.`
 }
 
 function componentSourceContractSection(): string {
   return `## Component Source Contract
 
-Tokens are not a component system. Before product UI edits, inspect \`components.json\`, package manager, aliases, existing component folders, installed UI libraries, and registry workflow.
+Tokens are not a component system. shadcn/ui and Radix UI are mandatory component foundations for product UI. Before product UI edits, inspect \`components.json\`, package manager, aliases, existing component folders, installed UI libraries, and registry workflow.
 
-Use existing project components first. Then choose the closest fitting registry primitive/block as the implementation baseline and repair reference. Map product logic into registry slots before styling: routes, navigation, page title, actions, filters, tables, forms, charts, dialogs, permissions, loading/empty/error states, and responsive behavior.
+Reuse existing project components only when they are already built on shadcn/Radix primitives or can wrap them without preserving a parallel component system. Otherwise, refactor the touched UI to shadcn/Radix. Choose the closest fitting shadcn registry primitive/block as the implementation baseline and repair reference. Map product logic into registry slots before styling: routes, navigation, page title, actions, filters, tables, forms, charts, dialogs, permissions, loading/empty/error states, and responsive behavior.
 
-Do not hand-write fake shadcn components, copy demo data, or invent a broad custom component suite. If no reliable component library or registry baseline exists, install the theme contract and report the blocked component gap instead of fabricating UI.`
+When a user adopts Design System Lab in the middle of an existing project, treat non-shadcn/Radix UI inside the approved scope as refactor work, not as a token-only skinning task. Do not hand-write fake shadcn components, copy demo data, or invent a broad custom component suite. If no reliable shadcn/Radix registry baseline exists, install the theme contract and report the blocked component gap instead of fabricating UI.`
 }
 
 function designRulesSection(): string {
@@ -211,7 +211,7 @@ function workflowSection(
 1. Inspect: framework, global CSS, component system, registry workflow, route/page inventory, and business logic. Output Project Mode plus Component Source Plan (\`registryBaseline\` and \`logicToRegistryMapping\` included).
 2. Install contract:
 ${implementSetup}
-3. Normalize UI only after component source is clear. Use existing components and approved registry/shadcn primitives; map product logic into registry slots; bind styling to tokens.
+3. Normalize UI only after component source is clear. Use shadcn/Radix primitives and approved registry blocks; map product logic into registry slots; bind styling to tokens.
 4. Verify: component source audit, token audit, preserved logic/data/handlers, responsive states, and available checks (typecheck, lint, build).`
 }
 
@@ -258,11 +258,11 @@ Before UI changes, read \`design-rules/index.json\` when it exists, load \`requi
 
 Read local \`PRODUCT.md\` and \`DESIGN.md\` when present. Classify page type before changing visual design, then normalize shell/background/max-width/grid/spacing, audit tokens, tune typography/density, and apply radius/elevation/motion/decoration last.
 
-Treat redesign/optimize/rebuild/refactor requests as UI normalization by default, not a full redesign. Preserve existing content, information architecture, workflow order, routes, APIs, state, validation, permissions, and domain copy. Do not wipe the UI tree or move major content regions unless the user asks for a full redesign. Prefer existing project components and shadcn/ui primitives. Do not browse external visual references unless the user provides one or explicitly asks for Impeccable/UIUXPROMAX/raw GitHub design assets. When external knowledge is requested, use \`${themeLabDesignRuleLibrary.externalKnowledgeManifest}\`, load only relevant raw GitHub files, and map decisions through local tokens. Reconnect APIs, data, handlers, validation, navigation, permissions, and state after normalizing.
+Treat redesign/optimize/rebuild/refactor requests as UI normalization by default, not a full redesign. Preserve existing content, information architecture, workflow order, routes, APIs, state, validation, permissions, and domain copy. Do not wipe the UI tree or move major content regions unless the user asks for a full redesign. shadcn/ui and Radix UI are mandatory for touched product UI; reuse local components only when they are shadcn/Radix-based, otherwise refactor the scope to shadcn/Radix. Do not browse external visual references unless the user provides one or explicitly asks for Impeccable/UIUXPROMAX/raw GitHub design assets. When external knowledge is requested, use \`${themeLabDesignRuleLibrary.externalKnowledgeManifest}\`, load only relevant raw GitHub files, and map decisions through local tokens. Reconnect APIs, data, handlers, validation, navigation, permissions, and state after normalizing.
 
 ## Component Source Rule
 
-Before product UI edits, inspect \`components.json\`, package manager, aliases, component folders, installed UI libraries, and registry workflow. Reuse existing project components first. Use the closest fitting registry primitive/block as implementation baseline and repair reference. Map real routes, data, permissions, actions, states, and responsive behavior into registry slots; strip demo content. If no reliable component library or registry baseline exists, do not invent a broad custom component system.
+Before product UI edits, inspect \`components.json\`, package manager, aliases, component folders, installed UI libraries, and registry workflow. shadcn/ui and Radix UI are mandatory. Reuse local components only when they are shadcn/Radix-based; otherwise refactor touched UI to shadcn/Radix. Use the closest fitting registry primitive/block as implementation baseline and repair reference. Map real routes, data, permissions, actions, states, and responsive behavior into registry slots; strip demo content. If no reliable shadcn/Radix registry baseline exists, do not invent a broad custom component system.
 
 ## Styling Rule
 
@@ -286,7 +286,7 @@ Forbidden for structural UI:
 1. Read \`theme-lab.json\` and \`design-rules/index.json\` (when present); load required and matched rules.
 2. Read \`PRODUCT.md\` and \`DESIGN.md\` when present; classify page type and choose registry baseline.
 3. Install or update the runtime CSS block, \`theme-lab.json\`, and this AI instruction block.
-4. Normalize with existing components or approved registry/shadcn primitives, then bind styles to tokens.
+4. Normalize with shadcn/Radix primitives or approved registry blocks, then bind styles to tokens.
 5. Preserve and reconnect business logic, API contracts, data loading, handlers, validation, permissions, and states.
 6. Report component source, files changed, QA, and risks.
 

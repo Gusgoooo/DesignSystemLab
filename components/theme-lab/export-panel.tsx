@@ -224,8 +224,8 @@ export function ExportPanel(props: ExportPanelProps) {
                     长期设计系统
                   </p>
                   <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
-                    导入主题契约，并要求执行方先选择合适的 registry
-                    组件或 block，再把项目里的真实逻辑映射进去。
+                    导入主题契约，并强制以 shadcn / Radix UI 与合适的
+                    registry 组件或 block 为底座，再把项目里的真实逻辑映射进去。
                   </p>
                 </div>
               </div>
