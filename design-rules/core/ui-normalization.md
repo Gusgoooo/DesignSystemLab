@@ -1,108 +1,153 @@
-# UI Normalization
+# 界面归一化
 
-Treat redesign, optimize, rebuild, and refactor requests as UI normalization by default.
+当用户提出 redesign、optimize、rebuild、refactor、优化界面、重写页面、统一视觉等请求时，默认把任务理解为界面归一化。
 
-## Goal
+## 目标
 
-Make the existing product UI calmer, clearer, more readable, and more internally consistent while preserving the user's current product.
+在保留当前产品业务的前提下，让界面更稳定、更清晰、更易读、更一致。
 
-## Preserve
+这里解决的不是单个页面是否“更酷炫”，而是长期 AI Coding 过程中页面结构、交互规则和视觉语言是否能持续收敛。
 
-- routes
-- page content
-- information architecture
-- workflow order
-- API contracts
-- data loading
-- mutations
-- event handlers
-- validation
-- permissions
-- feature flags
-- state transitions
-- domain copy
+## 必须保留
 
-## Normalize
+- 路由
+- 页面真实内容
+- 信息架构
+- 工作流顺序
+- API 契约
+- 数据加载方式
+- mutation 行为
+- 事件处理
+- 表单校验
+- 权限逻辑
+- feature flag
+- 状态流转
+- 业务文案
 
-- bespoke controls that have safe project or shadcn equivalents
-- repeated visual class fragments
-- inconsistent spacing
-- mixed radius scales
-- one-off shadows
-- weak hierarchy
-- missing or unsafe states
-- raw palette colors in structural UI
-- token mismatches
+## 需要归一化
 
-## Boundaries
+- 可以安全替换为项目已有组件或 shadcn 组件的临时控件
+- 重复出现的视觉 class 片段
+- 不一致的间距
+- 混乱的圆角层级
+- 一次性阴影
+- 弱信息层级
+- 缺失或不安全的状态表达
+- 结构性 UI 中的原始色值
+- token 使用不一致
+- 不合理的页面宽度
+- 不成体系的卡片、表格、表单、筛选区和操作区
 
-Do not replace the whole visible UI tree by default. Keep the same product page recognizable.
+## 边界
 
-Do not move major content regions or change workflow order unless:
+不要默认替换整个可见 UI 树。页面应该仍然是同一个产品、同一个业务流程。
 
-- the existing structure blocks usability
-- a matched design rule requires it
-- the user explicitly asks for a full redesign
+但也不要把旧页面里的组件结构当成设计真理。旧 DOM、旧组件名、旧视觉包裹层只是线索，不是最终约束。
 
-## Diagnosis Step
+对于界面优化、页面重写、设计系统接入、视觉统一等任务，要优先用“重构页面”的视角工作：
 
-Before editing, identify the top three UI problems in scope:
+- 先判断页面要完成的核心任务、用户工作流和信息层级
+- 再选择最接近的页面骨架、仪表盘、列表、表单、详情页或设置页 block 模式
+- 然后把原有业务内容重新映射到更合理的 block 结构中
+- 最后再处理按钮、卡片、表格、输入框等局部组件细节
 
-1. hierarchy problem
-2. component consistency problem
-3. token, state, or contrast problem
+如果旧页面存在嵌套卡片、分散控件、假分区、大面积空白容器、一次性组件变体、装饰性组件伪装成业务模块等问题，应在保留业务行为的前提下，用匹配的 block 结构替换，而不是只给旧结构换颜色。
 
-Then normalize specifically to solve those problems.
+不要随意移动主要内容区域或改变工作流顺序，除非：
 
-## UI/UX Quality Rules
+- 旧结构已经阻碍可用性
+- 匹配到的设计规则明确要求调整
+- 用户明确要求完整重设计
 
-Before applying tokens, make the screen easier to understand.
+优先修复 block 级问题，而不是只 polish 组件。一个页面如果保留了旧的错误组合，只是换了更好看的按钮和阴影，不算完成归一化。
 
-Every normalized screen should make these things clear:
+## Block 优先重写
 
-- where the user is
-- what the page is about
-- what changed or needs attention
-- what the primary action is
-- what secondary actions are available
-- what state the data is in
-- what the user can safely ignore
+在处理组件细节之前，先按 block 重写页面方案：
 
-Design for progressive exploration:
+1. 页面骨架：应用导航、顶部栏、内容容器、页面背景
+2. 页面标题区：标题、上下文、主操作、次级操作
+3. 工作流模块：概览、表单、表格、详情、图表、设置组、动态流、命令区、状态区
+4. 辅助控制：筛选、标签页、搜索、排序、视图切换、批量操作
+5. 渐进细节：抽屉、弹窗、浮层、可展开行、下钻路由
+6. 状态覆盖：加载、空态、错误、禁用、选中、hover、focus
 
-- show summary before detail
-- expose enough preview information before requiring a click
-- group related controls near the content they affect
-- keep destructive or rare actions visually quieter until needed
-- use tables and cards as entry points into deeper information, not as isolated decoration
-- make loading, empty, error, disabled, selected, hover, and focus states feel like part of the same component system
+只有当现有组件仍然符合 block 职责时，才继续使用它。
+如果本地组件承载了错误的页面职责，例如把装饰卡片当成数据 preview、把按钮组当成筛选区、把普通卡片当成页面分区，就应该围绕正确语义重建或拆分，而不是原地改样式。
 
-Use hierarchy deliberately:
+当存在成熟参考 block 时，把它作为结构和交互参考：
 
-- one dominant page heading
-- one clear primary action per workflow region
-- compact metadata below or beside titles
-- stronger text for object identity
-- muted text for helper context
-- badges only for real status, type, priority, or state
-- icons only when they speed recognition or clarify action meaning
+- 仪表盘或控制台首页：参考 dashboard block 的节奏
+- 资源列表页：页面标题区 + 工具栏/筛选区 + 表格/列表区
+- 详情页：对象身份标题 + 摘要/状态区 + 分区或标签页
+- 设置页：按业务概念分组的表单 block，并明确保存、重置和校验状态
+- 表单或 CRUD 流程：单一工作流列或分步结构，并覆盖明确状态
+- AI 或效率工具页面：命令/输入 block + 对话/结果 block
 
-Avoid:
+参考 block 只是布局和交互指南，不是 demo 内容。必须替换掉示例数据、示例路由、示例文案、示例图标和示例操作，保留产品真实内容和行为。
 
-- equal visual weight for every block
-- action bars with too many loud buttons
-- cards that contain only icon + title + generic description
-- tables that expose every database field at once
-- filters far away from the data they affect
-- nested cards or panel-inside-panel layouts
-- adding decoration to compensate for weak information design
+## 诊断步骤
 
-## Invalid Outcomes
+编辑前先识别当前范围内最主要的三个问题：
 
-- only swapping raw values for tokens
-- leaving obvious ad hoc controls untouched
-- disconnecting API behavior
-- increasing visual noise
-- making the primary action harder to find
-- making layout less scannable
-- shipping low-contrast filled surfaces
+1. 层级问题
+2. 组件一致性问题
+3. token、状态或对比度问题
+
+然后围绕这些问题做归一化，不要只做零散的视觉替换。
+
+## 质量规则
+
+在套 token 之前，先让页面更容易理解。
+
+每个被归一化的页面都应该清楚回答：
+
+- 用户现在在哪里
+- 当前页面在处理什么对象或任务
+- 什么内容发生了变化或需要关注
+- 主操作是什么
+- 次级操作有哪些
+- 数据处于什么状态
+- 哪些信息可以先忽略
+
+渐进探索规则：
+
+- 先展示摘要，再展示细节
+- 点击前给出足够的 preview 信息
+- 控件要靠近它影响的内容
+- 危险操作和低频操作默认保持克制
+- 表格和卡片应该作为进入更深信息的入口，而不是孤立装饰
+- 加载、空态、错误、禁用、选中、hover、focus 应该属于同一套组件系统
+
+层级规则：
+
+- 一个页面只保留一个主导标题
+- 每个工作流区域只保留一个清晰主操作
+- 元信息放在标题下方或旁边，并降低视觉权重
+- 对象身份信息要更强
+- 辅助说明要更弱
+- badge 只表达真实状态、类型、优先级或阶段
+- 图标只在能提升识别速度或解释操作含义时使用
+
+避免：
+
+- 每个模块视觉权重都一样
+- 操作栏里塞满高权重按钮
+- 卡片只有图标、标题和空泛描述
+- 表格一次暴露所有数据库字段
+- 筛选器离它控制的数据很远
+- 卡片套卡片、面板套面板
+- 用装饰补偿信息设计不足
+
+## 无效结果
+
+以下情况不算完成：
+
+- 只是把原始值替换成 token
+- 明显临时拼出来的控件仍然存在
+- API 或交互行为被断开
+- 视觉噪音增加
+- 主操作更难找到
+- 页面更难扫描
+- 大面积低对比度填充面被保留
+- 旧页面的不合理 block 结构被完整保留

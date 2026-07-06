@@ -1,109 +1,167 @@
-# Page Shell And Layout
+# 页面骨架与布局
 
-Use this rule before changing a route, page, or app-level layout.
+在修改路由页面、页面布局、应用骨架或大块页面区域之前，必须先读取这条规则。
 
-## Goal
+## 目标
 
-Identify the page structure first, then load the right block and component
-rules. Do not start by styling individual cards or buttons before the page shell
-is understood.
+先识别页面结构，再加载匹配的 block 和组件规则。
+不要在没理解页面骨架之前，直接从卡片、按钮、阴影、圆角等局部组件开始改。
 
-## Page Structure Inventory
+页面优化应优先解决结构问题：页面职责、内容宽度、信息层级、操作区位置、主要工作流和状态表达。
 
-Classify the selected scope as one or more of:
+## 页面结构盘点
 
-- authenticated product shell
-- standard dashboard
-- management table or resource index
-- detail page
-- settings page
-- form or CRUD flow
-- auth page
-- onboarding or invite flow
-- command/search workspace
-- AI/chat/productivity surface
-- marketing or public page
-- single-purpose tool page
+先判断当前范围属于以下一种或多种页面类型：
 
-Also identify:
+- 登录后的产品骨架
+- 标准仪表盘
+- 管理列表页或资源索引页
+- 详情页
+- 设置页
+- 表单或 CRUD 流程
+- 登录页
+- 邀请或 onboarding 流程
+- 命令或搜索工作区
+- AI、对话或效率工具界面
+- 营销页或公开页面
+- 单一工具页面
 
-- sidebar or navigation rail
-- top header
-- page heading
-- breadcrumbs
-- toolbar
-- content sections
-- primary action region
-- filters/search/sort controls
-- cards
-- tables/lists
-- charts
-- forms
-- tabs
-- badges/alerts/status indicators
-- dialogs/sheets/drawers/popovers
-- empty/loading/error states
+同时识别页面中是否存在：
 
-## Routing
+- 侧边栏或导航 rail
+- 顶部栏
+- 页面标题区
+- 面包屑
+- 工具栏
+- 内容分区
+- 主操作区域
+- 筛选、搜索、排序控件
+- 卡片
+- 表格或列表
+- 图表
+- 表单
+- 标签页
+- badge、alert、状态标识
+- 弹窗、抽屉、下拉、popover
+- 空态、加载态、错误态
 
-After structure inventory, open matched rules:
+## 规则路由
 
-- standard dashboard -> `design-rules/blocks/dashboard.md`
-- app shell/sidebar -> `design-rules/components/sidebar.md`
-- page heading/header -> `design-rules/components/page-heading.md`
-- cards -> `design-rules/components/card.md`
-- tables/lists -> `design-rules/components/table.md`
-- buttons/actions/toolbars -> `design-rules/components/actions-and-buttons.md`
-- filters/search/sort/view controls -> `design-rules/components/filters-and-controls.md`
-- forms/inputs/validation -> `design-rules/components/forms-and-inputs.md`
-- tabs/single-select switches -> `design-rules/components/tabs.md`
-- dialogs/sheets/popovers/dropdowns -> `design-rules/components/overlays.md`
-- badges/alerts/notices -> `design-rules/components/badges-and-alerts.md`
-- metrics/charts/legends -> `design-rules/components/metrics-and-charts.md`
-- page canvas/background -> `design-rules/patterns/page-background.md`
-- empty/loading/error/selected/disabled states -> `design-rules/patterns/states.md`
-- token setup -> `design-rules/core/token-system.md`
-- token classes and audits -> `design-rules/core/token-binding.md`
-- final compliance -> `design-rules/core/completion-compliance.md`
+完成结构盘点后，按实际元素打开匹配规则：
 
-If a page type has no dedicated block rule, preserve the existing page structure
-and normalize components conservatively.
+- 标准仪表盘：`design-rules/blocks/dashboard.md`
+- 应用骨架或侧边栏：`design-rules/components/sidebar.md`
+- 页面标题区：`design-rules/components/page-heading.md`
+- 卡片：`design-rules/components/card.md`
+- 表格或列表：`design-rules/components/table.md`
+- 按钮、操作组、工具栏：`design-rules/components/actions-and-buttons.md`
+- 筛选、搜索、排序、视图控制：`design-rules/components/filters-and-controls.md`
+- 表单、输入、校验：`design-rules/components/forms-and-inputs.md`
+- 标签页或单选切换：`design-rules/components/tabs.md`
+- 弹窗、抽屉、popover、下拉：`design-rules/components/overlays.md`
+- badge、alert、notice：`design-rules/components/badges-and-alerts.md`
+- 指标、图表、图例：`design-rules/components/metrics-and-charts.md`
+- 页面画布或背景：`design-rules/patterns/page-background.md`
+- 空态、加载、错误、选中、禁用状态：`design-rules/patterns/states.md`
+- token 安装：`design-rules/core/token-system.md`
+- token 绑定和审计：`design-rules/core/token-binding.md`
+- 完成检查：`design-rules/core/completion-compliance.md`
 
-## Layout Rules
+如果某类页面没有专门的 block 规则，不要被旧组件外观绑架。
+保留信息架构和业务流程，按通用页面骨架、标题区、内容区、控制区和状态区做保守重组。
 
-Preserve useful product structure:
+## 布局规则
 
-- route and navigation model
-- content order
-- primary workflow order
-- major page regions
-- existing API/data/state boundaries
-- domain copy
+保留有价值的产品结构：
 
-Normalize:
+- 路由和导航模型
+- 内容顺序
+- 主工作流顺序
+- 主要页面区域
+- 现有 API、数据和状态边界
+- 业务文案
 
-- inconsistent shell spacing
-- mixed content widths
-- page headers with unclear action placement
-- floating controls with no alignment system
-- page sections that feel unrelated
-- nested card/panel layouts
-- responsive overflow
-- old radius/shadow/surface systems
+需要归一化：
 
-## Confirmation
+- 不一致的页面间距
+- 混乱的内容宽度
+- 主次操作位置不清
+- 没有对齐系统的悬浮控件
+- 彼此无关的页面分区
+- 卡片套卡片、面板套面板
+- 响应式溢出
+- 旧的圆角、阴影和表面系统
+- 大屏幕下铺得过满的页面内容
 
-Before editing, state:
+## 内容宽度契约
 
-- detected page structure
-- shell regions found
-- block rules to open
-- component rules to open
-- token-system rule source
-- compliance rule source
-- content/workflow that must stay unchanged
+每个页面都必须有明确的宽度边界。
+不要让主内容在大屏幕中无限铺开，也不要让正文、表单、卡片和模块被拉得过散。
 
-Do not ask open-ended questions about obvious shell regions. If a sidebar,
-header, page heading, toolbar, or primary content region is present, include it
-in the plan by default and ask for one direct confirmation of the full plan only
-when approval is required.
+默认层级：
+
+- 应用骨架和页面画布可以占满视口
+- 主内容容器必须是 `w-full min-w-0`
+- 主要内容应使用 `mx-auto` 居中容器，或使用明确的左对齐容器
+- 内容区域默认需要 `max-width`，除非当前工作流确实需要全宽画布
+- 数据密集区域如果需要最小工作宽度，应把 `min-width` 放在表格、网格或工作区内部，并包在横向滚动容器里，不要放在整个页面根节点上
+
+推荐最大宽度：
+
+- 标准产品页：`max-w-7xl` 到 `max-w-screen-2xl`
+- 密集仪表盘或控制台：`max-w-screen-2xl`，主要模块仍然对齐到同一个容器
+- 资源列表页或数据表格页：`max-w-screen-2xl`，表格内部可使用 `min-w-[960px]` 或项目等价写法，并放入 `overflow-x-auto`
+- 详情页：`max-w-7xl`，如果需要侧栏可扩到项目中的更大容器
+- 设置页和表单页：`max-w-4xl` 到 `max-w-6xl`
+- 登录、邀请和窄流程页面：`max-w-sm` 到 `max-w-xl`
+- 文档、说明和长文本页面：`max-w-3xl` 到 `max-w-5xl`
+
+最小宽度规则：
+
+- 页面根节点应能响应到移动端；除非产品明确只支持桌面，否则不要设置全局 `min-w-[1024px]`
+- 固定格式的工作台、画布、表格、图表可以声明局部最小宽度，并提供横向滚动
+- grid、table、chart、toolbar 的弹性子项要使用 `min-w-0`，避免文本和控件把布局撑爆
+- 按钮、筛选器、标签页不能在小屏上强行撑宽整个页面
+
+大屏规则：
+
+- 大屏上也要让内容保持聚拢，不要把模块铺到左右边缘
+- 不要因为空间足够就制造过长文本行
+- 同一页面不要让无关区域使用随机的不同最大宽度
+- 只有编辑器、地图、时间线、代码区、画布、看板等明确工作区可以使用全宽
+- 如果使用全宽工作区，主操作、筛选器和可读文本仍应放在受控宽度的 lane 中
+
+宽度边界是设计系统的一部分。
+优化页面时，最终报告需要说明页面容器最大宽度、局部最小宽度区域，以及响应式溢出策略。
+
+## Block 视角
+
+页面骨架不能只看现有组件树。
+应该先判断页面由哪些 block 构成，再把旧组件映射进去。
+
+优先从以下 block 视角重组：
+
+- 页面标题区负责定位、对象身份和主操作
+- 工具栏负责筛选、搜索、排序、视图切换和批量操作
+- 卡片负责摘要、preview 或下一层入口，不负责充当任意分区边框
+- 表格负责高密度事实、状态、身份和行操作
+- 表单负责收集和校验输入，不负责承载无关说明
+- 抽屉或弹窗负责渐进细节和短流程，不负责替代完整页面
+- 状态区负责说明加载、空态、错误、权限和成功反馈
+
+如果旧页面的组件组合不符合这些职责，优先按 block 职责重构页面，再处理组件样式。
+
+## 修改前确认
+
+编辑前先说明：
+
+- 识别到的页面结构
+- 页面骨架区域
+- 需要打开的 block 规则
+- 需要打开的组件规则
+- token-system 规则来源
+- completion 规则来源
+- 哪些内容和工作流必须保持不变
+
+不要对明显页面区域反复追问。
+如果页面存在侧边栏、顶部栏、标题区、工具栏或主内容区，默认把它们纳入计划；只有在需要用户授权完整重构时，才请求一次明确确认。
