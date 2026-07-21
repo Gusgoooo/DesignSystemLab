@@ -1,9 +1,9 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "name": "Design System Lab Distributed Design Rules",
   "basePath": "design-rules",
   "routing": {
-    "instruction": "Read this index first. Load requiredAlways rules, classify page type, inventory the selected UI by element type, then load only matched rule files from source.",
+    "instruction": "Read this index first, choose a task mode, then load only that mode's required rules and matched block/component rules.",
     "missingRuleBehavior": "If no rule matches an element, make the smallest safe normalization with existing project components and Design System Lab tokens, then report the missing rule.",
     "priorityOrder": [
       "user-authored project rules",
@@ -13,7 +13,24 @@
       "existing local product patterns",
       "generic UI judgment"
     ],
-    "externalKnowledgeManifest": "design-rules/external/knowledge-assets.json"
+    "externalKnowledgeManifest": "design-rules/external/knowledge-assets.json",
+    "taskModes": {
+      "token-installation": {
+        "rules": ["rule-router", "token-system", "completion-compliance"],
+        "uiMutation": "forbidden",
+        "nextAction": "ask whether to map existing UI after successful installation"
+      },
+      "new-ui-creation": {
+        "rules": ["rule-router", "page-type-workflow", "project-context", "token-binding", "registry-block-mapping", "visual-qa", "completion-compliance"],
+        "sourceOrder": "matched block before matched component rules",
+        "tokenPolicy": "use installed tokens from first implementation"
+      },
+      "existing-ui-mapping": {
+        "requiresExplicitUserApproval": true,
+        "rules": ["rule-router", "page-type-workflow", "project-context", "ui-normalization", "token-binding", "registry-block-mapping", "visual-qa", "completion-compliance"],
+        "mappingMethod": "model-reasoned semantic mapping, not literal value replacement"
+      }
+    }
   },
   "rules": [
     {
@@ -27,7 +44,7 @@
       "id": "page-type-workflow",
       "title": "Page Type Workflow",
       "source": "design-rules/core/page-type-workflow.md",
-      "requiredAlways": true,
+      "requiredAlways": false,
       "appliesTo": [
         "all ui work",
         "page type",
@@ -47,7 +64,7 @@
       "id": "project-context",
       "title": "Project Context Contract",
       "source": "design-rules/core/project-context.md",
-      "requiredAlways": true,
+      "requiredAlways": false,
       "appliesTo": [
         "product context",
         "design context",
@@ -61,7 +78,7 @@
       "id": "external-knowledge-routing",
       "title": "External Knowledge Routing",
       "source": "design-rules/core/external-knowledge-routing.md",
-      "requiredAlways": true,
+      "requiredAlways": false,
       "appliesTo": [
         "impeccable",
         "uiuxpromax",
@@ -77,35 +94,50 @@
       "id": "ui-normalization",
       "title": "UI Normalization",
       "source": "design-rules/core/ui-normalization.md",
-      "requiredAlways": true,
-      "appliesTo": ["redesign", "optimize", "refactor", "selected scope", "product ui"]
+      "requiredAlways": false,
+      "appliesTo": ["approved existing ui mapping", "redesign", "optimize", "refactor", "selected scope", "product ui"]
     },
     {
       "id": "token-binding",
       "title": "Design System Lab Token Binding",
       "source": "design-rules/core/token-binding.md",
-      "requiredAlways": true,
+      "requiredAlways": false,
       "appliesTo": ["tokens", "colors", "radius", "shadow", "focus", "state", "theme"]
     },
     {
       "id": "token-system",
       "title": "Token System Installation",
       "source": "design-rules/core/token-system.md",
-      "requiredAlways": true,
+      "requiredAlways": false,
       "appliesTo": ["token system", "theme bridge", "theme-lab.json", "one-shot token bridge", "persistent theme contract"]
+    },
+    {
+      "id": "registry-block-mapping",
+      "title": "Registry, Block, And Token Slot Mapping",
+      "source": "design-rules/core/registry-block-mapping.md",
+      "requiredAlways": false,
+      "appliesTo": [
+        "all ui work",
+        "registry",
+        "blocks",
+        "component source",
+        "token mapping",
+        "greenfield",
+        "existing product"
+      ]
     },
     {
       "id": "visual-qa",
       "title": "Visual QA Gate",
       "source": "design-rules/core/visual-qa.md",
-      "requiredAlways": true,
+      "requiredAlways": false,
       "appliesTo": ["final qa", "visual review", "before after"]
     },
     {
       "id": "completion-compliance",
       "title": "Completion Compliance Gate",
       "source": "design-rules/core/completion-compliance.md",
-      "requiredAlways": true,
+      "requiredAlways": false,
       "appliesTo": ["completion", "compliance", "final report", "done criteria", "qa gate"]
     },
     {

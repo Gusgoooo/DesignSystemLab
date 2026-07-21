@@ -1,20 +1,50 @@
 import type { ThemeSeed } from "../schema"
 import { clamp, rem } from "./utils"
 
-const densityModeRatios: Record<ThemeSeed["density"]["mode"], number> = {
-  compact: 0.78,
-  default: 1,
-  comfortable: 1.2,
+export const densityPercentRange = {
+  min: 84,
+  max: 116,
+  default: 100,
+} as const
+
+export function densityPercentFromSeed(
+  density: ThemeSeed["density"]
+): number {
+  return Math.round(
+    clamp(
+      density.densityRatio * 100,
+      densityPercentRange.min,
+      densityPercentRange.max
+    )
+  )
+}
+
+export function densitySeedFromPercent(
+  value: number
+): ThemeSeed["density"] {
+  const densityPercent = Math.round(
+    clamp(value, densityPercentRange.min, densityPercentRange.max)
+  )
+  const mode: ThemeSeed["density"]["mode"] =
+    densityPercent <= 94
+      ? "compact"
+      : densityPercent >= 106
+        ? "comfortable"
+        : "default"
+  const controlHeightPx = Math.round(
+    38 + (densityPercent - densityPercentRange.default) / 4
+  )
+
+  return {
+    mode,
+    controlHeight: controlHeightPx / 16,
+    densityRatio: densityPercent / 100,
+  }
 }
 
 export function deriveDensityMap(seed: ThemeSeed): Record<string, string> {
-  const modeRatio = densityModeRatios[seed.density.mode]
-  const ratio = clamp(
-    1 + (modeRatio - 1) * 0.8 + (seed.density.densityRatio - 1) * 0.7,
-    0.7,
-    1.32
-  )
-  const controlHeight = seed.density.controlHeight
+  const ratio = clamp(seed.density.densityRatio, 0.84, 1.16)
+  const controlHeight = clamp(seed.density.controlHeight, 2.125, 2.75)
 
   return {
     "--control-height-sm": rem(Math.max(controlHeight - 0.35, 1.4)),

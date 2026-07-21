@@ -1,5 +1,8 @@
 # 界面归一化
 
+仅在用户明确同意 Existing UI Mapping 或单独提出界面优化请求后使用本规则。
+Token 安装阶段不得调用本规则，也不得修改现有 UI。
+
 当用户提出 redesign、optimize、rebuild、refactor、优化界面、重写页面、统一视觉等请求时，默认把任务理解为界面归一化。
 
 ## 目标

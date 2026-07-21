@@ -30,8 +30,9 @@ export function PreviewFrame(props: PreviewFrameProps) {
   return (
     <div
       style={style}
+      data-token-slot="page.canvas"
       className={cn(
-        "h-full min-h-full w-full min-w-0 text-foreground",
+        "h-full min-h-full w-full min-w-0 bg-background text-foreground",
         props.isDark && "dark"
       )}
     >

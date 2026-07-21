@@ -67,9 +67,9 @@ const specGroups: SpecGroup[] = [
         title: "Page Type Workflow",
         source: "design-rules/core/page-type-workflow.md",
         essence:
-          "把 UI 改造固定为页面类型、结构、token、文字密度、装饰的顺序。",
+          "创建新页面或已确认的旧 UI 映射，都先识别页面类型和用户任务。",
         useWhen:
-          "任何 dashboard、theme lab、marketing、settings、表格、详情、表单或 AI command 页面改造前。",
+          "创建 dashboard、theme lab、marketing、settings、详情、表单或 AI command 页面时。",
         aiRule:
           "先输出 pageTypeRecord，再处理 shell、背景、最大宽度、网格和间距。",
         avoid: "不要从渐变、阴影、圆角、动效或随机卡片美化开始。",
@@ -128,45 +128,69 @@ const specGroups: SpecGroup[] = [
         useWhen:
           "需要按产品类型选择风格 recipe、效果边界、适用/不适用场景或设计变量候选。",
         aiRule:
-          "把选中的 style row 映射到 Seed Token -> Map Token -> Semantic Token -> shadcn Adapter Token。",
+          "把选中的 style row 映射到 Seed Token -> Map Token -> Semantic Token -> 官方 shadcn Adapter Token -> 项目扩展 Token。",
         avoid: "不要直接把 CSV 里的颜色、阴影或 CSS 片段粘进结构性 UI。",
       },
     ],
   },
   {
     eyebrow: "Routing",
-    title: "规则读取与执行入口",
+    title: "接入、Blocks 与语义映射",
     description:
-      "先识别页面结构，再读取匹配 spec。它解决 prompt 太长、规则一次性塞满、AI 凭感觉套组件的问题。",
+      "安装阶段只写入 Token；创建页面先读 Block；旧 UI 只有确认后才做语义映射。",
     cards: [
+      {
+        title: "Token Installation",
+        source: "design-rules/core/token-system.md",
+        essence:
+          "将接入收敛成运行时 Token、theme-lab.json 和一个 AI 指令区块。",
+        useWhen:
+          "第一次把主题接入新项目或已有项目时。",
+        aiRule:
+          "安装并验证后停止；不修改现有页面，再询问用户是否需要映射旧 UI。",
+        avoid:
+          "不要在 Token 安装阶段执行页面改造、组件替换或字面值替换。",
+      },
+      {
+        title: "Blocks-first Creation",
+        source: "design-rules/core/registry-block-mapping.md",
+        essence:
+          "Block 提供页面结构与状态预期，组件负责实现，Token 负责视觉语义。",
+        useWhen:
+          "创建新页面或大型业务组件，以及用户明确同意的旧 UI 映射。",
+        aiRule:
+          "先读匹配 Block，再映射真实职责和状态；shadcn 优先 Registry Blocks，Ant 使用官方组件实现。",
+        avoid:
+          "不要从零堆 primitives，不要复制 demo，也不要把 Block 当成固定模板。",
+      },
       {
         title: "Rule Router",
         source: "design-rules/core/rule-router.md",
-        essence: "把规则库变成按需读取的路由系统。",
+        essence: "按安装、创建、旧 UI 映射三种任务模式读取规则。",
         useWhen:
-          "任何 UI normalization、主题落地、页面调整、组件规则解释任务开始前。",
+          "Token 接入、创建页面或用户确认进行现有 UI 映射时。",
         aiRule:
-          "先读 index，加载 requiredAlways，再盘点元素类型，最后只打开匹配文件。",
+          "先选 task mode，再读取该模式需要的规则和匹配的 Block / component 文件。",
         avoid: "不要一次读完整个规则库，也不要声称应用了没打开过的规则。",
       },
       {
         title: "Token Binding",
         source: "design-rules/core/token-binding.md",
-        essence: "限制视觉漂移，让结构性 UI 只消费语义 token。",
+        essence: "按职责、层级、表面、交互与状态推理正确 Token。",
         useWhen:
-          "任何涉及颜色、圆角、阴影、focus、状态、density、motion 的 UI 修改。",
+          "创建新 UI，或用户明确同意将现有 UI 映射到 Token 时。",
         aiRule:
-          "检查 filled surface 必须有 matching foreground，半径和 elevation 使用 Design System Lab 变量。",
-        avoid: "不要用 raw palette、hex、一次性 shadow 或同角色前景/背景错配。",
+          "先判断 command、selection、navigation、feedback 和 data role，再选择 semantic Token 与组件 variant。",
+        avoid: "不要因为两个旧值相同就映射成同一个 Token，也不要机械搜索替换。",
       },
       {
         title: "Completion Gate",
         source: "design-rules/core/completion-compliance.md",
         essence: "把 AI 的收尾变成可审计证据，而不是一句“已完成”。",
-        useWhen: "每一次 UI normalization 或 Design System Lab token 任务结束前。",
+        useWhen: "Token 安装、新 UI 创建或已确认映射任务结束前。",
         aiRule:
-          "报告打开的规则、保留的业务行为、检查过的状态、token audit 和风险。",
-        avoid: "不要只总结视觉变化，不说明规则读取、行为保留和验证结果。",
+          "按 task mode 报告；安装报告不要求 Registry 分数或页面改造清单。",
+        avoid: "不要把安装、创建和映射三种任务的验收证据混在一起。",
       },
     ],
   },
@@ -364,6 +388,7 @@ function SpecCardView({
       }
       aria-label={`查看 ${card.title} spec 详情`}
       className="flex min-h-[calc(var(--list-row-height)*2.35)] w-full flex-col overflow-hidden rounded-[var(--radius-card)] border border-border bg-card py-[var(--panel-padding)] text-left text-card-foreground [box-shadow:var(--elevation-card)] transition-[background-color,border-color,box-shadow,transform] [transition-duration:var(--duration-base)] [transition-timing-function:var(--ease-standard)] hover:-translate-y-0.5 hover:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      data-token-slot="card.raised"
     >
       <CardHeader className="w-full gap-[var(--field-gap)]">
         <div className="flex flex-wrap items-start justify-between gap-[var(--control-gap)]">
@@ -534,7 +559,7 @@ function SpecDetailDrawer({
                     Raw GitHub
                   </a>
                 </div>
-                <pre className="max-h-[420px] overflow-auto rounded-[var(--radius-card)] border border-border bg-muted p-[var(--panel-padding)] text-xs leading-5 text-foreground [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                <pre className="max-h-[420px] overflow-auto rounded-[var(--radius-card)] border border-border bg-surface-panel p-[var(--panel-padding)] text-xs leading-5 text-content-primary [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                   <code>{`Raw URL: ${rawSpecUrl}\nSource: ${rawSpec.source || selectedSpec.source}\n\n${rawSpecCode}`}</code>
                 </pre>
               </section>

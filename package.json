@@ -8,6 +8,8 @@
     "build:static": "npm run build",
     "build:publish": "next build --webpack && node scripts/strip-html-comments.mjs && node scripts/verify-static-export.mjs",
     "postbuild": "node scripts/strip-html-comments.mjs && node scripts/verify-static-export.mjs",
+    "theme:sync": "tsx scripts/sync-default-theme-css.ts",
+    "test:theme": "tsx scripts/verify-theme-system.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -41,6 +43,7 @@
     "@types/react-dom": "^19.2.3",
     "postcss": "^8.5.15",
     "tailwindcss": "^4.3.1",
+    "tsx": "^4.23.0",
     "typescript": "^6.0.3"
   }
 }

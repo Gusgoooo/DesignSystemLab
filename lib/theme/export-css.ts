@@ -1,10 +1,13 @@
 import {
+  requiredMapTokenNames,
   requiredSemanticTokenNames,
-  requiredShadcnTokenNames,
+  requiredShadcnExtensionTokenNames,
+  requiredShadcnOfficialTokenNames,
   type ThemeOutput,
 } from "./schema"
+import { assertCoreThemeHealth, assertThemeHealth } from "./health"
 
-const tailwindExposureTokens = {
+const shadcnTailwindExposureTokens = {
   "--color-background": "var(--background)",
   "--color-foreground": "var(--foreground)",
   "--color-card": "var(--card)",
@@ -20,7 +23,6 @@ const tailwindExposureTokens = {
   "--color-accent": "var(--accent)",
   "--color-accent-foreground": "var(--accent-foreground)",
   "--color-destructive": "var(--destructive)",
-  "--color-destructive-foreground": "var(--destructive-foreground)",
   "--color-border": "var(--border)",
   "--color-input": "var(--input)",
   "--color-ring": "var(--ring)",
@@ -37,6 +39,17 @@ const tailwindExposureTokens = {
   "--color-sidebar-accent-foreground": "var(--sidebar-accent-foreground)",
   "--color-sidebar-border": "var(--sidebar-border)",
   "--color-sidebar-ring": "var(--sidebar-ring)",
+  "--radius-sm": "calc(var(--radius) * 0.6)",
+  "--radius-md": "calc(var(--radius) * 0.8)",
+  "--radius-lg": "var(--radius)",
+  "--radius-xl": "calc(var(--radius) * 1.4)",
+  "--radius-2xl": "calc(var(--radius) * 1.8)",
+  "--radius-3xl": "calc(var(--radius) * 2.2)",
+  "--radius-4xl": "calc(var(--radius) * 2.6)",
+} as const
+
+const projectTailwindExposureTokens = {
+  "--color-destructive-foreground": "var(--destructive-foreground)",
   "--color-surface-canvas": "var(--surface-canvas)",
   "--color-surface-panel": "var(--surface-panel)",
   "--color-surface-raised": "var(--surface-raised)",
@@ -48,29 +61,47 @@ const tailwindExposureTokens = {
   "--color-content-disabled": "var(--content-disabled)",
   "--color-content-inverse": "var(--content-inverse)",
   "--color-success": "var(--status-success)",
+  "--color-success-solid-foreground": "var(--status-success-solid-fg)",
   "--color-success-bg": "var(--status-success-bg)",
   "--color-success-foreground": "var(--status-success-fg)",
   "--color-warning": "var(--status-warning)",
+  "--color-warning-solid-foreground": "var(--status-warning-solid-fg)",
   "--color-warning-bg": "var(--status-warning-bg)",
   "--color-warning-foreground": "var(--status-warning-fg)",
   "--color-info": "var(--status-info)",
+  "--color-info-solid-foreground": "var(--status-info-solid-fg)",
   "--color-info-bg": "var(--status-info-bg)",
   "--color-info-foreground": "var(--status-info-fg)",
   "--color-danger": "var(--status-danger)",
+  "--color-danger-solid-foreground": "var(--status-danger-solid-fg)",
   "--color-danger-bg": "var(--status-danger-bg)",
   "--color-danger-foreground": "var(--status-danger-fg)",
-  "--radius-sm": "calc(var(--radius) * 0.6)",
-  "--radius-md": "calc(var(--radius) * 0.8)",
-  "--radius-lg": "var(--radius)",
-  "--radius-xl": "calc(var(--radius) * 1.4)",
-  "--radius-2xl": "calc(var(--radius) * 1.8)",
-  "--radius-3xl": "calc(var(--radius) * 2.2)",
-  "--radius-4xl": "calc(var(--radius) * 2.6)",
+  "--shadow-control": "var(--elevation-control)",
   "--shadow-card": "var(--elevation-card)",
   "--shadow-popover": "var(--elevation-popover)",
   "--shadow-dialog": "var(--elevation-dialog)",
   "--font-sans": "var(--font-family-sans)",
   "--font-mono": "var(--font-family-mono)",
+  "--text-xs": "var(--font-size-xs)",
+  "--text-xs--line-height": "1.3333",
+  "--text-sm": "var(--font-size-sm)",
+  "--text-sm--line-height": "1.4286",
+  "--text-base": "var(--font-size-base)",
+  "--text-base--line-height": "1.5",
+  "--text-lg": "var(--font-size-lg)",
+  "--text-lg--line-height": "1.5556",
+  "--text-xl": "var(--font-size-xl)",
+  "--text-xl--line-height": "1.4",
+  "--text-2xl": "var(--font-size-2xl)",
+  "--text-2xl--line-height": "1.3333",
+  "--text-3xl": "var(--font-size-3xl)",
+  "--text-3xl--line-height": "1.2",
+  "--text-4xl": "var(--font-size-4xl)",
+  "--text-4xl--line-height": "1.1111",
+  "--text-5xl": "var(--font-size-5xl)",
+  "--text-5xl--line-height": "1",
+  "--text-6xl": "var(--font-size-6xl)",
+  "--text-6xl--line-height": "1",
 } as const
 
 const colorMapTokenNames = [
@@ -90,8 +121,11 @@ const colorMapTokenNames = [
   "--neutral-100",
   "--neutral-200",
   "--neutral-300",
+  "--neutral-400",
   "--neutral-500",
+  "--neutral-600",
   "--neutral-700",
+  "--neutral-800",
   "--neutral-900",
   "--neutral-950",
   "--green-600",
@@ -109,6 +143,7 @@ const colorMapTokenNames = [
 ] as const
 
 const radiusTokenNames = [
+  "--radius-none",
   "--radius",
   "--radius-base",
   "--radius-control",
@@ -135,6 +170,16 @@ const densityTokenNames = [
 const typographyTokenNames = [
   "--font-family-sans",
   "--font-family-mono",
+  "--font-size-xs",
+  "--font-size-sm",
+  "--font-size-base",
+  "--font-size-lg",
+  "--font-size-xl",
+  "--font-size-2xl",
+  "--font-size-3xl",
+  "--font-size-4xl",
+  "--font-size-5xl",
+  "--font-size-6xl",
   "--text-caption",
   "--text-body",
   "--text-title",
@@ -146,6 +191,8 @@ const typographyTokenNames = [
 ] as const
 
 const elevationTokenNames = [
+  "--elevation-none",
+  "--elevation-control",
   "--elevation-card",
   "--elevation-popover",
   "--elevation-dialog",
@@ -160,33 +207,33 @@ const motionTokenNames = [
 ] as const
 
 const compactDensityTokens = {
-  "--control-height-sm": "1.45rem",
-  "--control-height-md": "1.8rem",
-  "--control-height-lg": "2.35rem",
-  "--control-padding-x": "0.525rem",
-  "--control-gap": "0.35rem",
-  "--field-gap": "0.35rem",
-  "--section-gap": "1.05rem",
-  "--panel-padding": "0.7rem",
-  "--page-padding": "1.05rem",
-  "--table-cell-padding-x": "0.35rem",
-  "--table-cell-padding-y": "0.3rem",
-  "--list-row-height": "1.975rem",
+  "--control-height-sm": "1.775rem",
+  "--control-height-md": "2.125rem",
+  "--control-height-lg": "2.675rem",
+  "--control-padding-x": "0.63rem",
+  "--control-gap": "0.42rem",
+  "--field-gap": "0.42rem",
+  "--section-gap": "1.26rem",
+  "--panel-padding": "0.84rem",
+  "--page-padding": "1.26rem",
+  "--table-cell-padding-x": "0.42rem",
+  "--table-cell-padding-y": "0.3528rem",
+  "--list-row-height": "2.335rem",
 } as const
 
 const comfortableDensityTokens = {
-  "--control-height-sm": "2.65rem",
-  "--control-height-md": "3rem",
-  "--control-height-lg": "3.55rem",
-  "--control-padding-x": "0.99rem",
-  "--control-gap": "0.66rem",
-  "--field-gap": "0.66rem",
-  "--section-gap": "1.98rem",
-  "--panel-padding": "1.32rem",
-  "--page-padding": "1.98rem",
-  "--table-cell-padding-x": "0.66rem",
-  "--table-cell-padding-y": "0.55rem",
-  "--list-row-height": "3.33rem",
+  "--control-height-sm": "2.275rem",
+  "--control-height-md": "2.625rem",
+  "--control-height-lg": "3.175rem",
+  "--control-padding-x": "0.87rem",
+  "--control-gap": "0.58rem",
+  "--field-gap": "0.58rem",
+  "--section-gap": "1.74rem",
+  "--panel-padding": "1.16rem",
+  "--page-padding": "1.74rem",
+  "--table-cell-padding-x": "0.58rem",
+  "--table-cell-padding-y": "0.4872rem",
+  "--list-row-height": "2.915rem",
 } as const
 
 function serializeCssBlock(
@@ -297,8 +344,15 @@ function serializeLightVariables(theme: ThemeOutput): string {
         tokens: pickTokens(theme.cssVariables, requiredSemanticTokenNames),
       },
       {
-        title: "shadcn adapter tokens",
-        tokens: pickTokens(theme.cssVariables, requiredShadcnTokenNames),
+        title: "official shadcn adapter tokens",
+        tokens: pickTokens(theme.cssVariables, requiredShadcnOfficialTokenNames),
+      },
+      {
+        title: "Design System Lab shadcn extensions",
+        tokens: pickTokens(
+          theme.cssVariables,
+          requiredShadcnExtensionTokenNames
+        ),
       },
     ]
   )
@@ -319,23 +373,90 @@ function serializeDarkVariables(theme: ThemeOutput): string {
         tokens: pickTokens(darkVariableTokens, requiredSemanticTokenNames),
       },
       {
-        title: "dark shadcn adapter tokens",
-        tokens: pickTokens(darkVariableTokens, requiredShadcnTokenNames),
+        title: "dark official shadcn adapter tokens",
+        tokens: pickTokens(
+          darkVariableTokens,
+          requiredShadcnOfficialTokenNames
+        ),
+      },
+      {
+        title: "dark Design System Lab shadcn extensions",
+        tokens: pickTokens(
+          darkVariableTokens,
+          requiredShadcnExtensionTokenNames
+        ),
       },
     ]
   )
 }
 
 export function exportThemeCssFromOutput(theme: ThemeOutput): string {
+  assertThemeHealth(theme, "Theme CSS export")
+
   return [
     "/* Generated by Design System Lab */",
-    "/* 1. Tailwind exposure */",
-    serializeCssBlock("@theme inline", tailwindExposureTokens),
+    "/* 1. Tailwind exposure: official shadcn first, project extensions second */",
+    serializeGroupedCssBlock(
+      "@theme inline",
+      [],
+      [
+        {
+          title: "official shadcn Tailwind tokens",
+          tokens: shadcnTailwindExposureTokens,
+        },
+        {
+          title: "Design System Lab Tailwind extensions",
+          tokens: projectTailwindExposureTokens,
+        },
+      ]
+    ),
     "/* 2. Light theme variables */",
     serializeLightVariables(theme),
     "/* 3. Dark theme variables */",
     serializeDarkVariables(theme),
     "/* 4. Optional density presets */",
+    serializeCssBlock('[data-density="compact"]', compactDensityTokens),
+    serializeCssBlock(
+      '[data-density="comfortable"]',
+      comfortableDensityTokens
+    ),
+  ].join("\n\n")
+}
+
+export function exportCoreThemeCssFromOutput(theme: ThemeOutput): string {
+  assertCoreThemeHealth(theme, "Core theme CSS export")
+
+  return [
+    "/* Generated by Design System Lab */",
+    "/* Framework-neutral runtime: algorithmic map tokens plus semantic tokens only */",
+    serializeGroupedCssBlock(
+      ":root",
+      ["color-scheme: light;"],
+      [
+        {
+          title: "algorithmic map tokens",
+          tokens: pickTokens(theme.mapTokens, requiredMapTokenNames),
+        },
+        {
+          title: "semantic tokens",
+          tokens: pickTokens(theme.semanticTokens, requiredSemanticTokenNames),
+        },
+      ]
+    ),
+    serializeGroupedCssBlock(
+      ".dark",
+      ["color-scheme: dark;"],
+      [
+        {
+          title: "dark semantic tokens",
+          tokens: pickTokens(
+            theme.darkSemanticTokens,
+            requiredSemanticTokenNames
+          ),
+        },
+      ]
+    ),
+    "/* Optional density presets */",
     serializeCssBlock('[data-density="compact"]', compactDensityTokens),
     serializeCssBlock(
       '[data-density="comfortable"]',

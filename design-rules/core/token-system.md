@@ -1,182 +1,166 @@
 # Token System Installation
 
-Use this rule whenever Design System Lab tokens are installed, bridged, or audited.
+Use this rule when Design System Lab is connected to a project.
 
 ## Goal
 
-Create a complete token baseline before UI normalization so components do not
-fall back to old radius, unsafe foreground colors, incomplete focus rings, or
-partial surface systems.
+Install one complete, seed-driven Token contract before new UI is created.
+Installation is not a UI refactor task.
 
-## Long-Term Project Contract
+```txt
+ThemeSeed
+-> Algorithmic Map Tokens
+-> Semantic Tokens
+-> Selected Adapter
+   -> shadcn Tokens and extensions
+   -> Ant Design Seed/Alias Tokens and ThemeConfig
+```
 
-For persistent or long-term projects, the token system lands through the three
-Design System Lab contract touchpoints. Do not create extra token-system files by
-default.
+`ThemeSeed` is the only editable visual source. Regenerate every downstream
+layer after a seed change. Do not maintain a second hand-authored palette,
+typography scale, radius system, or shadow system.
 
-Required persistent touchpoints:
+Keep the primary installation prompt Token-first and compact. Its
+`theme-lab.json` payload contains only the Seed, compiler version, selected
+component system, and compiled Token values. Do not serialize health reports,
+health contracts, Registry contracts, long AI rules, or duplicated adapter
+artifacts into the prompt. Validate health before export and route static
+installation/adapter guidance through versioned raw Git sources.
 
-- existing global CSS theme block
-- `theme-lab.json`
-- tool-native AI instruction file Design System Lab section
+The portable Map and Semantic CSS export remains available as a low-level
+artifact, but the primary project connection flow asks only whether the
+component system is shadcn or Ant Design.
 
-Use the target tool's native AI instruction file:
+## Installation Boundary
+
+During installation:
+
+- locate the project's current runtime theme or global style entry
+- keep the current framework, directory structure, build setup, and unrelated
+  styling tools
+- install the selected adapter
+- write `theme-lab.json`
+- update one existing tool-native AI instruction file
+- verify Token health and project compilation
+
+Do not during installation:
+
+- redesign or normalize pages
+- replace components
+- map existing literal values to Tokens
+- run a product-wide migration
+- install Registry Blocks
+- copy the local `design-rules/` directory
+
+For a new project, finish installation before creating the first page or
+component. For an existing project, install the contract while leaving current
+UI output unchanged.
+
+## shadcn Adapter
+
+Install the generated runtime CSS in the project's existing global style entry.
+Keep the official shadcn vocabulary as the compatibility layer:
+
+- background and foreground
+- card and popover pairs
+- primary, secondary, muted, accent, and destructive
+- border, input, and ring
+- chart-1 through chart-5
+- the complete sidebar family
+- radius
+
+Keep Design System Lab extensions explicit:
+
+- deterministic destructive foreground
+- richer surface, content, border, action, and status roles
+- generated typography
+- density
+- elevation
+- motion
+
+Do not add components or change the existing primitive engine during Token
+installation. Registry and Blocks are used later when the user asks to create
+UI or explicitly approves existing-UI mapping.
+
+## Ant Design Adapter
+
+Install the generated ThemeConfig through the project's Ant theme module and
+`ConfigProvider`. Keep `App` context connected for feedback APIs.
+
+```txt
+ThemeSeed
+-> Map Tokens
+-> Semantic Tokens
+-> Ant Seed/Alias Tokens
+-> ConfigProvider ThemeConfig
+-> Ant CSS Variables
+```
+
+Requirements:
+
+- preserve the installed Ant Design version and existing provider composition
+- keep light/dark algorithms and generated integer sizes
+- keep structural colors opaque
+- merge justified `theme.components` overrides after the generated global layer
+- add the Tailwind v4 bridge only when Tailwind v4 already exists
+- do not add shadcn, Radix, Registry files, or Tailwind solely for theme
+  installation
+
+Selecting Ant Design is approval to use the Ant adapter. It is not approval to
+replace existing product UI during installation.
+
+## Persistent Touchpoints
+
+Install only three conceptual touchpoints by default:
+
+1. runtime theme entry
+   - shadcn: marker-delimited CSS in the existing global stylesheet
+   - Ant Design: existing theme module or `theme-lab.antd.ts`
+2. `theme-lab.json`
+3. one detected tool-native AI instruction file
+
+Use the existing native instruction file when present:
 
 - Claude Code: `CLAUDE.md`
-- Codex and generic coding agents: `AGENTS.md`
-- Cursor: `.cursor/rules/theme-lab.mdc` when Cursor rules exist; otherwise
-  `AGENTS.md` is acceptable for cross-agent compatibility
+- Codex and generic agents: `AGENTS.md`
+- Cursor: `.cursor/rules/theme-lab.mdc`, or `AGENTS.md` as fallback
 - GitHub Copilot: `.github/copilot-instructions.md`
 - Gemini CLI: `GEMINI.md`
 - Windsurf/Cascade: `.windsurfrules`
-- Qoder: `AGENTS.md` is compatible; native Qoder rules may override it
+- Qoder: `AGENTS.md`
 
-`design-rules/` is a rule reference library, not part of the default persistent
-theme contract. Read rule files from local `design-rules/` only when the target
-project already has it. Otherwise, read the raw GitHub rule URLs from the task
-prompt.
+Do not create every supported instruction file. Do not install local rule files
+unless the user explicitly requests an offline or customized rule library.
+Future component guidance reads the raw GitHub rule index.
 
-Only create or update local `design-rules/` files when the user explicitly asks
-to install the rule library into the project.
+## Post-Install Handoff
 
-The persistent contract is incomplete if `theme-lab.json` exists but the global
-CSS variables or tool-native AI instruction section are missing.
+After all files are written and verification succeeds, ask:
 
-## One-Shot Token Bridge
+> Token system is installed. Do you want me to semantically map all existing
+> interface content to these tokens now?
 
-For one-shot selected-scope optimization, do not create a full persistent Theme
-Lab contract unless requested.
+Do not start mapping before an explicit yes.
 
-Create or reuse the smallest complete token bridge needed for the selected
-scope. The bridge may be local to the existing global CSS/theme layer, but it
-must include every token family touched by the UI:
+If approved, start a separate Existing UI Mapping task. Load the raw rule index,
+Token Binding, UI Normalization, the matched Block, and matched component rules.
+Use model reasoning to infer each element's responsibility, hierarchy, surface,
+interaction, and state before choosing a Token or component variant. Do not
+perform literal value replacement alone.
 
-- surfaces
-- foreground text
-- borders
-- focus rings
-- radius
-- control height
-- spacing/density
-- elevation
-- state colors
-- motion timing
+## Health Gate
 
-Do not add only `--primary` and `--background`. Partial bridges cause invisible
-button text, mismatched radius, unsafe focus rings, and inconsistent cards.
+Installation is complete only when:
 
-## Minimum Required Runtime Tokens
+- every required Token exists
+- all Token references resolve
+- light and dark foreground pairs meet the configured contrast gate
+- generated color scales and typography scales remain ordered
+- generated sizes resolve to integers
+- shadcn mappings remain canonical, or Ant ThemeConfig coverage is complete
+- the runtime theme entry is connected
+- available typecheck and build checks pass
+- existing pages and components were not changed by the installation task
 
-When the target project does not already expose compatible shadcn/theme tokens,
-the one-shot bridge must cover at least:
-
-- `--background`
-- `--foreground`
-- `--card`
-- `--card-foreground`
-- `--popover`
-- `--popover-foreground`
-- `--primary`
-- `--primary-foreground`
-- `--secondary`
-- `--secondary-foreground`
-- `--muted`
-- `--muted-foreground`
-- `--accent`
-- `--accent-foreground`
-- `--destructive`
-- `--destructive-foreground`
-- `--border`
-- `--input`
-- `--ring`
-- `--radius`
-- `--radius-control`
-- `--radius-card`
-- `--radius-panel`
-- `--control-height-sm`
-- `--control-height-md`
-- `--control-height-lg`
-- `--control-padding-x`
-- `--control-gap`
-- `--panel-padding`
-- `--section-gap`
-- `--table-cell-padding-x`
-- `--table-cell-padding-y`
-- `--elevation-card`
-- `--elevation-popover`
-- `--duration-base`
-- `--ease-standard`
-
-If the selected scope shows status (success, warning, info, danger) on badges,
-alerts, or indicators, also include each status family as a solid reference
-color plus soft background plus paired foreground:
-
-- `--status-success`, `--status-success-bg`, `--status-success-fg`
-- `--status-warning`, `--status-warning-bg`, `--status-warning-fg`
-- `--status-info`, `--status-info-bg`, `--status-info-fg`
-- `--status-danger`, `--status-danger-bg`, `--status-danger-fg`
-
-If the selected scope distinguishes non-status categories, model types, or chart
-and legend series, also include the categorical palette:
-
-- `--chart-1`
-- `--chart-2`
-- `--chart-3`
-- `--chart-4`
-- `--chart-5`
-
-If the selected scope contains a sidebar, also include:
-
-- `--sidebar`
-- `--sidebar-foreground`
-- `--sidebar-primary`
-- `--sidebar-primary-foreground`
-- `--sidebar-accent`
-- `--sidebar-accent-foreground`
-- `--sidebar-border`
-- `--sidebar-ring`
-
-## Existing Token Systems
-
-If the project already has a token system, map Design System Lab semantics into that
-system instead of creating a parallel one.
-
-Use this order:
-
-1. existing shadcn CSS variables
-2. existing project semantic variables
-3. Ant Design `ConfigProvider` theme tokens when Ant Design is present
-4. a minimal scoped CSS variable bridge
-
-Do not overwrite existing Ant Design SCSS/Less/global overrides by default.
-Preserve them and add a bridge or `ConfigProvider` mapping.
-
-## Token Plan Requirement
-
-Before editing UI, output a token plan:
-
-- existing token system found
-- global CSS/theme file to update or reuse
-- three persistent touchpoints to land for long-term work
-- whether `design-rules/` is local, raw-only, or explicitly requested for local
-  installation
-- one-shot bridge variables needed for selected-scope work
-- component libraries detected, such as shadcn, Ant Design, Material UI, Radix,
-  or custom components
-- foreground/background pairs that will be checked
-- radius, elevation, focus, state, density, and motion tokens that will be used
-
-## Completion Gate
-
-Token setup is incomplete if:
-
-- a filled button, badge, alert, selected tab, active nav item, or chip uses a
-  background token without the matching foreground token
-- a normalized card/table/sidebar still uses old radius or shadow values
-- focus-visible states are missing or use raw colors
-- only color tokens were added while radius, elevation, density, and state tokens
-  remain undefined
-- one-shot work leaves future optimization without a usable token bridge
-- long-term work creates extra rule or token files without explicit user request
-
-Report unresolved token gaps before final response.
+If verification fails, repair the Token installation only. Do not compensate by
+editing product UI.

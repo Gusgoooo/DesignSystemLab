@@ -50,6 +50,23 @@ export type OklchColor = {
   alpha: number
 }
 
+export function parseOklchColor(value: string): OklchColor | null {
+  const match = value.trim().match(
+    /^oklch\(\s*([\d.]+)\s+([\d.]+)\s+(-?[\d.]+)(?:\s*\/\s*([\d.]+))?\s*\)$/i
+  )
+
+  if (!match) {
+    return null
+  }
+
+  return {
+    lightness: clamp(Number(match[1]), 0, 1),
+    chroma: Math.max(Number(match[2]), 0),
+    hue: ((Number(match[3]) % 360) + 360) % 360,
+    alpha: clamp(match[4] === undefined ? 1 : Number(match[4]), 0, 1),
+  }
+}
+
 function cubeRoot(value: number): number {
   return Math.sign(value) * Math.abs(value) ** (1 / 3)
 }
@@ -95,6 +112,61 @@ function srgbChannelToLinear(value: number): number {
   }
 
   return ((channel + 0.055) / 1.055) ** 2.4
+}
+
+export function relativeLuminanceFromHex(hex: string): number {
+  const { r, g, b } = hexToRgb(hex)
+
+  return (
+    0.2126 * srgbChannelToLinear(r) +
+    0.7152 * srgbChannelToLinear(g) +
+    0.0722 * srgbChannelToLinear(b)
+  )
+}
+
+export function contrastRatioBetweenHex(
+  firstHex: string,
+  secondHex: string
+): number {
+  const first = relativeLuminanceFromHex(firstHex)
+  const second = relativeLuminanceFromHex(secondHex)
+  const lighter = Math.max(first, second)
+  const darker = Math.min(first, second)
+
+  return (lighter + 0.05) / (darker + 0.05)
+}
+
+export function relativeLuminanceFromOklch(
+  lightness: number,
+  chroma: number,
+  hue: number
+): number {
+  const hueRadians = (hue * Math.PI) / 180
+  const a = chroma * Math.cos(hueRadians)
+  const b = chroma * Math.sin(hueRadians)
+  const lPrime = lightness + 0.3963377774 * a + 0.2158037573 * b
+  const mPrime = lightness - 0.1055613458 * a - 0.0638541728 * b
+  const sPrime = lightness - 0.0894841775 * a - 1.291485548 * b
+  const l = lPrime ** 3
+  const m = mPrime ** 3
+  const s = sPrime ** 3
+  const linearR = clamp(
+    4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+    0,
+    1
+  )
+  const linearG = clamp(
+    -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+    0,
+    1
+  )
+  const linearB = clamp(
+    -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s,
+    0,
+    1
+  )
+
+  return 0.2126 * linearR + 0.7152 * linearG + 0.0722 * linearB
 }
 
 export function hexAlphaToOklch(color: HexAlphaInput): OklchColor {

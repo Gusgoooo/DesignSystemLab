@@ -16,7 +16,6 @@ import { cn } from "../../lib/utils"
 type TourTarget =
   | "style-controls"
   | "theme-preview"
-  | "preview-mode"
   | "enterprise-prompt"
 
 type TourStep = {
@@ -37,7 +36,7 @@ type OnboardingTourProps = {
   restartKey: number
 }
 
-const storageKey = "visual-system-lab:onboarding-tour:v2"
+const storageKey = "visual-system-lab:onboarding-tour:v3"
 const highlightPadding = 8
 const viewportMargin = 16
 const cardWidth = 344
@@ -46,26 +45,20 @@ const estimatedCardHeight = 360
 const tourSteps: readonly TourStep[] = [
   {
     target: "style-controls",
-    title: "在这里定义样式",
-    description: "调整左侧参数，定义你的视觉风格。",
+    title: "三个决定生成主题",
+    description: "选择风格预设、品牌色并完成快速调整，其他 Token 会自动生成。",
     radius: "28px",
   },
   {
     target: "theme-preview",
-    title: "在这里查看主题参数预览",
-    description: "在右侧实时查看样式应用效果。",
+    title: "用真实页面确认结果",
+    description: "主题会实时应用到右侧项目模块，组件和规范细节仍可按需查看。",
     radius: "28px",
   },
   {
-    target: "preview-mode",
-    title: "切换预览模式",
-    description: "切换模块、组件、Spec 和说明，检查主题与规则的落地效果。",
-    radius: "999px",
-  },
-  {
     target: "enterprise-prompt",
-    title: "确定样式后直接导出 Prompt",
-    description: "确认后导出 Prompt，让 AI 工具应用到项目中。",
+    title: "选择组件体系后接入",
+    description: "选择 shadcn 或 Ant Design，复制接入指令。",
     radius: "20px",
   },
 ]

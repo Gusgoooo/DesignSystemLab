@@ -1,11 +1,17 @@
 "use client"
 
-import { useMemo, useState } from "react"
-import type { CSSProperties } from "react"
-import { CheckCircle2, MoreHorizontal, X } from "lucide-react"
+import { useState } from "react"
+import { Check, Copy, MoreHorizontal, X } from "lucide-react"
 import { exportAgentsThemeRulesFromOutput } from "../../lib/theme/export-agents"
 import { exportThemeAlgorithmFromOutput } from "../../lib/theme/export-algorithm"
-import { exportThemeCssFromOutput } from "../../lib/theme/export-css"
+import {
+  exportAntdTailwindCssFromOutput,
+  exportAntdThemeTsFromOutput,
+} from "../../lib/theme/export-antd"
+import {
+  exportCoreThemeCssFromOutput,
+  exportThemeCssFromOutput,
+} from "../../lib/theme/export-css"
 import {
   exportPresetJsonFromOutput,
   exportThemeLabManifestJsonFromOutput,
@@ -13,8 +19,10 @@ import {
 } from "../../lib/theme/export-json"
 import {
   compileProjectImportPrompt,
+  type ProjectComponentSystem,
 } from "../../lib/theme/export-prompt"
-import type { ThemeOutput, ThemeSeed } from "../../lib/theme/schema"
+import type { ThemeOutput } from "../../lib/theme/schema"
+import { cn } from "../../lib/utils"
 import { Button } from "../ui/button"
 import {
   Dialog,
@@ -33,64 +41,133 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu"
+import { Label } from "../ui/label"
+import { RadioGroup, RadioGroupItem } from "../ui/radio-group"
 import { getControlFloatingStyle } from "./control-panel-theme"
 
 type ExportPanelProps = {
-  seed: ThemeSeed
   theme: ThemeOutput
   isDark: boolean
 }
 
 const exportButtons = [
   { id: "css", label: "复制 global CSS block" },
+  { id: "core-css", label: "复制 Core Token CSS" },
   { id: "manifest", label: "复制 theme-lab.json" },
   { id: "rules", label: "复制 AI 指令区块" },
   { id: "preset", label: "复制完整 theme.preset.json" },
   { id: "vibe", label: "复制完整 vibe.json" },
   { id: "algorithm", label: "复制完整 theme.algorithm.ts" },
+  { id: "antd", label: "复制 Ant Design theme.ts" },
+  { id: "antd-tailwind", label: "复制 Ant Tailwind bridge.css（可选）" },
 ] as const
 
 type ExportButtonId = (typeof exportButtons)[number]["id"]
 
-function getBlueprintDialogStyle(isDark: boolean): CSSProperties {
-  const baseStyle = getControlFloatingStyle(isDark)
+type SelectionOption<T extends string> = {
+  value: T
+  label: string
+}
 
-  return {
-    ...baseStyle,
-    background:
-      "radial-gradient(circle at 18% 10%, rgb(190 207 255 / 0.74) 0%, rgb(190 207 255 / 0.34) 22%, transparent 44%), radial-gradient(circle at 82% 6%, rgb(244 176 233 / 0.72) 0%, rgb(244 176 233 / 0.34) 24%, transparent 48%), radial-gradient(circle at 48% 18%, rgb(204 176 255 / 0.46) 0%, transparent 38%), linear-gradient(180deg, rgb(238 244 255) 0%, rgb(249 248 252) 44%, rgb(255 255 255) 78%)",
-    color: "rgb(23 23 23)",
-    maxHeight: "calc(100dvh - 32px)",
-  }
+const componentSystemOptions: ReadonlyArray<
+  SelectionOption<ProjectComponentSystem>
+> = [
+  {
+    value: "shadcn",
+    label: "shadcn",
+  },
+  {
+    value: "antd",
+    label: "Ant Design",
+  },
+]
+
+function SelectionGroup<T extends string>(props: {
+  legend: string
+  idPrefix: string
+  value: T
+  options: ReadonlyArray<SelectionOption<T>>
+  onChange: (value: T) => void
+}) {
+  return (
+    <fieldset className="space-y-2.5">
+      <legend className="text-sm font-semibold text-foreground">
+        {props.legend}
+      </legend>
+      <RadioGroup
+        value={props.value}
+        className="grid grid-cols-2 gap-2"
+        onValueChange={(value) => props.onChange(value as T)}
+      >
+        {props.options.map((option) => {
+          const id = `${props.idPrefix}-${option.value}`
+          const selected = option.value === props.value
+
+          return (
+            <div
+              key={option.value}
+              className={cn(
+                "flex min-w-0 items-start gap-3 rounded-[var(--radius-card)] border border-border bg-card p-3 text-card-foreground transition-colors hover:bg-muted/60 focus-within:ring-2 focus-within:ring-ring",
+                selected && "border-ring bg-accent text-accent-foreground"
+              )}
+            >
+              <RadioGroupItem
+                id={id}
+                value={option.value}
+                className="mt-0.5"
+              />
+              <Label
+                htmlFor={id}
+                className="min-w-0 flex-1 cursor-pointer flex-col items-start gap-0"
+              >
+                <span className="block text-sm font-medium leading-5">
+                  {option.label}
+                </span>
+              </Label>
+            </div>
+          )
+        })}
+      </RadioGroup>
+    </fieldset>
+  )
 }
 
 async function copyTextToClipboard(value: string): Promise<boolean> {
-  try {
-    if (!navigator.clipboard) {
-      throw new Error("Clipboard API 不可用")
-    }
-
-    await navigator.clipboard.writeText(value)
-    return true
-  } catch {
-    const textArea = document.createElement("textarea")
-
-    textArea.value = value
-    textArea.setAttribute("readonly", "")
-    textArea.style.position = "fixed"
-    textArea.style.top = "-9999px"
-    textArea.style.left = "-9999px"
-
-    document.body.appendChild(textArea)
-    textArea.focus()
-    textArea.select()
-
+  if (navigator.clipboard) {
     try {
-      document.execCommand("copy")
+      await Promise.race([
+        navigator.clipboard.writeText(value),
+        new Promise<never>((_, reject) => {
+          window.setTimeout(
+            () => reject(new Error("Clipboard API timed out")),
+            600
+          )
+        }),
+      ])
       return true
-    } finally {
-      document.body.removeChild(textArea)
+    } catch {
+      // Fall through for embedded browsers with a stalled or denied API.
     }
+  }
+
+  const textArea = document.createElement("textarea")
+
+  textArea.value = value
+  textArea.setAttribute("readonly", "")
+  textArea.style.position = "fixed"
+  textArea.style.top = "-9999px"
+  textArea.style.left = "-9999px"
+
+  document.body.appendChild(textArea)
+  textArea.focus()
+  textArea.select()
+
+  try {
+    return document.execCommand("copy")
+  } catch {
+    return false
+  } finally {
+    document.body.removeChild(textArea)
   }
 }
 
@@ -98,35 +175,37 @@ export function ExportPanel(props: ExportPanelProps) {
   const [copiedId, setCopiedId] = useState<ExportButtonId | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [copiedPrompt, setCopiedPrompt] = useState(false)
-
-  const projectImportPrompt = useMemo(
-    () => {
-      return compileProjectImportPrompt({
-        mode: "persistent-project-contract",
-        task: "refactor-product-wide",
-        theme: props.theme,
-      })
-    },
-    [props.theme]
-  )
+  const [promptCopyFailed, setPromptCopyFailed] = useState(false)
+  const [componentSystem, setComponentSystem] =
+    useState<ProjectComponentSystem>("shadcn")
 
   function handleDialogOpenChange(nextOpen: boolean): void {
     setDialogOpen(nextOpen)
 
     if (!nextOpen) {
       setCopiedPrompt(false)
+      setPromptCopyFailed(false)
     }
   }
 
   async function copyProjectImportPrompt(): Promise<void> {
     try {
+      const projectImportPrompt = compileProjectImportPrompt({
+        mode: "persistent-project-contract",
+        componentSystem,
+        theme: props.theme,
+      })
       const didCopy = await copyTextToClipboard(projectImportPrompt)
 
       if (didCopy) {
         setCopiedPrompt(true)
+        setPromptCopyFailed(false)
         window.setTimeout(() => setCopiedPrompt(false), 1200)
+      } else {
+        setPromptCopyFailed(true)
       }
     } catch (error) {
+      setPromptCopyFailed(true)
       console.warn("Theme project import copy failed", error)
     }
   }
@@ -134,6 +213,10 @@ export function ExportPanel(props: ExportPanelProps) {
   function getExportValue(id: ExportButtonId): string {
     if (id === "css") {
       return exportThemeCssFromOutput(props.theme)
+    }
+
+    if (id === "core-css") {
+      return exportCoreThemeCssFromOutput(props.theme)
     }
 
     if (id === "preset") {
@@ -149,7 +232,15 @@ export function ExportPanel(props: ExportPanelProps) {
     }
 
     if (id === "rules") {
-      return exportAgentsThemeRulesFromOutput(props.theme)
+      return exportAgentsThemeRulesFromOutput(props.theme, componentSystem)
+    }
+
+    if (id === "antd") {
+      return exportAntdThemeTsFromOutput(props.theme)
+    }
+
+    if (id === "antd-tailwind") {
+      return exportAntdTailwindCssFromOutput(props.theme)
     }
 
     return exportThemeAlgorithmFromOutput(props.theme)
@@ -182,65 +273,66 @@ export function ExportPanel(props: ExportPanelProps) {
             className="h-10 text-sm font-medium"
             onClick={() => setDialogOpen(true)}
           >
-            导入到项目
+            应用到项目
           </Button>
           <DialogContent
-            className={`${props.isDark ? "dark " : ""}gap-7 overflow-y-auto overscroll-contain rounded-[28px] border-white/70 bg-transparent p-6 sm:max-w-4xl sm:p-8`}
+            className={`${props.isDark ? "dark " : ""}grid-rows-[auto_minmax(0,1fr)_auto] gap-0 overflow-hidden rounded-[var(--radius-panel)] border-border bg-popover p-0 text-popover-foreground [box-shadow:var(--elevation-popover)] sm:max-w-lg`}
             showCloseButton={false}
-            style={getBlueprintDialogStyle(props.isDark)}
           >
-            <DialogHeader className="gap-3">
+            <DialogHeader className="gap-2 border-b border-border bg-popover px-5 py-4 sm:px-6">
               <div className="flex items-start justify-between gap-4">
-                <DialogTitle className="min-w-0 text-4xl leading-tight tracking-normal">
-                  导出 Theme Blueprint Prompt
+                <DialogTitle className="min-w-0 text-xl leading-7 tracking-normal">
+                  接入 Token
                 </DialogTitle>
                 <DialogClose asChild>
                   <Button
                     type="button"
                     variant="ghost"
-                    size="icon"
-                    className="h-11 w-11 shrink-0 rounded-full bg-white/45 text-neutral-700 shadow-none hover:bg-white/70 hover:text-neutral-950 focus-visible:ring-neutral-950/25"
-                    aria-label="关闭导出对话框"
+                    size="icon-sm"
+                    className="shrink-0"
+                    aria-label="关闭应用对话框"
                   >
-                    <X className="size-5" aria-hidden="true" />
+                    <X className="size-4" aria-hidden="true" />
                   </Button>
                 </DialogClose>
               </div>
-              <DialogDescription className="text-base leading-7 text-neutral-600">
-                请选择应用方式
+              <DialogDescription className="leading-6">
+                选择组件体系并复制接入指令。
               </DialogDescription>
             </DialogHeader>
 
-            <div className="rounded-[24px] border border-border bg-card p-6 text-card-foreground shadow-sm">
-              <div className="flex items-start gap-3">
-                <span
-                  aria-hidden="true"
-                  className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground"
-                >
-                  <CheckCircle2 className="size-4" aria-hidden="true" />
-                </span>
-                <div className="min-w-0">
-                  <p className="text-lg font-semibold leading-6">
-                    长期设计系统
-                  </p>
-                  <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
-                    导入主题契约，并强制以 shadcn / Radix UI 与合适的
-                    registry 组件或 block 为底座，再把项目里的真实逻辑映射进去。
-                  </p>
-                </div>
-              </div>
+            <div className="px-5 py-5 sm:px-6">
+              <SelectionGroup
+                legend="组件体系"
+                idPrefix="component-system"
+                value={componentSystem}
+                options={componentSystemOptions}
+                onChange={setComponentSystem}
+              />
             </div>
 
-            <DialogFooter className="flex flex-col gap-3 sm:flex-col sm:items-stretch sm:justify-start">
-              <p className="text-sm leading-6 text-muted-foreground">
-                复制指令到 Codex / Cursor / Claude Code / Qoder 执行。
-              </p>
+            <DialogFooter className="border-t border-border bg-popover px-5 py-3 sm:px-6 sm:py-4">
               <Button
                 type="button"
-                className="h-11 w-full text-sm"
+                className="h-[var(--control-height-md)] w-full shrink-0 px-5 sm:w-auto"
                 onClick={() => void copyProjectImportPrompt()}
               >
-                {copiedPrompt ? "已复制" : "复制导入指令"}
+                {copiedPrompt ? (
+                  <>
+                    <Check className="size-4" aria-hidden="true" />
+                    已复制接入指令
+                  </>
+                ) : promptCopyFailed ? (
+                  <>
+                    <Copy className="size-4" aria-hidden="true" />
+                    复制失败，重试
+                  </>
+                ) : (
+                  <>
+                    <Copy className="size-4" aria-hidden="true" />
+                    复制接入指令
+                  </>
+                )}
               </Button>
             </DialogFooter>
           </DialogContent>

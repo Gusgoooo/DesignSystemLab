@@ -153,7 +153,7 @@ function deriveVisualLanguage(seed: ThemeSeed): VibeDescriptor["visualLanguage"]
         : "A cool-to-neutral color system uses brand color for key actions while keeping backgrounds restrained.",
     density: `${getDensityLabel(seed)} with controls around ${seed.density.controlHeight}rem tall.`,
     motion: `${getMotionLabel(seed)} using deterministic duration tokens.`,
-    typography: `Sans stack ${seed.typography.sans}; heading weight ${seed.typography.headingWeight}, body weight ${seed.typography.bodyWeight}.`,
+    typography: `Sans stack ${seed.typography.sans}; base size ${seed.typography.baseSize}px, heading weight ${seed.typography.headingWeight}, body weight ${seed.typography.bodyWeight}.`,
   }
 }
 

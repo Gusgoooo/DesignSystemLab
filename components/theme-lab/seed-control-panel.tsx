@@ -2,13 +2,21 @@
 
 import type { ReactNode } from "react"
 import { createContext, useContext, useEffect, useMemo, useState } from "react"
-import { ChevronDown, ChevronRight, Info, Moon, RotateCcw, Sun } from "lucide-react"
+import {
+  ChevronDown,
+  ChevronRight,
+  Info,
+  Moon,
+  RotateCcw,
+  SlidersHorizontal,
+  Sun,
+} from "lucide-react"
 import { Badge } from "../ui/badge"
 import { Button } from "../ui/button"
 import { Card, CardContent } from "../ui/card"
 import { Input } from "../ui/input"
 import { Label } from "../ui/label"
-import { Separator } from "../ui/separator"
+import { RadioGroup, RadioGroupItem } from "../ui/radio-group"
 import {
   Select,
   SelectContent,
@@ -26,6 +34,11 @@ import {
 import { defaultThemeSeed } from "../../lib/theme/defaults"
 import { themePresets } from "../../lib/theme/presets"
 import type { HexAlphaColor, ThemeOutput, ThemeSeed } from "../../lib/theme/schema"
+import {
+  densityPercentFromSeed,
+  densityPercentRange,
+  densitySeedFromPercent,
+} from "../../lib/theme/algorithms/density"
 import { normalizeHex } from "../../lib/theme/algorithms/utils"
 import { cn } from "../../lib/utils"
 import { getControlFloatingStyle } from "./control-panel-theme"
@@ -86,18 +99,24 @@ const densityPresetByMode: Record<
   Pick<ThemeSeed["density"], "controlHeight" | "densityRatio">
 > = {
   compact: {
-    controlHeight: 1.8,
-    densityRatio: 0.78,
+    controlHeight: 2.125,
+    densityRatio: 0.84,
   },
   default: {
-    controlHeight: 2.5,
+    controlHeight: 2.375,
     densityRatio: 1,
   },
   comfortable: {
-    controlHeight: 3,
-    densityRatio: 1.2,
+    controlHeight: 2.625,
+    densityRatio: 1.16,
   },
 }
+
+const elevationQuickOptions = [
+  { value: "flat", label: "平面" },
+  { value: "soft", label: "柔和" },
+  { value: "floating", label: "浮层" },
+] as const
 
 const optionLabels: Record<string, string> = {
   compact: "紧凑",
@@ -258,8 +277,8 @@ function TokenSwatch(props: { value: string; small?: boolean }) {
       aria-hidden="true"
       className={
         props.small
-          ? "size-4 shrink-0 rounded-sm border border-border bg-background shadow-xs"
-          : "size-5 shrink-0 rounded-md border border-border bg-background shadow-xs"
+          ? "size-4 shrink-0 rounded-[calc(var(--radius-control)*0.5)] border border-border bg-background"
+          : "size-5 shrink-0 rounded-[var(--radius-control)] border border-border bg-background"
       }
       style={{ background: props.value }}
     />
@@ -275,7 +294,7 @@ function InfoTooltip(props: { children: ReactNode; label?: string }) {
         <button
           type="button"
           aria-label={props.label ?? "查看说明"}
-          className="inline-flex size-5 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="inline-flex size-5 shrink-0 items-center justify-center rounded-[var(--radius-control)] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <Info className="size-3" />
         </button>
@@ -308,7 +327,7 @@ function ThemeModeToggle(props: {
           aria-pressed={props.isDark}
           data-state={props.isDark ? "on" : "off"}
           className={cn(
-            "h-7 w-7 rounded-full border shadow-none",
+            "h-7 w-7 rounded-[var(--radius-control)] border",
             props.isDark
               ? "border-primary bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
               : "border-border bg-muted/35 text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -341,7 +360,7 @@ function ResetButton(props: { onReset: () => void }) {
           variant="outline"
           size="icon-sm"
           aria-label="重置为默认"
-          className="h-7 w-7 rounded-full border-border bg-muted/35 text-muted-foreground shadow-none hover:bg-muted hover:text-foreground"
+          className="h-7 w-7 rounded-[var(--radius-control)] border-border bg-muted/35 text-muted-foreground hover:bg-muted hover:text-foreground"
           onClick={props.onReset}
         >
           <RotateCcw className="size-3.5" />
@@ -412,7 +431,7 @@ function TokenCard(props: TokenCardProps) {
         <Button
           type="button"
           variant="ghost"
-          className="h-auto min-h-[2.75rem] w-full justify-between rounded-none px-2.5 py-1.5 text-left"
+          className="h-auto min-h-[2.75rem] w-full justify-between rounded-[inherit] px-2.5 py-1.5 text-left"
           aria-expanded={open}
           aria-label={`${open ? "收起" : "展开"}${props.title}`}
           onClick={() => setOpen((current) => !current)}
@@ -442,6 +461,7 @@ function TokenCard(props: TokenCardProps) {
 function CompactColorEditor(props: {
   value: HexAlphaColor
   onChange: (next: HexAlphaColor) => void
+  showAlpha?: boolean
 }) {
   const [draft, setDraft] = useState(normalizeHex(props.value.hex))
 
@@ -488,6 +508,7 @@ function CompactColorEditor(props: {
           }
         />
         <Input
+          aria-label="种子颜色 Hex 值"
           value={draft}
           className="h-8 font-mono text-[11px]"
           spellCheck={false}
@@ -500,24 +521,26 @@ function CompactColorEditor(props: {
           }}
         />
       </div>
-      <div className="grid grid-cols-[2.25rem_1fr_3rem] items-center gap-2">
-        <Label className="text-[11px] text-muted-foreground">透明度</Label>
-        <Slider
-          min={0.05}
-          max={1}
-          step={0.05}
-          value={[props.value.alpha]}
-          onValueChange={(value) =>
-            props.onChange({
-              ...props.value,
-              alpha: value[0] ?? props.value.alpha,
-            })
-          }
-        />
-        <span className="text-right font-mono text-[10px] text-muted-foreground">
-          {formatAlpha(props.value.alpha)}
-        </span>
-      </div>
+      {props.showAlpha === false ? null : (
+        <div className="grid grid-cols-[2.25rem_1fr_3rem] items-center gap-2">
+          <Label className="text-[11px] text-muted-foreground">透明度</Label>
+          <Slider
+            min={0.05}
+            max={1}
+            step={0.05}
+            value={[props.value.alpha]}
+            onValueChange={(value) =>
+              props.onChange({
+                ...props.value,
+                alpha: value[0] ?? props.value.alpha,
+              })
+            }
+          />
+          <span className="text-right font-mono text-[10px] text-muted-foreground">
+            {formatAlpha(props.value.alpha)}
+          </span>
+        </div>
+      )}
     </div>
   )
 }
@@ -535,7 +558,7 @@ function ColorSeedCard(props: ColorSeedCardProps) {
         <Button
           type="button"
           variant="ghost"
-          className="h-auto min-h-[2.75rem] w-full justify-between rounded-none px-2.5 py-1.5 text-left"
+          className="h-auto min-h-[2.75rem] w-full justify-between rounded-[inherit] px-2.5 py-1.5 text-left"
           aria-expanded={open}
           aria-label={`${open ? "收起" : "展开"} ${props.name} 种子控制`}
           onClick={() => setOpen((current) => !current)}
@@ -610,7 +633,7 @@ function SurfaceSeedCard(props: {
         <Button
           type="button"
           variant="ghost"
-          className="h-auto min-h-[2.75rem] w-full justify-between rounded-none px-2.5 py-1.5 text-left"
+          className="h-auto min-h-[2.75rem] w-full justify-between rounded-[inherit] px-2.5 py-1.5 text-left"
           aria-expanded={open}
           onClick={() => setOpen((current) => !current)}
         >
@@ -623,7 +646,7 @@ function SurfaceSeedCard(props: {
                 >
                   <span
                     aria-hidden="true"
-                    className="size-4 shrink-0 rounded-sm border border-border bg-background shadow-xs"
+                    className="size-4 shrink-0 rounded-[calc(var(--radius-control)*0.5)] border border-border bg-background"
                     style={{
                       background:
                         props.variables[row.token] ?? props.seed.color[row.key].hex,
@@ -682,8 +705,10 @@ function NumberSlider(props: NumberSliderProps) {
 
   return (
     <div className="space-y-2">
-      <div className="flex items-center justify-between gap-3 text-[11px]">
-        <Label className="text-muted-foreground">{props.label}</Label>
+      <div className="flex items-center justify-between gap-3 text-[10px]">
+        <Label className="text-[10px] font-medium text-muted-foreground">
+          {props.label}
+        </Label>
         <span className="font-mono text-foreground">{displayValue}</span>
       </div>
       <Slider
@@ -695,6 +720,180 @@ function NumberSlider(props: NumberSliderProps) {
         onValueChange={(value) => props.onChange(value[0] ?? props.value)}
       />
     </div>
+  )
+}
+
+function RadiusQuickControl(props: {
+  value: number
+  onChange: (radius: number) => void
+}) {
+  const radiusPx = Math.round(props.value * 16)
+  const [draft, setDraft] = useState(String(radiusPx))
+
+  useEffect(() => {
+    setDraft(String(radiusPx))
+  }, [radiusPx])
+
+  function updateRadius(nextPx: number) {
+    const clampedPx = Math.min(Math.max(Math.round(nextPx), 0), 16)
+    setDraft(String(clampedPx))
+    props.onChange(clampedPx / 16)
+  }
+
+  function commitDraft() {
+    const parsed = Number(draft)
+
+    if (!Number.isFinite(parsed)) {
+      setDraft(String(radiusPx))
+      return
+    }
+
+    updateRadius(parsed)
+  }
+
+  return (
+    <fieldset className="space-y-1.5">
+      <legend className="text-[10px] font-medium text-muted-foreground">
+        圆角
+      </legend>
+      <div className="grid grid-cols-[minmax(0,1fr)_4.5rem] items-center gap-2">
+        <Slider
+          aria-label="圆角"
+          min={0}
+          max={16}
+          step={1}
+          value={[radiusPx]}
+          onValueChange={(value) => updateRadius(value[0] ?? radiusPx)}
+        />
+        <div className="relative">
+          <Input
+            aria-label="手动输入圆角"
+            type="number"
+            inputMode="numeric"
+            min={0}
+            max={16}
+            step={1}
+            value={draft}
+            className="h-8 pr-6 text-right font-mono text-[10px] [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            onChange={(event) => {
+              const nextDraft = event.currentTarget.value
+
+              if (nextDraft === "") {
+                setDraft("")
+                return
+              }
+
+              if (/^\d+$/.test(nextDraft)) {
+                updateRadius(Number(nextDraft))
+              }
+            }}
+            onBlur={commitDraft}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                commitDraft()
+                event.currentTarget.blur()
+              }
+            }}
+          />
+          <span className="pointer-events-none absolute inset-y-0 right-2 flex items-center font-mono text-[10px] text-muted-foreground">
+            px
+          </span>
+        </div>
+      </div>
+    </fieldset>
+  )
+}
+
+function DensityQuickControl(props: {
+  value: ThemeSeed["density"]
+  onChange: (density: ThemeSeed["density"]) => void
+}) {
+  const densityPercent = densityPercentFromSeed(props.value)
+  const [draft, setDraft] = useState(String(densityPercent))
+
+  useEffect(() => {
+    setDraft(String(densityPercent))
+  }, [densityPercent])
+
+  function updateDensity(nextPercent: number) {
+    const nextDensity = densitySeedFromPercent(nextPercent)
+    const normalizedPercent = densityPercentFromSeed(nextDensity)
+
+    setDraft(String(normalizedPercent))
+    props.onChange(nextDensity)
+  }
+
+  function commitDraft() {
+    const parsed = Number(draft)
+
+    if (!Number.isFinite(parsed)) {
+      setDraft(String(densityPercent))
+      return
+    }
+
+    updateDensity(parsed)
+  }
+
+  return (
+    <fieldset className="space-y-1.5">
+      <legend className="text-[10px] font-medium text-muted-foreground">
+        密度
+      </legend>
+      <div className="grid grid-cols-[minmax(0,1fr)_4.5rem] items-center gap-2">
+        <Slider
+          aria-label="密度"
+          min={densityPercentRange.min}
+          max={densityPercentRange.max}
+          step={1}
+          value={[densityPercent]}
+          onValueChange={(value) =>
+            updateDensity(value[0] ?? densityPercent)
+          }
+        />
+        <div className="relative">
+          <Input
+            aria-label="手动输入密度"
+            type="number"
+            inputMode="numeric"
+            min={densityPercentRange.min}
+            max={densityPercentRange.max}
+            step={1}
+            value={draft}
+            className="h-8 pr-6 text-right font-mono text-[10px] [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            onChange={(event) => {
+              const nextDraft = event.currentTarget.value
+
+              if (nextDraft === "") {
+                setDraft("")
+                return
+              }
+
+              if (/^\d+$/.test(nextDraft)) {
+                setDraft(nextDraft)
+                const parsed = Number(nextDraft)
+
+                if (
+                  parsed >= densityPercentRange.min &&
+                  parsed <= densityPercentRange.max
+                ) {
+                  props.onChange(densitySeedFromPercent(parsed))
+                }
+              }
+            }}
+            onBlur={commitDraft}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                commitDraft()
+                event.currentTarget.blur()
+              }
+            }}
+          />
+          <span className="pointer-events-none absolute inset-y-0 right-2 flex items-center font-mono text-[10px] text-muted-foreground">
+            %
+          </span>
+        </div>
+      </div>
+    </fieldset>
   )
 }
 
@@ -728,58 +927,122 @@ function SeedSelect<T extends string>(props: {
   )
 }
 
-function PresetSelect(props: {
+function PresetStarter(props: {
   value: string
   onChange: (presetId: string) => void
 }) {
-  const [expanded, setExpanded] = useState(false)
-  const visibleCount = 4
-  const options =
-    props.value === "custom"
-      ? [{ id: "custom", name: "自定义" }, ...themePresets]
-      : themePresets
-  const visibleOptions = expanded ? options : options.slice(0, visibleCount)
-  const hiddenCount = Math.max(0, options.length - visibleOptions.length)
+  const isDark = useControlPanelIsDark()
+  const selectedPreset = themePresets.find((preset) => preset.id === props.value)
 
   return (
-    <div className="flex flex-wrap gap-1.5">
-      {visibleOptions.map((preset) => {
-        const selected = preset.id === props.value
-
-        return (
-          <Button
-            key={preset.id}
-            type="button"
-            variant={selected ? "default" : "outline"}
-            size="xs"
-            aria-pressed={selected}
-            className={cn(
-              "h-8 rounded-full px-3.5 text-xs shadow-none",
-              !selected && "bg-background/70 text-muted-foreground hover:text-foreground"
-            )}
-            onClick={() => {
-              if (preset.id !== "custom") {
-                props.onChange(preset.id)
-              }
-            }}
-          >
-            {preset.name}
-          </Button>
-        )
-      })}
-      {!expanded && hiddenCount > 0 ? (
-        <Button
-          type="button"
-          variant="outline"
-          size="xs"
-          aria-expanded={expanded}
-          className="h-8 rounded-full bg-muted/40 px-3.5 text-xs text-muted-foreground shadow-none hover:bg-muted hover:text-foreground"
-          onClick={() => setExpanded(true)}
+    <div className="space-y-1.5">
+      <Label className="text-[11px] font-semibold text-foreground">
+        风格预设
+      </Label>
+      <Select value={props.value} onValueChange={props.onChange}>
+        <SelectTrigger
+          aria-label="选择风格预设"
+          className="h-[var(--control-height-md)] w-full bg-background"
         >
-          +{hiddenCount}
-        </Button>
-      ) : null}
+          <SelectValue placeholder="选择风格预设">
+            {selectedPreset?.name ?? "自定义"}
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent
+          className={isDark ? "dark" : undefined}
+          position="popper"
+          align="start"
+          style={getControlFloatingStyle(isDark)}
+        >
+          {props.value === "custom" ? (
+            <SelectItem value="custom">自定义</SelectItem>
+          ) : null}
+          {themePresets.map((preset) => (
+            <SelectItem key={preset.id} value={preset.id}>
+              {preset.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
+  )
+}
+
+function QuickChoiceGroup<T extends string>(props: {
+  id: string
+  label: string
+  value: T
+  options: ReadonlyArray<{ value: T; label: string }>
+  onChange: (value: T) => void
+}) {
+  return (
+    <fieldset className="space-y-1.5">
+      <legend className="text-[10px] font-medium text-muted-foreground">
+        {props.label}
+      </legend>
+      <RadioGroup
+        value={props.value}
+        className="grid grid-cols-3 gap-1"
+        onValueChange={(value) => props.onChange(value as T)}
+      >
+        {props.options.map((option) => {
+          const id = `${props.id}-${option.value}`
+          const selected = option.value === props.value
+
+          return (
+            <div
+              key={option.value}
+              className={cn(
+                "flex h-8 items-center justify-center rounded-[var(--radius-control)] border text-[10px] font-medium transition-colors focus-within:ring-2 focus-within:ring-ring",
+                selected
+                  ? "border-primary bg-primary/10 text-foreground"
+                  : "border-border bg-background/70 text-muted-foreground hover:bg-muted hover:text-foreground"
+              )}
+            >
+              <RadioGroupItem id={id} value={option.value} className="sr-only" />
+              <Label
+                htmlFor={id}
+                className="flex h-full flex-1 cursor-pointer items-center justify-center px-1 text-[10px] font-medium"
+              >
+                {option.label}
+              </Label>
+            </div>
+          )
+        })}
+      </RadioGroup>
+    </fieldset>
+  )
+}
+
+function AdvancedTokenControls(props: { children: ReactNode }) {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <section className="space-y-2 pt-1">
+      <Button
+        type="button"
+        variant="ghost"
+        className="h-auto min-h-10 w-full justify-between px-2 text-left"
+        aria-expanded={open}
+        onClick={() => setOpen((current) => !current)}
+      >
+        <span className="flex min-w-0 items-center gap-2">
+          <SlidersHorizontal className="size-3.5 shrink-0" aria-hidden="true" />
+          <span className="min-w-0">
+            <span className="block text-[11px] font-semibold">高级 Token</span>
+            <span className="block truncate text-[10px] font-normal text-muted-foreground">
+              状态色、表面与精细参数
+            </span>
+          </span>
+        </span>
+        {open ? (
+          <ChevronDown className="size-4 text-muted-foreground" />
+        ) : (
+          <ChevronRight className="size-4 text-muted-foreground" />
+        )}
+      </Button>
+      {open ? <div className="space-y-2.5">{props.children}</div> : null}
+    </section>
   )
 }
 
@@ -796,7 +1059,7 @@ function AdvancedSeeds(props: { children: ReactNode }) {
         <Button
           type="button"
           variant="ghost"
-          className="h-auto min-h-[2.75rem] w-full justify-between rounded-none px-2.5 py-1.5 text-left"
+          className="h-auto min-h-[2.75rem] w-full justify-between rounded-[inherit] px-2.5 py-1.5 text-left"
           aria-label={`${open ? "收起" : "展开"}高级种子`}
           aria-expanded={open}
           onClick={() => setOpen((current) => !current)}
@@ -820,7 +1083,7 @@ function AdvancedSeeds(props: { children: ReactNode }) {
 
 function ControlGroup(props: { title: string; children: ReactNode }) {
   return (
-    <div className="space-y-2 rounded-lg border border-border bg-muted/40 p-2.5">
+    <div className="space-y-2 rounded-[var(--radius-card)] border border-border bg-muted/40 p-2.5">
       <h3 className="text-[11px] font-semibold uppercase tracking-[var(--tracking-body)] text-muted-foreground">
         {props.title}
       </h3>
@@ -832,7 +1095,7 @@ function ControlGroup(props: { title: string; children: ReactNode }) {
 export function SeedControlPanel(props: SeedControlPanelProps) {
   const { seed, theme, onSeedChange, isDark, onDarkChange } = props
   const currentVariables = isDark ? theme.darkCssVariables : theme.cssVariables
-  const selectedPresetId = useMemo(
+  const starterPresetId = useMemo(
     () =>
       themePresets.find((preset) => seedEquals(preset.seed, seed))?.id ??
       "custom",
@@ -870,6 +1133,23 @@ export function SeedControlPanel(props: SeedControlPanelProps) {
         mode,
         controlHeight: preset.controlHeight,
         densityRatio: preset.densityRatio,
+      },
+    })
+  }
+
+  function updateDensity(density: ThemeSeed["density"]) {
+    onSeedChange({
+      ...seed,
+      density,
+    })
+  }
+
+  function updateRadius(radius: number) {
+    onSeedChange({
+      ...seed,
+      shape: {
+        ...seed.shape,
+        radius,
       },
     })
   }
@@ -932,328 +1212,446 @@ export function SeedControlPanel(props: SeedControlPanelProps) {
   return (
     <ControlPanelModeContext.Provider value={isDark}>
       <div className="space-y-2.5">
-      <div className="space-y-2.5 px-0.5">
-        <div className="flex items-center justify-between gap-2.5">
-          <div className="flex min-w-0 items-center gap-2">
-            <h1 className="truncate text-lg font-extrabold leading-6 tracking-normal text-foreground">
-              Design System Lab
-            </h1>
+        <div className="space-y-2.5 px-0.5">
+          <div className="flex items-center justify-between gap-2.5">
+            <div className="flex min-w-0 items-center gap-2">
+              <h1 className="truncate text-lg font-extrabold leading-6 tracking-normal text-foreground">
+                Design System Lab
+              </h1>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <ResetButton
+                onReset={() => {
+                  onSeedChange(structuredClone(defaultThemeSeed))
+                }}
+              />
+              <ThemeModeToggle isDark={isDark} onChange={onDarkChange} />
+            </div>
           </div>
-          <div className="flex items-center gap-1.5">
-            <ResetButton
-              onReset={() => onSeedChange(structuredClone(defaultThemeSeed))}
+        </div>
+
+        <div className="space-y-3 px-0.5">
+          <PresetStarter value={starterPresetId} onChange={updatePreset} />
+
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between gap-2">
+              <Label className="text-[11px] font-semibold text-foreground">
+                品牌主色
+              </Label>
+              <span className="font-mono text-[10px] text-muted-foreground">
+                {normalizeHex(seed.color.primary.hex).toUpperCase()}
+              </span>
+            </div>
+            <CompactColorEditor
+              value={seed.color.primary}
+              showAlpha={false}
+              onChange={(value) =>
+                updateColor("primary", {
+                  ...value,
+                  alpha: 1,
+                })
+              }
             />
-            <ThemeModeToggle isDark={isDark} onChange={onDarkChange} />
           </div>
-        </div>
 
-        <div className="space-y-1">
-          <Label className="text-[11px] font-medium text-muted-foreground">
-            预设
-          </Label>
-          <PresetSelect value={selectedPresetId} onChange={updatePreset} />
-        </div>
-        <div className="py-0.5">
-          <Separator />
-        </div>
-      </div>
-
-      {colorTokenConfig.map((config) => (
-        <ColorSeedCard
-          key={config.key}
-          title={config.title}
-          name={config.name}
-          value={seed.color[config.key]}
-          previewValue={currentVariables[config.previewToken] ?? seed.color[config.key].hex}
-          derived={tokenRowsByNames(currentVariables, config.derivedNames)}
-          onChange={(value) => updateColor(config.key, value)}
-          matchesPrimary={
-            config.key === "info" ? seed.color.infoMatchesPrimary : undefined
-          }
-          onMatchesPrimaryChange={
-            config.key === "info"
-              ? (infoMatchesPrimary) =>
+          <div className="space-y-2">
+            <Label className="text-[11px] font-semibold text-foreground">
+              快速调整
+            </Label>
+            <div className="space-y-4">
+              <DensityQuickControl
+                value={seed.density}
+                onChange={updateDensity}
+              />
+              <RadiusQuickControl
+                value={seed.shape.radius}
+                onChange={updateRadius}
+              />
+              <QuickChoiceGroup
+                id="quick-elevation"
+                label="默认投影"
+                value={seed.material.elevation}
+                options={elevationQuickOptions}
+                onChange={(elevation) =>
                   onSeedChange({
                     ...seed,
-                    color: {
-                      ...seed.color,
-                      infoMatchesPrimary,
+                    material: {
+                      ...seed.material,
+                      elevation,
                     },
                   })
-              : undefined
-          }
-          primaryValue={config.key === "info" ? seed.color.primary : undefined}
-        />
-      ))}
-
-      <SurfaceSeedCard
-        seed={seed}
-        variables={currentVariables}
-        derived={surfaceDerived}
-        onChange={updateColor}
-        rows={[
-          { key: "background", label: "colorBgBase", token: "--background" },
-          { key: "foreground", label: "colorTextBase", token: "--foreground" },
-          { key: "neutral", label: "colorNeutral", token: "--neutral-500" },
-        ]}
-      />
-
-      <TokenCard
-        title="圆角"
-        summary={`${formatNumber(seed.shape.radius)}rem / 比例 ${formatNumber(seed.shape.radiusRatio)}`}
-        description="圆角会影响按钮、卡片和面板的整体外观。"
-        derived={radiusDerived}
-      >
-        <div className="space-y-3">
-          <NumberSlider
-            label="borderRadius"
-            value={seed.shape.radius}
-            min={0}
-            max={1.5}
-            step={0.025}
-            unit="rem"
-            onChange={(radius) =>
-              onSeedChange({
-                ...seed,
-                shape: {
-                  ...seed.shape,
-                  radius,
-                },
-              })
-            }
-          />
-          <NumberSlider
-            label="radiusRatio"
-            value={seed.shape.radiusRatio}
-            min={0.7}
-            max={1.4}
-            step={0.025}
-            onChange={(radiusRatio) =>
-              onSeedChange({
-                ...seed,
-                shape: {
-                  ...seed.shape,
-                  radiusRatio,
-                },
-              })
-            }
-          />
+                }
+              />
+              <div className="space-y-1.5">
+                <Label className="text-[10px] font-medium text-muted-foreground">
+                  中性色
+                </Label>
+                <CompactColorEditor
+                  value={seed.color.neutral}
+                  showAlpha={false}
+                  onChange={(value) =>
+                    updateColor("neutral", {
+                      ...value,
+                      alpha: 1,
+                    })
+                  }
+                />
+              </div>
+              <NumberSlider
+                label="基础字号"
+                value={seed.typography.baseSize}
+                min={14}
+                max={18}
+                step={1}
+                unit="px"
+                onChange={(baseSize) =>
+                  onSeedChange({
+                    ...seed,
+                    typography: {
+                      ...seed.typography,
+                      baseSize,
+                    },
+                  })
+                }
+              />
+            </div>
+          </div>
         </div>
-      </TokenCard>
 
-      <TokenCard
-        title="密度"
-        summary={`${formatOptionLabel(seed.density.mode)} / ${formatNumber(seed.density.controlHeight)}rem / 比例 ${formatNumber(seed.density.densityRatio)}`}
-        description="密度会影响按钮、输入框、列表、间距和容器留白。"
-        derived={densityDerived}
-      >
-        <div className="space-y-3">
-          <SeedSelect
-            label="mode"
-            value={seed.density.mode}
-            options={["compact", "default", "comfortable"] as const}
-            onChange={updateDensityMode}
-          />
-          <NumberSlider
-            label="controlHeight"
-            value={seed.density.controlHeight}
-            min={1.6}
-            max={3.4}
-            step={0.05}
-            unit="rem"
-            onChange={(controlHeight) =>
-              onSeedChange({
-                ...seed,
-                density: {
-                  ...seed.density,
-                  controlHeight,
-                },
-              })
-            }
-          />
-          <NumberSlider
-            label="densityRatio"
-            value={seed.density.densityRatio}
-            min={0.75}
-            max={1.35}
-            step={0.01}
-            onChange={(densityRatio) =>
-              onSeedChange({
-                ...seed,
-                density: {
-                  ...seed.density,
-                  densityRatio,
-                },
-              })
-            }
-          />
-        </div>
-      </TokenCard>
+        <AdvancedTokenControls>
+          {colorTokenConfig
+            .filter((config) => config.key !== "primary")
+            .map((config) => (
+              <ColorSeedCard
+                key={config.key}
+                title={config.title}
+                name={config.name}
+                value={seed.color[config.key]}
+                previewValue={
+                  currentVariables[config.previewToken] ?? seed.color[config.key].hex
+                }
+                derived={tokenRowsByNames(currentVariables, config.derivedNames)}
+                onChange={(value) => updateColor(config.key, value)}
+                matchesPrimary={
+                  config.key === "info" ? seed.color.infoMatchesPrimary : undefined
+                }
+                onMatchesPrimaryChange={
+                  config.key === "info"
+                    ? (infoMatchesPrimary) =>
+                        onSeedChange({
+                          ...seed,
+                          color: {
+                            ...seed.color,
+                            infoMatchesPrimary,
+                          },
+                        })
+                    : undefined
+                }
+                primaryValue={
+                  config.key === "info" ? seed.color.primary : undefined
+                }
+              />
+            ))}
 
-      <AdvancedSeeds>
-        <ControlGroup title="字体">
-          <NumberSlider
-            label="scaleRatio"
-            value={seed.typography.scaleRatio}
-            min={1.1}
-            max={1.35}
-            step={0.01}
-            onChange={(scaleRatio) =>
-              onSeedChange({
-                ...seed,
-                typography: {
-                  ...seed.typography,
-                  scaleRatio,
-                },
-              })
-            }
+          <SurfaceSeedCard
+            seed={seed}
+            variables={currentVariables}
+            derived={surfaceDerived}
+            onChange={updateColor}
+            rows={[
+              { key: "background", label: "colorBgBase", token: "--background" },
+              { key: "foreground", label: "colorTextBase", token: "--foreground" },
+              { key: "neutral", label: "colorNeutral", token: "--neutral-500" },
+            ]}
           />
-          <NumberSlider
-            label="headingWeight"
-            value={seed.typography.headingWeight}
-            min={500}
-            max={800}
-            step={10}
-            onChange={(headingWeight) =>
-              onSeedChange({
-                ...seed,
-                typography: {
-                  ...seed.typography,
-                  headingWeight,
-                },
-              })
-            }
-          />
-          <NumberSlider
-            label="bodyWeight"
-            value={seed.typography.bodyWeight}
-            min={350}
-            max={600}
-            step={10}
-            onChange={(bodyWeight) =>
-              onSeedChange({
-                ...seed,
-                typography: {
-                  ...seed.typography,
-                  bodyWeight,
-                },
-              })
-            }
-          />
-          <NumberSlider
-            label="trackingBias"
-            value={seed.typography.trackingBias}
-            min={-0.02}
-            max={0.04}
-            step={0.002}
-            unit="em"
-            onChange={(trackingBias) =>
-              onSeedChange({
-                ...seed,
-                typography: {
-                  ...seed.typography,
-                  trackingBias,
-                },
-              })
-            }
-          />
-        </ControlGroup>
 
-        <ControlGroup title="材质">
-          <SeedSelect
-            label="elevation"
-            value={seed.material.elevation}
-            options={["flat", "soft", "floating"] as const}
-            onChange={(elevation) =>
-              onSeedChange({
-                ...seed,
-                material: {
-                  ...seed.material,
-                  elevation,
-                },
-              })
-            }
-          />
-          <NumberSlider
-            label="shadowAlpha"
-            value={seed.material.shadowAlpha}
-            min={0}
-            max={0.18}
-            step={0.01}
-            onChange={(shadowAlpha) =>
-              onSeedChange({
-                ...seed,
-                material: {
-                  ...seed.material,
-                  shadowAlpha,
-                },
-              })
-            }
-          />
-        </ControlGroup>
+          <TokenCard
+            title="圆角"
+            summary={`${Math.round(seed.shape.radius * 16)}px / 比例 ${formatNumber(seed.shape.radiusRatio)}`}
+            description="圆角会影响按钮、卡片和面板的整体外观。"
+            derived={radiusDerived}
+          >
+            <div className="space-y-3">
+              <NumberSlider
+                label="borderRadius"
+                value={Math.round(seed.shape.radius * 16)}
+                min={0}
+                max={16}
+                step={1}
+                unit="px"
+                onChange={(radiusPx) =>
+                  onSeedChange({
+                    ...seed,
+                    shape: {
+                      ...seed.shape,
+                      radius: Math.round(radiusPx) / 16,
+                    },
+                  })
+                }
+              />
+              <NumberSlider
+                label="radiusRatio"
+                value={seed.shape.radiusRatio}
+                min={0.8}
+                max={1.15}
+                step={0.025}
+                onChange={(radiusRatio) =>
+                  onSeedChange({
+                    ...seed,
+                    shape: {
+                      ...seed.shape,
+                      radiusRatio,
+                    },
+                  })
+                }
+              />
+            </div>
+          </TokenCard>
 
-        <ControlGroup title="动效 + 风格">
-          <SeedSelect
-            label="motion"
-            value={seed.motion.level}
-            options={["none", "subtle", "expressive"] as const}
-            onChange={(level) =>
-              onSeedChange({
-                ...seed,
-                motion: {
-                  ...seed.motion,
-                  level,
-                },
-              })
-            }
-          />
-          <NumberSlider
-            label="durationBase"
-            value={seed.motion.durationBase}
-            min={80}
-            max={320}
-            step={10}
-            unit="ms"
-            onChange={(durationBase) =>
-              onSeedChange({
-                ...seed,
-                motion: {
-                  ...seed.motion,
-                  durationBase,
-                },
-              })
-            }
-          />
-          <SeedSelect
-            label="domain"
-            value={seed.vibe.domain}
-            options={["saas", "ai", "editorial", "finance", "consumer", "tooling"] as const}
-            onChange={(domain) =>
-              onSeedChange({
-                ...seed,
-                vibe: {
-                  ...seed.vibe,
-                  domain,
-                },
-              })
-            }
-          />
-          <SeedSelect
-            label="tone"
-            value={seed.vibe.tone}
-            options={["calm", "precise", "friendly", "premium", "experimental"] as const}
-            onChange={(tone) =>
-              onSeedChange({
-                ...seed,
-                vibe: {
-                  ...seed.vibe,
-                  tone,
-                },
-              })
-            }
-          />
-        </ControlGroup>
-      </AdvancedSeeds>
+          <TokenCard
+            title="密度"
+            summary={`${formatOptionLabel(seed.density.mode)} / ${formatNumber(seed.density.controlHeight)}rem / 比例 ${formatNumber(seed.density.densityRatio)}`}
+            description="密度会影响按钮、输入框、列表、间距和容器留白。"
+            derived={densityDerived}
+          >
+            <div className="space-y-3">
+              <SeedSelect
+                label="mode"
+                value={seed.density.mode}
+                options={["compact", "default", "comfortable"] as const}
+                onChange={updateDensityMode}
+              />
+              <NumberSlider
+                label="controlHeight"
+                value={seed.density.controlHeight}
+                min={2.125}
+                max={2.75}
+                step={0.05}
+                unit="rem"
+                onChange={(controlHeight) =>
+                  onSeedChange({
+                    ...seed,
+                    density: {
+                      ...seed.density,
+                      controlHeight,
+                    },
+                  })
+                }
+              />
+              <NumberSlider
+                label="densityRatio"
+                value={seed.density.densityRatio}
+                min={0.84}
+                max={1.16}
+                step={0.01}
+                onChange={(densityRatio) =>
+                  onSeedChange({
+                    ...seed,
+                    density: {
+                      ...seed.density,
+                      densityRatio,
+                    },
+                  })
+                }
+              />
+            </div>
+          </TokenCard>
+
+          <AdvancedSeeds>
+            <ControlGroup title="字体">
+              <NumberSlider
+                label="baseSize"
+                value={seed.typography.baseSize}
+                min={14}
+                max={18}
+                step={1}
+                unit="px"
+                onChange={(baseSize) =>
+                  onSeedChange({
+                    ...seed,
+                    typography: {
+                      ...seed.typography,
+                      baseSize,
+                    },
+                  })
+                }
+              />
+              <NumberSlider
+                label="scaleRatio"
+                value={seed.typography.scaleRatio}
+                min={1.1}
+                max={1.28}
+                step={0.01}
+                onChange={(scaleRatio) =>
+                  onSeedChange({
+                    ...seed,
+                    typography: {
+                      ...seed.typography,
+                      scaleRatio,
+                    },
+                  })
+                }
+              />
+              <NumberSlider
+                label="headingWeight"
+                value={seed.typography.headingWeight}
+                min={500}
+                max={800}
+                step={10}
+                onChange={(headingWeight) =>
+                  onSeedChange({
+                    ...seed,
+                    typography: {
+                      ...seed.typography,
+                      headingWeight,
+                    },
+                  })
+                }
+              />
+              <NumberSlider
+                label="bodyWeight"
+                value={seed.typography.bodyWeight}
+                min={350}
+                max={600}
+                step={10}
+                onChange={(bodyWeight) =>
+                  onSeedChange({
+                    ...seed,
+                    typography: {
+                      ...seed.typography,
+                      bodyWeight,
+                    },
+                  })
+                }
+              />
+              <NumberSlider
+                label="trackingBias"
+                value={seed.typography.trackingBias}
+                min={-0.02}
+                max={0.04}
+                step={0.002}
+                unit="em"
+                onChange={(trackingBias) =>
+                  onSeedChange({
+                    ...seed,
+                    typography: {
+                      ...seed.typography,
+                      trackingBias,
+                    },
+                  })
+                }
+              />
+            </ControlGroup>
+
+            <ControlGroup title="材质">
+              <SeedSelect
+                label="elevation"
+                value={seed.material.elevation}
+                options={["flat", "soft", "floating"] as const}
+                onChange={(elevation) =>
+                  onSeedChange({
+                    ...seed,
+                    material: {
+                      ...seed.material,
+                      elevation,
+                    },
+                  })
+                }
+              />
+              <NumberSlider
+                label="shadowAlpha"
+                value={seed.material.shadowAlpha}
+                min={0}
+                max={0.18}
+                step={0.01}
+                onChange={(shadowAlpha) =>
+                  onSeedChange({
+                    ...seed,
+                    material: {
+                      ...seed.material,
+                      shadowAlpha,
+                    },
+                  })
+                }
+              />
+            </ControlGroup>
+
+            <ControlGroup title="动效 + 风格">
+              <SeedSelect
+                label="motion"
+                value={seed.motion.level}
+                options={["none", "subtle", "expressive"] as const}
+                onChange={(level) =>
+                  onSeedChange({
+                    ...seed,
+                    motion: {
+                      ...seed.motion,
+                      level,
+                    },
+                  })
+                }
+              />
+              <NumberSlider
+                label="durationBase"
+                value={seed.motion.durationBase}
+                min={80}
+                max={320}
+                step={10}
+                unit="ms"
+                onChange={(durationBase) =>
+                  onSeedChange({
+                    ...seed,
+                    motion: {
+                      ...seed.motion,
+                      durationBase,
+                    },
+                  })
+                }
+              />
+              <SeedSelect
+                label="domain"
+                value={seed.vibe.domain}
+                options={[
+                  "saas",
+                  "ai",
+                  "editorial",
+                  "finance",
+                  "consumer",
+                  "tooling",
+                ] as const}
+                onChange={(domain) =>
+                  onSeedChange({
+                    ...seed,
+                    vibe: {
+                      ...seed.vibe,
+                      domain,
+                    },
+                  })
+                }
+              />
+              <SeedSelect
+                label="tone"
+                value={seed.vibe.tone}
+                options={[
+                  "calm",
+                  "precise",
+                  "friendly",
+                  "premium",
+                  "experimental",
+                ] as const}
+                onChange={(tone) =>
+                  onSeedChange({
+                    ...seed,
+                    vibe: {
+                      ...seed.vibe,
+                      tone,
+                    },
+                  })
+                }
+              />
+            </ControlGroup>
+          </AdvancedSeeds>
+        </AdvancedTokenControls>
       </div>
     </ControlPanelModeContext.Provider>
   )

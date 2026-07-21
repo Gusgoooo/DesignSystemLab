@@ -1,89 +1,78 @@
 # Completion Compliance Gate
 
-Use this rule before final response for every UI normalization or Design System Lab
-token task.
+Choose the active task mode before declaring completion.
 
-## Required Evidence
+## Token Installation
 
-Final work must report evidence, not only a summary.
+Required evidence:
 
-Include:
+- selected component system
+- runtime theme entry changed
+- `theme-lab.json` written
+- one tool-native AI instruction file updated
+- Token health result
+- available typecheck/build result
+- confirmation that existing pages and components were not changed
 
-- page structure detected
-- rule index source used, local or raw URL
-- required rule files opened
-- matched rule files opened
-- missing or inaccessible rule files
-- token system source used
-- token bridge or persistent contract files changed
-- component/block rules applied
-- business workflows preserved
-- APIs/data/handlers/validation/permissions/state preserved
-- responsive states checked
-- token audit results
-- unresolved risks
+After successful verification, ask whether the user wants to map the existing
+interface to the Token system. Do not begin mapping in the installation task.
 
-## Rule Loading Compliance
+Installation fails when:
 
-The task is non-compliant if:
+- the runtime adapter is incomplete
+- required Tokens or references are missing
+- light/dark contrast or generated scale checks fail
+- a parallel Token system is introduced
+- existing product UI is restyled or replaced
+- every supported AI instruction file is created
+- local `design-rules/` files are copied without an explicit request
 
-- the agent changed cards without opening the card rule
-- the agent changed tables without opening the table rule
-- the agent changed a sidebar without opening the sidebar rule
-- the agent changed forms/inputs/validation without opening the forms-and-inputs
-  rule
-- the agent changed tabs or single-select switches without opening the tabs rule
-- the agent changed dialogs, sheets, popovers, dropdowns, or command palettes
-  without opening the overlays rule
-- the agent changed badges, alerts, chips, notices, or status indicators without
-  opening the badges-and-alerts rule and semantic-color rule
-- the agent changed metrics, charts, legends, or progress indicators without
-  opening the metrics-and-charts rule
-- the agent changed a dashboard without opening the dashboard rule
-- the agent changed page structure without opening the page-shell rule
-- the agent changed token-bearing UI without opening token-system and
-  token-binding rules
-- the agent claims a rule was applied without listing the exact file or raw URL
-  opened
+## New UI Creation
 
-## Token Compliance
+Required evidence:
 
-Check changed product UI for:
+- page type and user job
+- raw or local rule index used
+- matched Block loaded before component rules
+- component system used
+- Block slots mapped to semantic Tokens
+- real product content and behavior connected
+- responsive and interaction states checked
+- Token audit and available typecheck/build result
 
-- raw Tailwind palette classes in structural UI
-- hardcoded hex/color functions in structural UI
-- old radius utilities or arbitrary radius values
-- one-off shadows or old elevation values
-- same-role filled pairs such as `bg-primary text-primary`
-- missing `*-foreground` token on filled surfaces
-- missing focus-visible state
-- incomplete one-shot token bridge
-- missing persistent contract files in long-term mode
+Creation fails when:
 
-## UI Compliance
+- page-level UI was composed from isolated primitives without considering a
+  matching Block
+- demo content remains
+- raw structural colors, typography, radius, or shadows bypass Tokens
+- filled surfaces lack matching foreground roles
+- business behavior or responsive states are missing
 
-Check that:
+## Existing UI Mapping
 
-- the page still looks like the same product
-- content and workflow order are preserved
-- primary action is still visible
-- secondary actions are quieter
-- filters/controls are near the data they affect
-- horizontal control rows use consistent heights
-- cards/tables/forms/tabs/overlays/badges/alerts/metrics/charts/states follow
-  their matched rule files
-- responsive layouts do not overflow
-- empty/loading/error/disabled/selected states are readable
+Required evidence:
 
-## Final Response Gate
+- explicit user approval
+- mapped scope
+- matched Block and component rules loaded
+- semantic reasoning record for commands, selection, navigation, input,
+  feedback, surfaces, and data roles
+- preserved routes, APIs, data, handlers, validation, permissions,
+  accessibility, and responsive behavior
+- Token audit and available typecheck/build result
 
-Do not mark the task complete if:
+Mapping fails when:
 
-- required rule files could not be read and the work depended on them
-- token bridge is incomplete for the changed UI
-- APIs, handlers, validation, or permissions were disconnected
-- changed UI uses unsafe token pairs
-- the final response does not list rule files or raw URLs actually opened
-- no typecheck/build/lint/manual check was run and no reason was given
+- it started without explicit approval
+- literal values were replaced one-to-one without inferring semantic roles
+- command, selection, status, and category meanings were conflated
+- component structure or workflow changed without a separate request
+- unresolved raw structural values are ignored
 
-If blocked, report the blocker and the smallest safe next step.
+## Final Report
+
+Keep the report proportional to the active mode. Do not include Registry scores,
+coverage calculations, page inventories, or migration plans in a Token
+Installation report. Do not claim a rule was read unless its local file or raw
+URL was actually opened.

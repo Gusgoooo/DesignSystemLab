@@ -8,10 +8,19 @@ import { mergeTokenRecords } from "./algorithms/utils"
 import {
   deriveDarkSemanticTokens,
   deriveSemanticTokens,
+  assertRequiredTokens,
 } from "./semantic"
-import { deriveShadcnTokens } from "./shadcn-adapter"
-import type { ThemeOutput, ThemeSeed } from "./schema"
+import {
+  deriveShadcnExtensionTokens,
+  deriveShadcnTokens,
+} from "./shadcn-adapter"
+import {
+  requiredMapTokenNames,
+  type ThemeOutput,
+  type ThemeSeed,
+} from "./schema"
 import { deriveVibeDescriptor } from "./vibe"
+import { deriveAntdThemeAdapter } from "./antd-adapter"
 
 export function deriveTheme(seed: ThemeSeed): ThemeOutput {
   const mapTokens = mergeTokenRecords(
@@ -22,15 +31,31 @@ export function deriveTheme(seed: ThemeSeed): ThemeOutput {
     deriveElevationMap(seed),
     deriveMotionMap(seed)
   )
-  const semanticTokens = deriveSemanticTokens(seed)
-  const darkSemanticTokens = deriveDarkSemanticTokens(seed)
+  assertRequiredTokens(mapTokens, requiredMapTokenNames, "map tokens")
+  const semanticTokens = deriveSemanticTokens(seed, mapTokens)
+  const darkSemanticTokens = deriveDarkSemanticTokens(seed, mapTokens)
   const shadcnTokens = deriveShadcnTokens(semanticTokens)
   const darkShadcnTokens = deriveShadcnTokens(darkSemanticTokens)
-  const cssVariables = mergeTokenRecords(mapTokens, semanticTokens, shadcnTokens)
+  const shadcnExtensionTokens = deriveShadcnExtensionTokens(semanticTokens)
+  const darkShadcnExtensionTokens =
+    deriveShadcnExtensionTokens(darkSemanticTokens)
+  const antdTheme = deriveAntdThemeAdapter(
+    seed,
+    mapTokens,
+    semanticTokens,
+    darkSemanticTokens
+  )
+  const cssVariables = mergeTokenRecords(
+    mapTokens,
+    semanticTokens,
+    shadcnTokens,
+    shadcnExtensionTokens
+  )
   const darkCssVariables = mergeTokenRecords(
     mapTokens,
     darkSemanticTokens,
-    darkShadcnTokens
+    darkShadcnTokens,
+    darkShadcnExtensionTokens
   )
   const vibe = deriveVibeDescriptor(seed)
 
@@ -41,6 +66,9 @@ export function deriveTheme(seed: ThemeSeed): ThemeOutput {
     darkSemanticTokens,
     shadcnTokens,
     darkShadcnTokens,
+    shadcnExtensionTokens,
+    darkShadcnExtensionTokens,
+    antdTheme,
     cssVariables,
     darkCssVariables,
     vibe,

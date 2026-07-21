@@ -12,6 +12,8 @@ export function deriveElevationMap(seed: ThemeSeed): Record<string, string> {
 
   if (seed.material.elevation === "flat") {
     return {
+      "--elevation-none": "none",
+      "--elevation-control": "none",
       "--elevation-card": "none",
       "--elevation-popover": `0 4px 10px rgb(0 0 0 / ${alphaLight})`,
       "--elevation-dialog": `0 8px 18px rgb(0 0 0 / ${alpha})`,
@@ -20,6 +22,8 @@ export function deriveElevationMap(seed: ThemeSeed): Record<string, string> {
 
   if (seed.material.elevation === "floating") {
     return {
+      "--elevation-none": "none",
+      "--elevation-control": `0 1px 2px rgb(0 0 0 / ${alphaLight})`,
       "--elevation-card": `0 2px 8px rgb(0 0 0 / ${alphaLight}), 0 1px 2px rgb(0 0 0 / ${alphaLight})`,
       "--elevation-popover": `0 12px 30px rgb(0 0 0 / ${alpha}), 0 4px 10px rgb(0 0 0 / ${alphaLight})`,
       "--elevation-dialog": `0 22px 50px rgb(0 0 0 / ${alphaStrong}), 0 8px 18px rgb(0 0 0 / ${alpha})`,
@@ -27,6 +31,8 @@ export function deriveElevationMap(seed: ThemeSeed): Record<string, string> {
   }
 
   return {
+    "--elevation-none": "none",
+    "--elevation-control": `0 1px 2px rgb(0 0 0 / ${alphaLight})`,
     "--elevation-card": `0 1px 2px rgb(0 0 0 / ${alpha}), 0 1px 1px rgb(0 0 0 / ${alphaLight})`,
     "--elevation-popover": `0 8px 22px rgb(0 0 0 / ${alpha}), 0 2px 6px rgb(0 0 0 / ${alphaLight})`,
     "--elevation-dialog": `0 16px 38px rgb(0 0 0 / ${alphaStrong}), 0 5px 14px rgb(0 0 0 / ${alpha})`,

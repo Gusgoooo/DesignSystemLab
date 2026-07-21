@@ -1,4 +1,9 @@
 export default function HomePage() {
+  const themeLabHref =
+    process.env.NODE_ENV === "production"
+      ? "./theme-lab/index.html"
+      : "./theme-lab/"
+
   return (
     <main className="relative min-h-screen overflow-hidden bg-background text-foreground">
       <div
@@ -31,7 +36,7 @@ export default function HomePage() {
           </p>
           <a
             className="mt-8 inline-flex h-[var(--control-height-lg)] w-fit items-center rounded-[var(--radius-control)] bg-foreground px-6 text-sm font-medium text-background transition-colors hover:bg-foreground/90"
-            href="./theme-lab/index.html"
+            href={themeLabHref}
           >
             打开 Design System Lab
           </a>

@@ -30,6 +30,8 @@ Current repository state:
 - Install dependencies: `npm install`
 - Run the dev server: `npm run dev`
 - Typecheck: `npm run typecheck`
+- Lightweight theme/registry health test: `npm run test:theme`
+- Synchronize generated default theme CSS: `npm run theme:sync`
 - Build the app: `npm run build`
 - Build static artifact: `npm run build:static`
 - Static artifact output directory: `out/`
@@ -37,14 +39,38 @@ Current repository state:
 
 ## Project purpose
 
-This project contains an AI-era design system generator for shadcn/ui. It
-provides seed token controls, algorithmic token generation, semantic token
-mapping, shadcn adapter output, preview pages, and exportable theme artifacts.
+This project contains an AI-era design system generator with two project
+adapters: shadcn/ui and Ant Design. It provides seed token controls,
+algorithmic token generation, semantic token mapping, component-system
+adapters, preview pages, raw GitHub component guidance, and exportable theme
+artifacts. Framework-neutral core Token CSS remains a portable export artifact.
 
 ## Core architecture
 
 - `src/theme` or `lib/theme`: theme seed schema, token algorithms, CSS export,
   vibe descriptor generation.
+- `lib/theme/registry-capabilities.ts`: audited block/primitive-bundle capability
+  index, page-slot profiles, resolver weights, and install diff gate.
+- `lib/theme/registry-resolver.ts`: deterministic registry candidate inference,
+  scoring, blocked/deferred decisions, and pre-install command generation.
+- `lib/theme/health.ts`: framework-neutral core health plus required-token,
+  reference, opacity, contrast, scale-order, category-separation, and
+  shadcn-adapter health checks.
+- `lib/theme/antd-adapter.ts`: seed-driven Ant Design Seed/Alias token adapter.
+- `lib/theme/antd-health.ts`: Ant Design all-component coverage, algorithm,
+  opaque-color, foreground, and integer-size health checks.
+- `lib/theme/export-css.ts`: shadcn-compatible runtime CSS and portable
+  framework-neutral Map/Semantic CSS exports.
+- `lib/theme/export-antd.ts`: Ant Design ThemeConfig and optional Tailwind v4
+  bridge exports.
+- `lib/theme/export-prompt.ts`: compact Token-first installation packet. It
+  transports only Seed plus compiled Token values and routes static adapter,
+  rule, and Blocks guidance through versioned raw Git sources.
+- `scripts/verify-theme-system.ts`: lightweight preset, edge-seed, registry,
+  shadcn, isolated Ant Design, and portable core Token compatibility
+  verification.
+- `design-rules/core/registry-block-mapping.md`: Blocks-first creation and
+  approved existing-UI semantic mapping contract.
 - `app/theme-lab` or equivalent route: UI for seed controls and preview.
 - `components/theme-lab`: theme lab UI, preview frame, control panel, preview
   tabs, and spec browser.
@@ -74,6 +100,24 @@ Use shadcn semantic classes first:
 - `text-muted-foreground`
 - `border-border`
 - `ring-ring`
+
+For an Ant Design target:
+
+- Keep Ant Design as the complete component system.
+- Install the generated `ThemeConfig` through `ConfigProvider` and wrap feedback
+  consumers with Ant Design `App`.
+- Keep `cssVar` enabled. Generate the `@theme inline` bridge to `--ant-*`
+  variables only when Tailwind v4 is already active.
+- Auto-detect Tailwind, CSS Modules, CSS-in-JS, Less/SCSS, or plain CSS. Do not
+  add Tailwind solely for theme installation.
+- Do not add shadcn, Radix, `components.json`, or registry workflows.
+- Avoid global `.ant-*` overrides for normal theming; use global Alias tokens,
+  then justified `theme.components` overrides.
+
+For the portable core Token export:
+
+- Export framework-neutral algorithmic Map and Semantic CSS variables only.
+- Treat it as a low-level artifact rather than a third main application mode.
 
 Use project semantic utilities only when needed:
 
@@ -105,26 +149,33 @@ Do not create new theme variables inside components. Add a new token only when
 a visual concept repeats across multiple components and cannot be represented by
 existing semantic tokens.
 
+Treat `typography.baseSize` and `typography.scaleRatio` as Seeds for the complete
+generated `--font-size-xs` through `--font-size-6xl` scale. Tailwind `text-xs`
+through `text-6xl` must resolve to that generated scale instead of maintaining a
+second hardcoded type scale. Generated sizes may serialize as `rem`, but every
+runtime font size must resolve to an integer pixel value.
+
+Default shadcn Button labels should bind to the generated compact typography
+token with `text-[length:var(--text-caption)]`. Do not let default product
+buttons inherit `--text-body`.
+
 Preview components should consume semantic classes, not raw palette values. Raw
 palette or map-token classes are acceptable only in pages or components that are
 explicitly displaying token swatches.
 
 ## Design rule routing
 
-Do not compress all UI rules into a single prompt. Before UI normalization:
+Do not compress all UI rules into a single prompt. Read
+`design-rules/index.json`, choose a task mode, then load only that mode's rules:
 
-1. Read `design-rules/index.json`.
-2. Load rules marked `requiredAlways`.
-3. Read `PRODUCT.md` and `DESIGN.md` when present.
-4. Classify page type first: dashboard, theme-lab, marketing, settings,
-   resource-index, detail, form-flow, AI command, or docs/spec.
-5. Normalize page shell, background, maximum width, grid, and spacing before
-   polishing components.
-6. Inventory the selected UI by element type.
-7. Match element types against `rules[].appliesTo`.
-8. Open only the matched `rules[].source` files.
-9. Apply matched rules before generic UI judgment.
-10. If no rule matches, keep changes conservative and report the missing rule.
+1. `token-installation`: install and verify Tokens; do not mutate existing UI;
+   ask whether to map existing UI after success.
+2. `new-ui-creation`: classify page type, load the matched Block before
+   component rules, and use Tokens from the first implementation.
+3. `existing-ui-mapping`: require explicit user approval, then infer semantic
+   roles instead of replacing literal values one-to-one.
+4. Open only matched `rules[].source` files or their raw GitHub URLs.
+5. If no rule matches, keep changes conservative and report the missing rule.
 
 The distributed rule library currently covers page shell/layout routing,
 standard dashboard blocks, cards, tables, page headings, sidebars,
@@ -134,15 +185,19 @@ installation, token binding, product alignment, visual QA, completion
 compliance, page-type workflow, project context, external knowledge routing,
 and the rule router itself.
 
-## Page-type normalization flow
+## UI creation and mapping flow
 
-Use this sequence for existing-product UI work:
+Use this sequence for new UI creation or approved existing-UI mapping:
 
-1. Classify the page type.
-2. Normalize page shell, background, maximum width, grid, and spacing.
-3. Audit token usage and remove raw structural Tailwind palette values.
-4. Adjust typography hierarchy and density.
-5. Apply radius, shadow/elevation, motion, and decorative details last.
+1. Confirm the task mode; existing UI mapping requires explicit approval.
+2. Classify the page type and user job.
+3. Load the closest matched Block before individual component rules.
+4. For shadcn, inspect matching Registry Blocks before primitives. For Ant
+   Design, compose the Block structure from official Ant components.
+5. Map real product responsibilities and states into Block slots.
+6. Infer semantic Token roles from responsibility, hierarchy, surface,
+   interaction, and state.
+7. Preserve business behavior and verify responsive states.
 
 Do not start UI work by adding gradients, glassmorphism, shadows, radius, or
 animation. If the result still feels wrong, return to page type, information
@@ -164,7 +219,8 @@ generators, or cross-stack rules.
 - Preserve local `PRODUCT.md`, `DESIGN.md`, `AGENTS.md`, route behavior, token
   architecture, and shadcn components as the source of truth.
 - Translate external style rows into the chain `Seed Token -> Algorithmic Map
-  Token -> Semantic Token -> shadcn Adapter Token -> Preview Component`.
+  Token -> Semantic Token -> Official shadcn Adapter Token -> Design System Lab
+  shadcn Extension Token -> Preview Component`.
 - Do not copy external demo content, brand styling, or long rule bodies into
   local prompts. Route to raw URLs and summarize decisions.
 
@@ -212,11 +268,40 @@ Use this chain:
 Seed Token
 -> Algorithmic Map Token
 -> Semantic Token
--> shadcn Adapter Token
+-> Official shadcn Adapter Token
+-> Design System Lab shadcn Extension Token
 -> Preview Component
 
-Algorithm generates gradients and scales. Semantic mapping makes product
-decisions. shadcn adapter guarantees compatibility.
+For Ant Design, the adapter branch is:
+
+```txt
+Seed Token
+-> Algorithmic Map Token
+-> Semantic Token
+-> Ant Design Seed/Alias Token
+-> ConfigProvider ThemeConfig
+-> Ant CSS Variables
+-> Optional Detected Styling-Layer Exposure
+```
+
+The portable core export stops before a component-system adapter:
+
+```txt
+Seed Token
+-> Algorithmic Map Token
+-> Semantic Token
+-> Existing Project Styling Mechanism
+```
+
+`ThemeSeed` is the only editable theme source. Algorithms generate maps and
+scales, semantic mapping makes product decisions, the official shadcn adapter
+guarantees compatibility, and project-only concepts stay in the separate
+extension layer.
+
+Keep the primary project prompt compact. Do not embed health reports, health
+contracts, Registry contracts, long rule bodies, or duplicated runtime
+artifacts. Validate before export; include only the Seed and compiled Token
+payload, then route static adapter and design guidance to versioned raw Git.
 
 ## Preview architecture
 
@@ -277,6 +362,9 @@ Theme lab has four tabs:
 
 Before completing a task:
 
+- Run `npm run test:theme` when registry, token generation, semantic mapping,
+  shadcn adaptation, Ant Design adaptation, portable core export, conditional
+  styling bridging, or theme export behavior changes.
 - Run typecheck if available.
 - Run lint if available.
 - Confirm the app builds or at least the edited route compiles.

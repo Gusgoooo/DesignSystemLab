@@ -165,7 +165,7 @@ type MetricCardProps = {
 
 function BlockSection(props: BlockSectionProps) {
   return (
-    <section className="space-y-4">
+    <section className="space-y-4" data-token-slot="page.section">
       <div className="space-y-1">
         <h3 className="text-[length:var(--text-title)] font-[var(--font-weight-heading)] tracking-[var(--tracking-heading)]">
           {props.title}
@@ -184,6 +184,7 @@ function BlockSection(props: BlockSectionProps) {
 function BlockCard(props: BlockCardProps) {
   return (
     <div
+      data-token-slot="card.raised"
       className={cn(
         "min-w-0 rounded-[var(--radius-card)] border border-border bg-card p-[var(--panel-padding)] text-card-foreground [box-shadow:var(--elevation-card)]",
         props.className
@@ -270,7 +271,7 @@ function MetricCard(props: MetricCardProps) {
   const tone = props.tone ?? "neutral"
 
   return (
-    <BlockCard className="[box-shadow:none]">
+    <BlockCard className="[box-shadow:var(--elevation-none)]">
       <p className="text-sm text-muted-foreground">{props.label}</p>
       <p className="mt-2 text-2xl font-[var(--font-weight-heading)]">
         {props.value}
@@ -311,13 +312,13 @@ function StaticSwitch(props: { checked: boolean; label: string }) {
         role="switch"
         aria-checked={props.checked}
         className={cn(
-          "flex h-6 w-11 items-center rounded-full p-1",
+          "flex h-6 w-11 items-center rounded-[var(--radius-pill)] p-1",
           props.checked ? "bg-primary" : "bg-muted"
         )}
       >
         <span
           className={cn(
-            "h-4 w-4 rounded-full border border-border bg-background",
+            "h-4 w-4 rounded-[var(--radius-pill)] border border-border bg-background",
             props.checked && "ml-auto"
           )}
         />
@@ -639,7 +640,7 @@ function DashboardSidebarPanel(props: {
           props.collapsed && "justify-center"
         )}
       >
-        <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground">
+        <div className="flex size-8 shrink-0 items-center justify-center rounded-[var(--radius-pill)] bg-primary text-xs font-medium text-primary-foreground">
           林
         </div>
         {!props.collapsed ? (
@@ -690,10 +691,10 @@ function DashboardSidebar(props: {
   return (
     <>
       {props.mobileOpen ? (
-        <div className="absolute inset-0 z-30 md:hidden">
+        <div className="absolute inset-0 z-30 @[860px]/dashboard:hidden">
           <button
             aria-label="关闭侧栏遮罩"
-            className="absolute inset-0 bg-background/70"
+            className="absolute inset-0 bg-foreground/20"
             onClick={() => props.onMobileOpenChange(false)}
             type="button"
           />
@@ -708,7 +709,7 @@ function DashboardSidebar(props: {
 
       <aside
         className={cn(
-          "hidden shrink-0 flex-col border-[var(--sidebar-border)] border-r bg-[var(--sidebar)] text-[var(--sidebar-foreground)] transition-[width] [transition-duration:var(--duration-base)] md:flex",
+          "hidden shrink-0 flex-col border-[var(--sidebar-border)] border-r bg-[var(--sidebar)] text-[var(--sidebar-foreground)] transition-[width] [transition-duration:var(--duration-base)] @[860px]/dashboard:flex",
           props.collapsed ? "w-[4.75rem]" : "w-[17rem]"
         )}
       >
@@ -726,10 +727,10 @@ function DashboardSiteHeader(props: {
   onMobileOpenChange: (next: boolean) => void
 }) {
   return (
-    <header className="flex min-h-14 items-center gap-2 border-border border-b bg-background/95 px-4 lg:px-6">
+    <header className="flex min-h-14 items-center gap-2 border-border border-b bg-background/95 px-4 @[960px]/main:px-6">
       <Button
         aria-label="打开移动侧栏"
-        className="md:hidden"
+        className="@[860px]/dashboard:hidden"
         onClick={() => props.onMobileOpenChange(true)}
         size="icon-sm"
         variant="ghost"
@@ -738,7 +739,7 @@ function DashboardSiteHeader(props: {
       </Button>
       <Button
         aria-label={props.collapsed ? "展开侧栏" : "收起侧栏"}
-        className="hidden md:inline-flex"
+        className="hidden @[860px]/dashboard:inline-flex"
         onClick={() => props.onCollapsedChange(!props.collapsed)}
         size="icon-sm"
         variant="ghost"
@@ -753,7 +754,7 @@ function DashboardSiteHeader(props: {
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium">Documents</p>
       </div>
-      <div className="relative hidden w-56 lg:block">
+      <div className="relative hidden w-56 @[780px]/main:block">
         <Search className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 size-4 text-muted-foreground" />
         <Input
           aria-label="搜索"
@@ -765,7 +766,7 @@ function DashboardSiteHeader(props: {
       <Button aria-label="通知" size="icon-sm" variant="ghost">
         <Bell className="size-4" />
       </Button>
-      <Button className="hidden sm:inline-flex" size="sm" variant="outline">
+      <Button className="hidden @[520px]/main:inline-flex" size="sm" variant="outline">
         GitHub
       </Button>
     </header>
@@ -781,7 +782,7 @@ function DashboardSectionCards() {
   ] as const
 
   return (
-    <div className="grid grid-cols-1 gap-4 px-4 md:grid-cols-2 lg:px-6 xl:grid-cols-4">
+    <div className="grid grid-cols-1 gap-4 px-4 @[560px]/main:grid-cols-2 @[960px]/main:px-6 @[1100px]/main:grid-cols-4">
       {metrics.map(([label, value, delta, caption, tone]) => {
         const isDown = delta.startsWith("-")
         const Icon = isDown ? TrendingDown : TrendingUp
@@ -789,7 +790,7 @@ function DashboardSectionCards() {
         return (
           <Card
             key={label}
-            className="@container/card min-w-0 gap-2 overflow-hidden bg-gradient-to-t from-primary/5 to-card"
+            className="@container/card min-w-0 gap-2 overflow-hidden bg-card"
           >
             <CardHeader className="min-w-0 gap-3">
               <div className="flex min-w-0 flex-wrap items-start justify-between gap-2">
@@ -984,25 +985,25 @@ function DashboardDataTablePreview() {
   }
 
   return (
-    <Tabs className="w-full gap-4 px-4 lg:px-6" defaultValue="outline">
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+    <Tabs className="@container/table w-full gap-4 px-4 @[960px]/main:px-6" defaultValue="outline">
+      <div className="flex flex-col gap-3 @[640px]/table:flex-row @[640px]/table:items-center @[640px]/table:justify-between">
         <div className="flex min-w-0 items-center gap-2">
-          <Button className="md:hidden" size="sm" variant="outline">
+          <Button className="@[640px]/table:hidden" size="sm" variant="outline">
             <Rows3 className="size-4" />
             目录
             <ChevronDown className="size-4" />
           </Button>
-          <TabsList className="hidden max-w-full md:inline-flex">
+          <TabsList className="hidden max-w-full @[640px]/table:inline-flex">
             <TabsTrigger value="outline">目录</TabsTrigger>
             <TabsTrigger value="performance">
               绩效
-              <Badge className="ml-1 size-5 rounded-full px-1" variant="secondary">
+              <Badge className="ml-1 size-5 rounded-[var(--radius-pill)] px-1" variant="secondary">
                 3
               </Badge>
             </TabsTrigger>
             <TabsTrigger value="people">
               人员
-              <Badge className="ml-1 size-5 rounded-full px-1" variant="secondary">
+              <Badge className="ml-1 size-5 rounded-[var(--radius-pill)] px-1" variant="secondary">
                 2
               </Badge>
             </TabsTrigger>
@@ -1010,7 +1011,7 @@ function DashboardDataTablePreview() {
           </TabsList>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Button className="hidden sm:inline-flex" size="sm" variant="outline">
+          <Button className="hidden @[520px]/table:inline-flex" size="sm" variant="outline">
             <SlidersHorizontal className="size-4" />
             筛选
           </Button>
@@ -1018,8 +1019,8 @@ function DashboardDataTablePreview() {
             <DropdownMenuTrigger asChild>
               <Button size="sm" variant="outline">
                 <Columns3 className="size-4" />
-                <span className="hidden sm:inline">自定义列</span>
-                <span className="sm:hidden">列</span>
+                <span className="hidden @[520px]/table:inline">自定义列</span>
+                <span className="@[520px]/table:hidden">列</span>
                 <ChevronDown className="size-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -1044,12 +1045,12 @@ function DashboardDataTablePreview() {
           </DropdownMenu>
           <Button size="sm" variant="outline">
             <Plus className="size-4" />
-            <span className="hidden sm:inline">添加章节</span>
+            <span className="hidden @[520px]/table:inline">添加章节</span>
           </Button>
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-[var(--radius-card)] border border-border bg-card">
+      <div className="overflow-hidden rounded-[var(--radius-card)] border border-border bg-card text-card-foreground">
         <Table className="min-w-[920px]">
           <TableHeader className="bg-muted/40">
             <TableRow>
@@ -1164,7 +1165,7 @@ function DashboardDataTablePreview() {
       </div>
 
       {openRow ? (
-        <div className="grid gap-4 rounded-[var(--radius-card)] border border-border bg-[var(--surface-panel)] p-[var(--panel-padding)] lg:grid-cols-[1fr_auto]">
+        <div className="grid gap-4 rounded-[var(--radius-card)] border border-border bg-surface-panel p-[var(--panel-padding)] text-content-primary @[760px]/table:grid-cols-[1fr_auto]">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
               <CircleCheck className="size-4 text-muted-foreground" />
@@ -1178,7 +1179,7 @@ function DashboardDataTablePreview() {
               dashboard detail drawer 的预览替代。
             </p>
           </div>
-          <div className="grid grid-cols-3 gap-3 text-sm lg:min-w-72">
+          <div className="grid grid-cols-3 gap-3 text-sm @[760px]/table:min-w-72">
             <div>
               <p className="text-xs text-muted-foreground">目标</p>
               <p className="mt-1 font-medium tabular-nums">{openRow.target}</p>
@@ -1195,12 +1196,12 @@ function DashboardDataTablePreview() {
         </div>
       ) : null}
 
-      <div className="flex flex-col gap-3 py-4 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-3 py-4 @[640px]/table:flex-row @[640px]/table:items-center @[640px]/table:justify-between">
         <p className="text-sm text-muted-foreground">
           已选中 {selectedCount} 行，共 {dashboardRows.length} 行。
         </p>
         <div className="flex flex-wrap items-center gap-3">
-          <div className="hidden items-center gap-2 lg:flex">
+          <div className="hidden items-center gap-2 @[900px]/table:flex">
             <span className="text-sm text-muted-foreground">每页行数</span>
             <Button size="sm" variant="outline">
               10
@@ -1210,7 +1211,7 @@ function DashboardDataTablePreview() {
           <span className="text-sm font-medium">第 1 / 10 页</span>
           <Button
             aria-label="第一页"
-            className="hidden lg:inline-flex"
+            className="hidden @[900px]/table:inline-flex"
             size="icon-sm"
             variant="outline"
           >
@@ -1224,7 +1225,7 @@ function DashboardDataTablePreview() {
           </Button>
           <Button
             aria-label="最后一页"
-            className="hidden lg:inline-flex"
+            className="hidden @[900px]/table:inline-flex"
             size="icon-sm"
             variant="outline"
           >
@@ -1241,7 +1242,7 @@ function DashboardBlock() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
 
   return (
-    <section className="w-full min-w-0 overflow-hidden rounded-[var(--radius-panel)] border border-border bg-background text-foreground [box-shadow:var(--elevation-card)]">
+    <section className="@container/dashboard w-full min-w-0 overflow-hidden rounded-[var(--radius-panel)] border border-border bg-background text-foreground [box-shadow:var(--elevation-card)]">
       <div className="relative flex min-h-[720px] w-full min-w-0">
         <DashboardSidebar
           collapsed={isSidebarCollapsed}
@@ -1255,9 +1256,9 @@ function DashboardBlock() {
             onCollapsedChange={setIsSidebarCollapsed}
             onMobileOpenChange={setIsMobileSidebarOpen}
           />
-          <div className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
+          <div className="flex flex-1 flex-col gap-[var(--section-gap)] py-[var(--section-gap)]">
             <DashboardSectionCards />
-            <div className="px-4 lg:px-6">
+            <div className="px-4 @[960px]/main:px-6">
               <DashboardAreaChart />
             </div>
             <DashboardDataTablePreview />
@@ -1303,7 +1304,7 @@ function MetaIcon() {
 
 function SignupBlock() {
   return (
-    <section className="w-full min-w-0 overflow-hidden rounded-[var(--radius-panel)] border border-border bg-muted text-foreground [box-shadow:var(--elevation-card)]">
+    <section className="w-full min-w-0 overflow-hidden rounded-[var(--radius-panel)] border border-border bg-surface-panel text-content-primary [box-shadow:var(--elevation-card)]">
       <div className="flex min-h-[760px] flex-col items-center justify-center p-6 md:p-10">
         <div className="flex w-full max-w-xl flex-col gap-6">
           <Card className="overflow-hidden p-0">
@@ -1522,7 +1523,7 @@ function SettingsBlock() {
 
         <div className="grid gap-4 xl:grid-cols-2">
           <div className="space-y-4">
-            <BlockCard title="资料" className="[box-shadow:none]">
+            <BlockCard title="资料" className="[box-shadow:var(--elevation-none)]">
               <div className="grid gap-3">
                 <Field label="姓名" value="林安娜" />
                 <Field label="邮箱" type="email" value="olivia@example.com" />
@@ -1530,7 +1531,7 @@ function SettingsBlock() {
               </div>
             </BlockCard>
 
-            <BlockCard title="API 访问" className="[box-shadow:none]">
+            <BlockCard title="API 访问" className="[box-shadow:var(--elevation-none)]">
               <div className="space-y-3">
                 <div className="flex min-h-[var(--list-row-height)] min-w-0 items-center justify-between gap-3 rounded-[var(--radius-control)] border border-border bg-background px-3">
                   <div className="min-w-0">
@@ -1548,7 +1549,7 @@ function SettingsBlock() {
           </div>
 
           <div className="space-y-4">
-            <BlockCard title="偏好设置" className="[box-shadow:none]">
+            <BlockCard title="偏好设置" className="[box-shadow:var(--elevation-none)]">
               <div className="space-y-2">
                 <StaticSwitch checked label="邮件通知" />
                 <StaticSwitch checked={false} label="周报摘要" />
@@ -1566,7 +1567,7 @@ function SettingsBlock() {
             <BlockCard
               title="危险区域"
               description="破坏性操作需要保持清晰的语义区分。"
-              className="border-[var(--status-danger)] bg-[var(--status-danger-bg)] text-[var(--status-danger-fg)] [box-shadow:none]"
+              className="border-danger bg-danger-bg text-danger-foreground [box-shadow:var(--elevation-none)]"
             >
               <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                 <p className="text-sm">
@@ -1619,7 +1620,7 @@ function DataTableBlock() {
         <div className="overflow-hidden rounded-[var(--radius-card)] border border-border">
           <div className="overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <table className="w-full min-w-[760px] border-collapse text-sm">
-              <thead className="bg-[var(--surface-panel)] text-muted-foreground">
+              <thead className="bg-muted text-muted-foreground">
                 <tr>
                   {[
                     "",
@@ -1646,7 +1647,7 @@ function DataTableBlock() {
                     className={cn(
                       "border-border border-b last:border-b-0",
                       index === 1 && "bg-accent",
-                      index === 2 && "bg-[var(--surface-panel)]"
+                      index === 2 && "bg-muted"
                     )}
                   >
                     <td className="px-4 py-3">
@@ -1670,9 +1671,9 @@ function DataTableBlock() {
                     <td className="px-4 py-3 text-muted-foreground">{owner}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <div className="h-2 w-20 rounded-full bg-muted">
+                        <div className="h-2 w-20 rounded-[var(--radius-pill)] bg-muted">
                           <div
-                            className="h-2 rounded-full bg-primary"
+                            className="h-2 rounded-[var(--radius-pill)] bg-primary"
                             style={{ width: usage }}
                           />
                         </div>
@@ -1716,7 +1717,7 @@ function AuthBlock() {
       title="认证模块"
       description="紧凑登录界面用来测试主要动作清晰度、卡片质感、字体和低密度构图。"
     >
-      <BlockCard className="flex min-h-[420px] items-center justify-center bg-[var(--surface-panel)]">
+      <BlockCard className="flex min-h-[420px] items-center justify-center bg-surface-panel text-content-primary">
         <div className="w-full max-w-sm rounded-[var(--radius-panel)] border border-border bg-card p-[var(--panel-padding)] text-card-foreground [box-shadow:var(--elevation-dialog)]">
           <div className="mb-6 text-center">
             <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-[var(--radius-control)] bg-primary font-[var(--font-weight-heading)] text-primary-foreground">
@@ -1785,10 +1786,10 @@ type AssistantAction = {
 
 const assistantToneClasses = {
   primary: "bg-primary text-primary-foreground",
-  info: "bg-[var(--status-info-bg)] text-[var(--status-info-fg)]",
-  success: "bg-[var(--status-success-bg)] text-[var(--status-success-fg)]",
-  warning: "bg-[var(--status-warning-bg)] text-[var(--status-warning-fg)]",
-  danger: "bg-[var(--status-danger-bg)] text-[var(--status-danger-fg)]",
+  info: "bg-info-bg text-info-foreground",
+  success: "bg-success-bg text-success-foreground",
+  warning: "bg-warning-bg text-warning-foreground",
+  danger: "bg-danger-bg text-danger-foreground",
   neutral: "bg-muted text-muted-foreground",
   inverse: "bg-[var(--surface-inverse)] text-[var(--content-inverse)]",
 } satisfies Record<AssistantTone, string>
@@ -1871,7 +1872,7 @@ function AssistantIconBubble(props: {
   return (
     <span
       className={cn(
-        "inline-flex size-8 shrink-0 items-center justify-center rounded-full",
+        "inline-flex size-8 shrink-0 items-center justify-center rounded-[var(--radius-pill)]",
         assistantToneClasses[props.tone ?? "neutral"],
         props.className
       )}
@@ -1907,13 +1908,13 @@ function AssistantRailButton(props: { item: AssistantRailItem }) {
 
 function AssistantWorkspaceBlock() {
   return (
-    <section className="@container/assistant w-full min-w-0 overflow-hidden rounded-[var(--radius-panel)] border border-border bg-muted p-3 text-foreground [box-shadow:var(--elevation-card)] sm:p-4">
+    <section className="@container/assistant w-full min-w-0 overflow-hidden rounded-[var(--radius-panel)] border border-border bg-surface-panel p-3 text-content-primary [box-shadow:var(--elevation-card)] sm:p-4">
       <div
-        className="grid min-h-[820px] min-w-0 grid-cols-1 overflow-hidden rounded-[var(--radius-panel)] border border-border bg-background @[760px]/assistant:grid-cols-[4.25rem_minmax(0,1fr)] @[1100px]/assistant:grid-cols-[4.25rem_17rem_minmax(0,1fr)]"
+        className="grid min-h-[820px] min-w-0 grid-cols-1 overflow-hidden rounded-[var(--radius-panel)] border border-border bg-background text-foreground @[760px]/assistant:grid-cols-[4.25rem_minmax(0,1fr)] @[1100px]/assistant:grid-cols-[4.25rem_17rem_minmax(0,1fr)]"
         data-assistant-ui-thread-list
       >
-        <aside className="hidden min-h-0 flex-col items-center border-border border-r bg-background px-3 py-4 @[760px]/assistant:flex">
-          <div className="flex size-10 items-center justify-center rounded-full bg-primary text-primary-foreground [box-shadow:var(--elevation-popover)]">
+        <aside className="hidden min-h-0 flex-col items-center border-border border-r bg-background px-3 py-4 text-foreground @[760px]/assistant:flex">
+          <div className="flex size-10 items-center justify-center rounded-[var(--radius-pill)] bg-primary text-primary-foreground [box-shadow:var(--elevation-popover)]">
             <Sparkles className="size-5" />
           </div>
           <nav className="mt-7 flex flex-1 flex-col items-center gap-2">
@@ -1927,7 +1928,7 @@ function AssistantWorkspaceBlock() {
             </Button>
             <Button
               aria-label="个人中心"
-              className="rounded-full"
+              className="rounded-[var(--radius-pill)]"
               size="icon-sm"
               variant="outline"
             >
@@ -2018,7 +2019,7 @@ function AssistantWorkspaceBlock() {
         </aside>
 
         <main
-          className="@container/thread flex min-w-0 flex-col bg-[var(--surface-panel)]"
+          className="@container/thread flex min-w-0 flex-col bg-surface-panel text-content-primary"
           data-assistant-ui-thread
         >
           <header className="flex flex-col gap-3 border-border border-b bg-background/95 px-4 py-4 sm:flex-row sm:items-center sm:justify-between lg:px-6">
@@ -2208,13 +2209,13 @@ function AssistantWorkspaceBlock() {
                         </SelectContent>
                       </Select>
                       <div className="grid grid-cols-2 gap-2">
-                        <div className="rounded-[var(--radius-control)] bg-muted p-3">
+                        <div className="rounded-[var(--radius-control)] bg-muted p-3 text-muted-foreground">
                           <p className="text-xs text-muted-foreground">语气</p>
-                          <p className="mt-1 text-sm font-medium">专业</p>
+                          <p className="mt-1 text-sm font-medium text-foreground">专业</p>
                         </div>
-                        <div className="rounded-[var(--radius-control)] bg-muted p-3">
+                        <div className="rounded-[var(--radius-control)] bg-muted p-3 text-muted-foreground">
                           <p className="text-xs text-muted-foreground">格式</p>
-                          <p className="mt-1 text-sm font-medium">要点</p>
+                          <p className="mt-1 text-sm font-medium text-foreground">要点</p>
                         </div>
                       </div>
                     </div>
@@ -2230,7 +2231,7 @@ function AssistantWorkspaceBlock() {
                   <div className="flex items-start gap-3">
                     <Sparkles className="mt-1 size-4 shrink-0 text-muted-foreground" />
                     <Textarea
-                      className="min-h-14 resize-none border-0 bg-transparent p-0 text-sm shadow-none focus-visible:ring-0"
+                      className="min-h-14 resize-none border-0 bg-transparent p-0 text-sm [box-shadow:var(--elevation-none)] focus-visible:ring-0"
                       placeholder="问我任何问题..."
                     />
                   </div>
@@ -2331,7 +2332,7 @@ function PricingMarketingBlock() {
               <MiniButton variant="outline">查看预览</MiniButton>
             </div>
           </div>
-          <div className="rounded-[var(--radius-panel)] border border-border bg-[var(--surface-panel)] p-[var(--panel-padding)]">
+          <div className="rounded-[var(--radius-panel)] border border-border bg-surface-panel p-[var(--panel-padding)] text-content-primary">
             <p className="font-[var(--font-weight-heading)]">
               产品团队正在使用
             </p>
@@ -2388,7 +2389,7 @@ function OperationalStatesBlock() {
     >
       <div className="grid gap-4 md:grid-cols-2">
         <BlockCard title="空状态" className="text-center">
-          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-[var(--radius-card)] bg-[var(--surface-panel)]">
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-[var(--radius-card)] bg-muted text-muted-foreground">
             +
           </div>
           <p className="font-medium">暂无报告</p>
@@ -2408,13 +2409,13 @@ function OperationalStatesBlock() {
                 className="h-4 animate-pulse rounded-[var(--radius-control)] bg-muted"
               />
             ))}
-            <div className="h-2 rounded-full bg-muted">
-              <div className="h-2 w-2/3 rounded-full bg-primary" />
+            <div className="h-2 rounded-[var(--radius-pill)] bg-muted">
+              <div className="h-2 w-2/3 rounded-[var(--radius-pill)] bg-primary" />
             </div>
           </div>
         </BlockCard>
 
-        <BlockCard className="bg-[var(--status-danger-bg)] text-[var(--status-danger-fg)]">
+        <BlockCard className="bg-danger-bg text-danger-foreground">
           <p className="font-[var(--font-weight-heading)]">同步失败</p>
           <p className="mt-1 text-sm">
             账单工作区无法更新。
@@ -2424,14 +2425,14 @@ function OperationalStatesBlock() {
           </div>
         </BlockCard>
 
-        <BlockCard className="bg-[var(--status-success-bg)] text-[var(--status-success-fg)]">
+        <BlockCard className="bg-success-bg text-success-foreground">
           <p className="font-[var(--font-weight-heading)]">主题已导出</p>
           <p className="mt-1 text-sm">
             CSS 变量和 AI 规则已准备复制。
           </p>
         </BlockCard>
 
-        <BlockCard className="md:col-span-2 bg-[var(--status-warning-bg)] text-[var(--status-warning-fg)]">
+        <BlockCard className="md:col-span-2 bg-warning-bg text-warning-foreground">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div>
               <p className="font-[var(--font-weight-heading)]">
@@ -2468,7 +2469,7 @@ function DensityStressBlock() {
     >
       <BlockCard>
         <div className="grid gap-[var(--field-gap)] xl:grid-cols-2">
-          <div className="space-y-[var(--field-gap)] rounded-[var(--radius-panel)] border border-border bg-[var(--surface-panel)] p-[var(--panel-padding)]">
+          <div className="space-y-[var(--field-gap)] rounded-[var(--radius-panel)] border border-border bg-surface-panel p-[var(--panel-padding)] text-content-primary">
             {items.map((item, index) => (
               <div
                 key={item}
@@ -2496,7 +2497,7 @@ function DensityStressBlock() {
           </div>
 
           <div className="grid gap-[var(--field-gap)] md:grid-cols-2">
-            <BlockCard title="嵌套卡片" className="[box-shadow:none]">
+            <BlockCard title="嵌套卡片" className="[box-shadow:var(--elevation-none)]">
               <p className="truncate text-sm">
                 很长的工作区配置名称，带有溢出处理
               </p>
@@ -2506,7 +2507,7 @@ function DensityStressBlock() {
                 <StatusPill>账单</StatusPill>
               </div>
             </BlockCard>
-            <BlockCard title="小控件" className="[box-shadow:none]">
+            <BlockCard title="小控件" className="[box-shadow:var(--elevation-none)]">
               <div className="flex flex-wrap gap-2">
                 <MiniButton size="sm">接受</MiniButton>
                 <MiniButton size="sm" variant="outline">
@@ -2519,18 +2520,18 @@ function DensityStressBlock() {
             </BlockCard>
             <BlockCard
               title="双列迷你布局"
-              className="md:col-span-2 [box-shadow:none]"
+              className="md:col-span-2 [box-shadow:var(--elevation-none)]"
             >
               <div className="grid gap-[var(--field-gap)] md:grid-cols-2">
-                <div className="rounded-[var(--radius-card)] bg-[var(--surface-panel)] p-[var(--panel-padding)]">
+                <div className="rounded-[var(--radius-card)] bg-muted p-[var(--panel-padding)] text-muted-foreground">
                   <p className="text-sm font-medium">留存</p>
-                  <p className="mt-1 text-2xl font-[var(--font-weight-heading)]">
+                  <p className="mt-1 text-2xl font-[var(--font-weight-heading)] text-foreground">
                     78%
                   </p>
                 </div>
-                <div className="rounded-[var(--radius-card)] bg-[var(--surface-panel)] p-[var(--panel-padding)]">
+                <div className="rounded-[var(--radius-card)] bg-muted p-[var(--panel-padding)] text-muted-foreground">
                   <p className="text-sm font-medium">用量</p>
-                  <p className="mt-1 text-2xl font-[var(--font-weight-heading)]">
+                  <p className="mt-1 text-2xl font-[var(--font-weight-heading)] text-foreground">
                     91%
                   </p>
                 </div>

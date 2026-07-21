@@ -218,7 +218,7 @@ function Sidebar({
       <div
         data-slot="sidebar-gap"
         className={cn(
-          "relative w-(--sidebar-width) bg-transparent transition-[width] duration-200 ease-linear",
+          "relative w-(--sidebar-width) bg-transparent transition-[width] duration-[var(--duration-base)] ease-[var(--ease-standard)]",
           "group-data-[collapsible=offcanvas]:w-0",
           "group-data-[side=right]:rotate-180",
           variant === "floating" || variant === "inset"
@@ -229,7 +229,7 @@ function Sidebar({
       <div
         data-slot="sidebar-container"
         className={cn(
-          "fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear md:flex",
+          "fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-[var(--duration-base)] ease-[var(--ease-standard)] md:flex",
           side === "left"
             ? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
             : "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
@@ -244,7 +244,7 @@ function Sidebar({
         <div
           data-sidebar="sidebar"
           data-slot="sidebar-inner"
-          className="flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow-sm"
+          className="flex h-full w-full flex-col bg-sidebar text-sidebar-foreground group-data-[variant=floating]:rounded-[var(--radius-panel)] group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:[box-shadow:var(--elevation-card)]"
         >
           {children}
         </div>
@@ -310,7 +310,7 @@ function SidebarInset({ className, ...props }: React.ComponentProps<"main">) {
       data-slot="sidebar-inset"
       className={cn(
         "relative flex w-full flex-1 flex-col bg-background",
-        "md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2",
+        "md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-[var(--radius-panel)] md:peer-data-[variant=inset]:[box-shadow:var(--elevation-card)] md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2",
         className
       )}
       {...props}
@@ -326,7 +326,10 @@ function SidebarInput({
     <Input
       data-slot="sidebar-input"
       data-sidebar="input"
-      className={cn("h-8 w-full bg-background shadow-none", className)}
+      className={cn(
+        "h-8 w-full bg-background text-foreground [box-shadow:var(--elevation-none)]",
+        className
+      )}
       {...props}
     />
   )
@@ -405,7 +408,7 @@ function SidebarGroupLabel({
       data-slot="sidebar-group-label"
       data-sidebar="group-label"
       className={cn(
-        "flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 ring-sidebar-ring outline-hidden transition-[margin,opacity] duration-200 ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
+        "flex h-8 shrink-0 items-center rounded-[var(--radius-control)] px-2 text-xs font-medium text-sidebar-foreground/70 ring-sidebar-ring outline-hidden transition-[margin,opacity] [transition-duration:var(--duration-base)] [transition-timing-function:var(--ease-standard)] focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
         "group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0",
         className
       )}
@@ -426,7 +429,7 @@ function SidebarGroupAction({
       data-slot="sidebar-group-action"
       data-sidebar="group-action"
       className={cn(
-        "absolute top-3.5 right-3 flex aspect-square w-5 items-center justify-center rounded-md p-0 text-sidebar-foreground ring-sidebar-ring outline-hidden transition-transform hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
+        "absolute top-3.5 right-3 flex aspect-square w-5 items-center justify-center rounded-[var(--radius-control)] p-0 text-sidebar-foreground ring-sidebar-ring outline-hidden transition-transform hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
         // Increases the hit area of the button on mobile.
         "after:absolute after:-inset-2 md:after:hidden",
         "group-data-[collapsible=icon]:hidden",
@@ -561,7 +564,7 @@ function SidebarMenuAction({
       data-slot="sidebar-menu-action"
       data-sidebar="menu-action"
       className={cn(
-        "absolute top-1.5 right-1 flex aspect-square w-5 items-center justify-center rounded-md p-0 text-sidebar-foreground ring-sidebar-ring outline-hidden transition-transform peer-hover/menu-button:text-sidebar-accent-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
+        "absolute top-1.5 right-1 flex aspect-square w-5 items-center justify-center rounded-[var(--radius-control)] p-0 text-sidebar-foreground ring-sidebar-ring outline-hidden transition-transform peer-hover/menu-button:text-sidebar-accent-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
         // Increases the hit area of the button on mobile.
         "after:absolute after:-inset-2 md:after:hidden",
         "peer-data-[size=sm]/menu-button:top-1",
@@ -586,7 +589,7 @@ function SidebarMenuBadge({
       data-slot="sidebar-menu-badge"
       data-sidebar="menu-badge"
       className={cn(
-        "pointer-events-none absolute right-1 flex h-5 min-w-5 items-center justify-center rounded-md px-1 text-xs font-medium text-sidebar-foreground tabular-nums select-none",
+        "pointer-events-none absolute right-1 flex h-5 min-w-5 items-center justify-center rounded-[var(--radius-control)] px-1 text-xs font-medium text-sidebar-foreground tabular-nums select-none",
         "peer-hover/menu-button:text-sidebar-accent-foreground peer-data-[active=true]/menu-button:text-sidebar-accent-foreground",
         "peer-data-[size=sm]/menu-button:top-1",
         "peer-data-[size=default]/menu-button:top-1.5",
@@ -615,12 +618,15 @@ function SidebarMenuSkeleton({
     <div
       data-slot="sidebar-menu-skeleton"
       data-sidebar="menu-skeleton"
-      className={cn("flex h-8 items-center gap-2 rounded-md px-2", className)}
+      className={cn(
+        "flex h-8 items-center gap-2 rounded-[var(--radius-control)] px-2",
+        className
+      )}
       {...props}
     >
       {showIcon && (
         <Skeleton
-          className="size-4 rounded-md"
+          className="size-4 rounded-[var(--radius-control)]"
           data-sidebar="menu-skeleton-icon"
         />
       )}

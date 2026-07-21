@@ -21,7 +21,7 @@ import { TooltipProvider } from "../ui/tooltip"
 import { getControlPanelStyle } from "./control-panel-theme"
 
 const initialThemeSeed =
-  themePresets.find((preset) => preset.id === "xiaotian-business-line")?.seed ??
+  themePresets.find((preset) => preset.id === "cobalt")?.seed ??
   themePresets[0].seed
 
 function renderPreview(
@@ -105,7 +105,7 @@ export function ThemeLabShell() {
                   onDarkChange={setIsDark}
                 />
               </div>
-              <ExportPanel seed={seed} theme={theme} isDark={isDark} />
+              <ExportPanel theme={theme} isDark={isDark} />
             </div>
           </aside>
 
@@ -118,7 +118,10 @@ export function ThemeLabShell() {
             </div>
 
             <div className="min-h-0 flex-1 overflow-hidden bg-[var(--lab-panel-bg)]">
-              <PreviewCanvas dragEnabled={activeTab === "components"}>
+              <PreviewCanvas
+                key={activeTab}
+                dragEnabled={activeTab === "components"}
+              >
                 <PreviewFrame theme={theme} isDark={isDark}>
                   {renderPreview(activeTab, seed, theme)}
                 </PreviewFrame>

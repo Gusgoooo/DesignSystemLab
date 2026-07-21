@@ -67,6 +67,7 @@ Filled buttons and filled action states must use matching foreground tokens:
 
 Use token-backed radius, height, focus, and motion:
 
+- `text-[length:var(--text-caption)]` for default button labels
 - `rounded-[var(--radius-control)]`
 - `h-[var(--control-height-sm)]`
 - `h-[var(--control-height-md)]`
@@ -74,6 +75,8 @@ Use token-backed radius, height, focus, and motion:
 - `duration-[var(--duration-base)] ease-[var(--ease-standard)]`
 
 Never use `bg-primary text-primary`.
+Do not let default buttons inherit `--text-body`, and do not globally redefine
+Tailwind `text-sm` just to resize buttons.
 
 ## Layout
 

@@ -2,21 +2,21 @@
 
 This directory is the distributed design rule library for Design System Lab.
 
-Agents should not read every file by default. Start from `design-rules/index.json`,
-inventory the selected UI scope, then open only the matched rule files.
+Agents should not read every file by default. Start from
+`design-rules/index.json`, choose a task mode, then open only that mode's rules
+and matched Block/component files.
 
 ## Routing Flow
 
 1. Read `design-rules/index.json`.
-2. Always load the core rules marked `requiredAlways`.
-3. Read local `PRODUCT.md` and `DESIGN.md` when present.
-4. Classify the page type with `design-rules/core/page-type-workflow.md`.
-5. Normalize shell/background/width/grid/spacing before component polish.
-6. Inventory the selected scope by element type.
-7. Match element types against each rule's `appliesTo`.
-8. Open only the matched `source` files.
-9. Apply user-authored rules before generic UI taste.
-10. If no rule matches, keep the change conservative and report the missing rule.
+2. Choose `token-installation`, `new-ui-creation`, or
+   `existing-ui-mapping`.
+3. Token installation writes and verifies the contract without changing UI.
+4. New UI creation loads the matched Block before component rules.
+5. Existing UI mapping requires explicit user approval and semantic reasoning.
+6. Read local `PRODUCT.md` and `DESIGN.md` when the selected mode changes UI.
+7. Open only the task-mode and matched `source` files.
+8. If no rule matches, keep the change conservative and report the missing rule.
 
 ## Access Requirements
 

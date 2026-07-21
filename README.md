@@ -56,14 +56,14 @@ Design System Lab 的流程不是从零发明一套审美词典，而是把优�
 | 来源 | 引用资产 | 在本流程中的作用 | 边界 |
 | --- | --- | --- | --- |
 | [Impeccable](https://github.com/pbakaus/impeccable) | `SKILL.md`、`reference/product.md`、`reference/brand.md`、`reference/layout.md`、`reference/typeset.md`、`reference/colorize.md`、`reference/interaction-design.md`、`reference/shape.md`、`reference/polish.md`、`reference/audit.md`、`reference/critique.md`、`reference/distill.md`、`reference/harden.md`、detector scripts 和 anti-pattern registry | 抽取设计语言、命令体系、product/brand register、项目上下文模式、critique/audit/harden/polish 质检方法 | 不复制 Impeccable 的品牌风格，不把它当组件库；只吸收工作法和质量标准 |
-| [UI UX Pro Max Skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | `data/styles.csv`、`colors.csv`、`typography.csv`、`charts.csv`、`products.csv`、`ui-reasoning.csv`、`ux-guidelines.csv`、`app-interface.csv`、`landing.csv`、`react-performance.csv`、`scripts/search.py`、`scripts/design_system.py`、`scripts/core.py`、`data/stacks/*.csv` | 抽取数据集、风格库、产品类型映射、颜色/字体候选、图表选择、生成器思路和跨栈规则 | CSV 里的颜色、字体、阴影、CSS 不能直接写入结构性 UI；必须映射到 Seed -> Map Token -> Semantic Token -> shadcn Adapter Token |
+| [UI UX Pro Max Skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | `data/styles.csv`、`colors.csv`、`typography.csv`、`charts.csv`、`products.csv`、`ui-reasoning.csv`、`ux-guidelines.csv`、`app-interface.csv`、`landing.csv`、`react-performance.csv`、`scripts/search.py`、`scripts/design_system.py`、`scripts/core.py`、`data/stacks/*.csv` | 抽取数据集、风格库、产品类型映射、颜色/字体候选、图表选择、生成器思路和跨栈规则 | CSV 里的颜色、字体、阴影、CSS 不能直接写入结构性 UI；必须映射到 Seed -> Map Token -> Semantic Token -> 官方 shadcn Adapter Token -> 项目扩展 Token |
 
 这两类资产的分工：
 
 - Impeccable 负责“怎么判断与表达”：语言、命令、上下文、设计 register、QA 和反模式检测。
 - UIUXPROMAX 负责“查什么数据与候选”：style recipe、palette、typography、chart、product type、UX guideline、stack rule。
 
-因此 Design System Lab 的 UI normalization 会固定走这条链路：
+因此 Design System Lab 的 Token 生成固定走这条链路：
 
 ```text
 Local Product Context
@@ -73,9 +73,15 @@ Local Product Context
   -> Seed Token
   -> Algorithmic Map Token
   -> Semantic Token
-  -> shadcn Adapter Token
+  -> Selected Route:
+     shadcn Adapter + Extensions
+     or Ant Design ThemeConfig
   -> Preview / Product UI
 ```
+
+`ThemeSeed` 是唯一允许直接修改的主题源。官方 shadcn Token 作为兼容基线，
+项目缺失的状态、表面、内容、密度、排版、阴影和动效语义放在独立扩展层，
+两者都由同一个 Seed 和确定性算法生成。
 
 外部知识不是一个巨大 prompt，而是按任务读取的资产库。比如：
 
@@ -83,14 +89,29 @@ Local Product Context
 - 改 marketing：先确认 brand register；需要外部候选时，再读 Impeccable brand/colorize/typeset 和 UIUXPROMAX landing/styles/typography。
 - 做跨栈导出：先保留本地 token contract，再按目标技术栈读取 UIUXPROMAX `data/stacks/*.csv`。
 
+## 两种组件体系
+
+“应用到项目”只要求用户选择组件体系：
+
+| 选择 | 做什么 | 不做什么 | 适合 |
+| --- | --- | --- | --- |
+| shadcn | 输出 shadcn 兼容 Token 与长期组件指导 | 安装时不改造现有页面 | 使用 shadcn 组件与 Registry Blocks 的项目 |
+| Ant Design | 输出完整 ConfigProvider ThemeConfig；已有 Tailwind v4 时才附加 bridge | 不安装 shadcn、Radix 或额外样式栈 | 使用 Ant Design 的项目 |
+
+产品不再要求用户选择框架、项目类型、页面类型、Primitive 或应用范围。
+接入指令沿用目标项目当前结构，只负责安装 Token 契约。
+
+框架无关的 Map + Semantic CSS 仍可从“其它导出格式”单独导出，供自研接入；
+它不是第三套前台流程。
+
 ## 默认只落 3 个文件
 
 长期接入时，Design System Lab 默认只在用户项目里落三类文件。
 
 | 文件 | 作用 | 默认安装 |
 | --- | --- | --- |
-| `globals.css` 或 `app/globals.css` 中的 token block | 运行时视觉契约。提供 surface、foreground、status、chart、radius、density、typography、elevation、motion，以及 shadcn adapter tokens。 | 是 |
-| `theme-lab.json` | 机器可读设计系统 manifest。记录 seed、token contract、vibe、AI rules、rule index URL、raw spec base URL。 | 是 |
+| 当前运行时主题入口 | shadcn 写入 global CSS；Ant 写入 ThemeConfig。 | 是 |
+| `theme-lab.json` | 紧凑 Token 包。只记录 Seed、编译后的 Map/Semantic Token 或 Ant Token，以及编译器版本。 | 是 |
 | AI 工具原生指令文件 | 长期执行协议。根据工具写入 `AGENTS.md`、`CLAUDE.md`、`.cursor/rules/theme-lab.mdc`、`.github/copilot-instructions.md`、`GEMINI.md` 或 `.windsurfrules`。 | 是 |
 
 可选项不会默认安装：
@@ -100,6 +121,7 @@ Local Product Context
 | `design-rules/` | 只有用户需要本地、离线、内网或深度定制 spec 时才复制。默认通过 raw GitHub URL 按需读取。 |
 | `theme.preset.json` | 需要分享、复现或版本化某套 seed preset 时导出。 |
 | `theme.algorithm.ts` | 目标项目需要拥有、审计或二次开发 token 生成算法时导出。 |
+| Ant Tailwind bridge | 只有目标项目已经使用 Tailwind v4 时才写入，不会为主题接入安装 Tailwind。 |
 
 默认路径不复制组件源码，不安装运行时 SDK，不创建新的组件货架。它安装的是设计治理层。
 
@@ -132,7 +154,8 @@ Token Compiler 会确定性生成：
 
 - map tokens：OKLCH 色阶、radius、density、typography、elevation、motion
 - semantic tokens：`--surface-canvas`、`--content-primary`、`--action-primary`、`--status-success-bg`、`--border-default`
-- shadcn adapter tokens：`--background`、`--foreground`、`--card`、`--primary`、`--muted`、`--border`、`--ring`、`--sidebar`
+- 官方 shadcn adapter tokens：`--background`、`--foreground`、`--card`、`--primary`、`--muted`、`--border`、`--ring`、`--chart-*`、`--sidebar-*`、`--radius`
+- 项目扩展 tokens：`--destructive-foreground`、surface/content/status、density、typography、elevation、motion
 - density primitives：`--control-height-md`、`--control-padding-x`、`--section-gap`、`--panel-padding`、`--table-cell-padding-x`、`--list-row-height`
 
 AI 后续改 UI 时不需要重新发明颜色、圆角、阴影、密度和状态色，只需要消费这套运行时 token。
@@ -177,32 +200,35 @@ Spec 不是样式清单，也不是组件源码。它描述的是 UI 元素在�
 
 AI 指令文件把设计系统变成长期项目规则。
 
-它会要求 AI：
+它只保留长期必要的指导：
 
 - 修改 UI 前读取 `theme-lab.json`
-- 把 global CSS token block 当作视觉 source of truth
-- 通过 `design-rules/index.json` 路由 component / block spec
-- 保留 routes、navigation、API、data loading、mutations、event handlers、state、validation、permissions、feature flags、domain copy
-- 不使用 raw Tailwind palette、hardcoded hex、arbitrary OKLCH、one-off shadow、随机渐变和无关重设计
-- 最终报告实际读取的规则、保留的业务行为、token audit、状态检查和剩余风险
+- 新建 UI 从第一行代码开始使用 Token
+- 通过 raw GitHub `design-rules/index.json` 按需读取规则
+- 创建页面时优先读取匹配的 Block，再读取组件规则
+- 安装阶段不修改现有 UI
+- 只有用户明确同意后，才对现有 UI 做语义 Token 映射
+- 映射需要推理组件职责、层级、表面、交互与状态，不是机械替换色值
 
 ## 应用模式
 
 | 模式 | 当前状态 | 说明 |
 | --- | --- | --- |
-| 长期设计系统 | 推荐 | 安装三文件契约：global CSS token block、`theme-lab.json`、AI 工具原生指令文件。 |
-| 一次性优化 | 建设中 | 计划用于单个 scope 的短期 UI 规整，不落长期文件。当前 UI 中已禁用，因为治理效果有限。 |
+| Token 接入 | 默认 | 安装三文件契约，不修改现有 UI。 |
+| 现有 UI 映射 | 安装后可选 | 安装成功后询问用户；得到明确同意才开始语义映射。 |
+| 新 UI 创建 | 持续使用 | 从 Token 开始，并优先使用匹配的 Blocks 作为结构引导。 |
 
 Design System Lab 更推荐长期模式。没有文件落到目标项目里，AI 的项目记忆就会变弱，设计漂移很快会回来。
 
 ## 使用流程
 
-1. 选择场景 preset，或手动调整 seed
+1. 选择风格 preset，或手动调整 seed
 2. 在模块、组件、Spec、说明四个视图中检查结果
-3. 导出 Project Import Prompt
-4. 在 Codex、Claude Code、Cursor、Qoder 等 AI Coding 工具中运行 prompt
-5. AI 在目标项目中安装三文件契约
-6. 后续 UI 修改都通过同一套 token vocabulary 和 spec routing protocol 执行
+3. 选择 shadcn 或 Ant Design
+4. 复制 Token 接入指令
+5. AI 安装并验证三文件契约，不修改现有页面
+6. 安装成功后，AI 询问是否映射现有 UI
+7. 新建页面时通过 raw GitHub 规则优先读取匹配的 Blocks
 
 ## 与现有系统的关系
 
@@ -212,7 +238,14 @@ shadcn/ui 是很好的源码 registry 和实现材料。Design System Lab 兼容
 
 ### Ant Design
 
-Ant Design 的主题算法和企业组件体系非常成熟。Design System Lab 借鉴“设计可以算法化派生”的思路，但输出的是 CSS variables、JSON、spec 和 AI 指令，不要求目标项目运行时绑定 antd。
+Ant Design 模式输出完整的 ConfigProvider ThemeConfig，并保留目标项目已有的
+Ant 版本、App Context、组件覆盖与样式层。Tailwind bridge 是可选产物，只在
+目标项目已经使用 Tailwind v4 时接入。
+
+### Portable Core Token Export
+
+框架无关的 Map 与 Semantic Token CSS 仍然可以独立导出，供自研适配器、
+非 React 环境或特殊构建链使用。它属于底层资产，不增加主流程选项。
 
 ### SAP Fiori / IBM Carbon / Material Design
 
@@ -223,9 +256,9 @@ Ant Design 的主题算法和企业组件体系非常成熟。Design System Lab 
 | 产物 | 作用 |
 | --- | --- |
 | global CSS block | 运行时 token 层，写入用户项目已有全局 CSS 文件。 |
-| `theme-lab.json` | 机器可读设计系统 manifest 和 AI rule entrypoint。 |
+| `theme-lab.json` | 以 Seed 为真源的紧凑 Token 包，不内嵌健康报告或静态规则正文。 |
 | AI instruction block | 写入 `AGENTS.md`、`CLAUDE.md`、Cursor rules 等工具原生指令文件。 |
-| Project import prompt | 让 AI 在目标项目安装并应用契约的执行包。 |
+| Project import prompt | 轻量 Token 安装指令；静态 Adapter、规则与 Blocks 通过 Raw Git 按需读取。 |
 | `theme.preset.json` | 可分享、可复现的 seed preset。 |
 | `vibe.json` | 风格描述符和 AI context。 |
 | `theme.algorithm.ts` | 可选的确定性 token compiler 源码。 |
@@ -305,6 +338,8 @@ Design System Lab 当前重点解决：
 
 - 确定性 token 生成
 - shadcn-compatible semantic token 输出
+- Ant Design ConfigProvider ThemeConfig 与条件式样式桥接
+- framework-neutral portable core Token 输出
 - spec-driven component / block rules
 - raw GitHub rule routing
 - 面向 AI Coding 工具的长期项目契约
@@ -312,8 +347,9 @@ Design System Lab 当前重点解决：
 
 它暂时不解决：
 
-- 在用户项目里安装完整组件库
-- 替换用户已有 UI 技术栈
+- Token 安装时自动改造现有页面
+- 未经用户确认就映射现有 UI
+- 把语义映射退化为简单的字面值替换
 - 在不落文件的情况下保证长期治理效果
 - 后端持久化、账号体系或多人协作
 

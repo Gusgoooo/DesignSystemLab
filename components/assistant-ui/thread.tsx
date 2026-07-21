@@ -47,7 +47,7 @@ function MessageText() {
 
         if (part.type === "tool-call") {
           return (
-            <div className="rounded-[var(--radius-control)] border border-border bg-muted px-3 py-2 text-sm">
+            <div className="rounded-[var(--radius-control)] border border-border bg-muted px-3 py-2 text-sm text-muted-foreground">
               工具调用：{part.toolName}
             </div>
           )
@@ -62,7 +62,7 @@ function MessageText() {
 function AssistantMessage() {
   return (
     <MessagePrimitive.Root className="grid grid-cols-[2rem_minmax(0,1fr)] gap-3">
-      <div className="flex size-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
+      <div className="flex size-8 items-center justify-center rounded-[var(--radius-pill)] bg-primary text-primary-foreground">
         <Bot className="size-4" />
       </div>
       <div className="min-w-0 rounded-[var(--radius-card)] border border-border bg-card px-4 py-3 text-sm text-card-foreground [box-shadow:var(--elevation-card)]">
@@ -78,7 +78,7 @@ function UserMessage() {
       <div className="min-w-0 justify-self-end rounded-[var(--radius-card)] bg-primary px-4 py-3 text-sm text-primary-foreground">
         <MessageText />
       </div>
-      <div className="flex size-8 items-center justify-center rounded-full bg-muted text-muted-foreground">
+      <div className="flex size-8 items-center justify-center rounded-[var(--radius-pill)] bg-muted text-muted-foreground">
         <UserRound className="size-4" />
       </div>
     </MessagePrimitive.Root>
@@ -96,7 +96,7 @@ function ThreadWelcome() {
           用 token 生成 shadcn 主题与预览
         </span>
         <button
-          className="rounded-[calc(var(--radius-control)-2px)] bg-foreground px-5 py-2 text-sm font-medium leading-none text-background"
+          className="rounded-[calc(var(--radius-control)-2px)] bg-primary px-5 py-2 text-sm font-medium leading-none text-primary-foreground"
           type="button"
         >
           开始提问
@@ -108,10 +108,10 @@ function ThreadWelcome() {
 
 function ThreadComposer() {
   return (
-    <ComposerPrimitive.Root className="mx-auto w-full rounded-[var(--radius-panel)] border border-border bg-background p-5 [box-shadow:var(--elevation-card)] md:w-3/5">
+    <ComposerPrimitive.Root className="mx-auto w-full rounded-[var(--radius-panel)] border border-border bg-background p-5 text-foreground [box-shadow:var(--elevation-card)] md:w-3/5">
       <ComposerPrimitive.Input asChild>
         <Textarea
-          className="min-h-24 resize-none border-0 bg-transparent p-0 text-base shadow-none focus-visible:ring-0"
+          className="min-h-24 resize-none border-0 bg-transparent p-0 text-base [box-shadow:var(--elevation-none)] focus-visible:ring-0"
           placeholder="输入你的问题..."
         />
       </ComposerPrimitive.Input>
@@ -137,7 +137,10 @@ export function AssistantThread({ className }: { className?: string }) {
   return (
     <AssistantRuntimeProvider runtime={runtime}>
       <ThreadPrimitive.Root
-        className={cn("flex h-full min-h-0 flex-col bg-background", className)}
+        className={cn(
+          "flex h-full min-h-0 flex-col bg-background text-foreground",
+          className
+        )}
       >
         <ThreadPrimitive.Viewport className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4 sm:p-6">
           <ThreadPrimitive.Messages
@@ -150,7 +153,7 @@ export function AssistantThread({ className }: { className?: string }) {
             <ThreadWelcome />
           </AuiIf>
         </ThreadPrimitive.Viewport>
-        <div className="bg-background p-4">
+        <div className="bg-background p-4 text-foreground">
           <ThreadComposer />
         </div>
       </ThreadPrimitive.Root>

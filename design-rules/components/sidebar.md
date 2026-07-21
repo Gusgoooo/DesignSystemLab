@@ -141,6 +141,10 @@ Use:
 - `ring-sidebar-ring` or `ring-ring`
 - token-backed radius, spacing, and elevation
 
+`--sidebar-accent` should reuse the existing `--action-secondary-hover`
+semantic state. Its generated value must remain visibly distinct from the
+sidebar background.
+
 ## States
 
 Check:

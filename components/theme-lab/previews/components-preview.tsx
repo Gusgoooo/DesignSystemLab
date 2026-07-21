@@ -207,7 +207,10 @@ function formatVibeLabel(value: string): string {
 
 function PreviewCard({ children, className }: PreviewCardProps) {
   return (
-    <Card className={cn("w-full overflow-hidden", className)}>
+    <Card
+      data-token-slot="card.raised"
+      className={cn("w-full overflow-hidden", className)}
+    >
       {children}
     </Card>
   )
@@ -229,7 +232,7 @@ function Swatch({ value, label }: { value: string; label: string }) {
   return (
     <div className="min-w-0 space-y-2 text-center">
       <div
-        className="aspect-square rounded-lg border border-border bg-background"
+        className="aspect-square rounded-[var(--radius-card)] border border-border bg-background"
         style={{ background: `var(${value})` }}
       />
       <p className="truncate font-mono text-xs" title={value}>
@@ -327,9 +330,15 @@ function IconPreviewGrid() {
           return (
             <Button
               key={item.label}
-              variant={active === index ? "default" : "outline"}
+              variant="ghost"
               size="icon"
               aria-label={item.label}
+              aria-pressed={active === index}
+              className={cn(
+                "border border-transparent",
+                active === index &&
+                  "border-border bg-accent text-accent-foreground"
+              )}
               onClick={() => setActive(index)}
             >
               <Icon />
@@ -357,7 +366,7 @@ function UIElements() {
           <Button variant="ghost">幽灵按钮</Button>
         </div>
 
-        <div className="rounded-lg border border-border p-4">
+        <div className="rounded-[var(--radius-card)] border border-border bg-background p-4 text-foreground">
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="font-medium">双重验证</p>
@@ -473,7 +482,7 @@ function CodespacesCard() {
             <Separator />
             <div className="grid min-h-64 place-items-center text-center">
               <div className="space-y-4">
-                <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                <div className="mx-auto flex size-12 items-center justify-center rounded-[var(--radius-pill)] bg-muted text-muted-foreground">
                   <HardDrive />
                 </div>
                 <div>
@@ -647,7 +656,7 @@ function InviteTeam() {
       </CardHeader>
       <CardContent className="space-y-4">
         <Input value={email} onChange={(event) => setEmail(event.target.value)} />
-        <div className="flex items-center gap-3 rounded-lg border border-border p-3">
+        <div className="flex items-center gap-3 rounded-[var(--radius-card)] border border-border bg-background p-3 text-foreground">
           <AvatarGroup>
             {["GA", "AL", "MK"].map((item) => (
               <Avatar key={item}>
@@ -782,13 +791,13 @@ function SkeletonLoading() {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex items-center gap-3">
-          <Skeleton className="size-10 rounded-full" />
+          <Skeleton className="size-10 rounded-[var(--radius-pill)]" />
           <div className="flex-1 space-y-2">
             <Skeleton className="h-4 w-2/3" />
             <Skeleton className="h-4 w-1/2" />
           </div>
         </div>
-        <Skeleton className="h-28 w-full rounded-lg" />
+        <Skeleton className="h-28 w-full rounded-[var(--radius-card)]" />
       </CardContent>
     </PreviewCard>
   )
@@ -829,7 +838,7 @@ function NoTeamMembers() {
     <PreviewCard>
       <CardContent className="grid min-h-64 place-items-center pt-0 text-center">
         <div className="space-y-4">
-          <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
+          <div className="mx-auto flex size-12 items-center justify-center rounded-[var(--radius-pill)] bg-muted text-muted-foreground">
             <Users />
           </div>
           <div>
@@ -854,7 +863,7 @@ function ReportBug() {
       </CardHeader>
       <CardContent className="space-y-3">
         <Textarea placeholder="发生了什么？" />
-        <div className="rounded-lg bg-danger-bg p-3 text-sm text-danger-foreground">
+        <div className="rounded-[var(--radius-control)] bg-danger-bg p-3 text-sm text-danger-foreground">
           检测到某个组件状态存在 token 冲突。
         </div>
       </CardContent>
@@ -933,22 +942,25 @@ function BookAppointment() {
         <CardDescription>分段选择与选中状态。</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-5 gap-2">
+        <Tabs value={day} onValueChange={setDay}>
+          <TabsList className="grid w-full grid-cols-5">
+            {days.map((item) => (
+              <TabsTrigger key={item} value={item}>
+                {item}
+              </TabsTrigger>
+            ))}
+          </TabsList>
           {days.map((item) => (
-            <Button
+            <TabsContent
               key={item}
-              variant={day === item ? "default" : "outline"}
-              size="sm"
-              onClick={() => setDay(item)}
+              value={item}
+              className="rounded-[var(--radius-card)] border border-border bg-background p-3 text-sm text-foreground"
             >
-              {item}
-            </Button>
+              <CalendarDays className="mb-2 size-4 text-muted-foreground" />
+              已选择：{item}，10:30
+            </TabsContent>
           ))}
-        </div>
-        <div className="rounded-lg border border-border p-3 text-sm">
-          <CalendarDays className="mb-2 size-4 text-muted-foreground" />
-          已选择：{day}，10:30
-        </div>
+        </Tabs>
       </CardContent>
     </PreviewCard>
   )
@@ -1036,12 +1048,12 @@ function FileUpload() {
       <CardContent>
         <button
           type="button"
-          className="flex min-h-40 w-full flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-border bg-muted/40 text-center text-sm transition-colors hover:bg-muted"
+          className="flex min-h-40 w-full flex-col items-center justify-center gap-3 rounded-[var(--radius-card)] border border-dashed border-border bg-muted text-center text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           onClick={() => setUploaded(true)}
         >
           <Upload className="text-muted-foreground" />
-          <span className="font-medium">{uploaded ? "主题文件已附加" : "拖入主题预设"}</span>
-          <span className="text-muted-foreground">JSON、CSS 或 token 导出</span>
+          <span className="font-medium text-foreground">{uploaded ? "主题文件已附加" : "拖入主题预设"}</span>
+          <span>JSON、CSS 或 token 导出</span>
         </button>
       </CardContent>
     </PreviewCard>
@@ -1139,7 +1151,7 @@ function AnomalyAlert() {
     <PreviewCard>
       <CardHeader>
         <div className="flex items-start gap-3">
-          <div className="rounded-full bg-warning-bg p-2 text-warning-foreground">
+          <div className="rounded-[var(--radius-pill)] bg-warning-bg p-2 text-warning-foreground">
             <Bell className="size-4" />
           </div>
           <div>
@@ -1174,12 +1186,12 @@ function LiveWaveformCard() {
         <CardDescription>动效 token 预览。</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex h-28 items-end gap-2 rounded-lg border border-border bg-muted/40 p-3">
+        <div className="flex h-28 items-end gap-2 rounded-[var(--radius-card)] border border-border bg-muted p-3 text-muted-foreground">
           {bars.map((height, index) => (
             <span
               key={index}
               className={cn(
-                "w-full rounded-full bg-primary transition-[background-color,height,opacity]",
+                "w-full rounded-[var(--radius-pill)] bg-chart-1 transition-[background-color,height,opacity]",
                 active && "animate-pulse"
               )}
               style={{
@@ -1244,7 +1256,7 @@ function ContributionsActivity() {
           {cells.map((value, index) => (
             <span
               key={index}
-              className="aspect-square rounded-sm border border-border bg-primary"
+              className="aspect-square rounded-[calc(var(--radius-control)*0.45)] border border-border bg-chart-3"
               style={{ opacity: 0.16 + value / 130 }}
             />
           ))}
@@ -1259,7 +1271,7 @@ function NotFound() {
     <PreviewCard>
       <CardContent className="grid min-h-64 place-items-center pt-0 text-center">
         <div className="space-y-4">
-          <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
+          <div className="mx-auto flex size-12 items-center justify-center rounded-[var(--radius-pill)] bg-muted text-muted-foreground">
             <CircleHelp />
           </div>
           <div>
@@ -1287,7 +1299,7 @@ function StatusStrip() {
           ["info", "Agent 正在使用工具", "bg-info-bg text-info-foreground"],
           ["danger", "Token 冲突", "bg-danger-bg text-danger-foreground"],
         ].map(([tone, label, className]) => (
-          <div key={tone} className={cn("rounded-lg px-3 py-2 text-sm", className)}>
+          <div key={tone} className={cn("rounded-[var(--radius-control)] px-3 py-2 text-sm", className)}>
             {label}
           </div>
         ))}
@@ -1313,7 +1325,7 @@ function AdvancedSeedResponse({ seed }: { seed: ThemeSeed }) {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="rounded-[var(--radius-card)] border border-border bg-surface-panel p-[var(--panel-padding)] [box-shadow:var(--elevation-card)]">
+        <div className="rounded-[var(--radius-card)] border border-border bg-surface-panel p-[var(--panel-padding)] text-content-primary [box-shadow:var(--elevation-card)]">
           <p className="text-xs uppercase text-muted-foreground">
             字体比例
           </p>
@@ -1333,7 +1345,7 @@ function AdvancedSeedResponse({ seed }: { seed: ThemeSeed }) {
           ].map(([token, label]) => (
             <div
               key={token}
-              className="rounded-[var(--radius-control)] border border-border bg-card p-3 text-center text-xs [transition-duration:var(--duration-base)] [transition-timing-function:var(--ease-standard)]"
+              className="rounded-[var(--radius-control)] border border-border bg-card p-3 text-center text-xs text-card-foreground [transition-duration:var(--duration-base)] [transition-timing-function:var(--ease-standard)]"
               style={{
                 boxShadow: `var(--elevation-${token})`,
               }}
@@ -1343,13 +1355,13 @@ function AdvancedSeedResponse({ seed }: { seed: ThemeSeed }) {
           ))}
         </div>
 
-        <div className="rounded-[var(--radius-card)] border border-border bg-card p-[var(--panel-padding)]">
+        <div className="rounded-[var(--radius-card)] border border-border bg-card p-[var(--panel-padding)] text-card-foreground">
           <div className="mb-3 flex items-center justify-between gap-3 text-sm">
             <span className="font-medium">{motionLevel}</span>
             <Badge variant="outline">{seed.motion.durationBase}ms</Badge>
           </div>
-          <div className="h-2 overflow-hidden rounded-full bg-muted">
-            <div className="h-full w-2/3 rounded-full bg-primary transition-[width,background-color] [transition-duration:var(--duration-base)] [transition-timing-function:var(--ease-emphasized)]" />
+          <div className="h-2 overflow-hidden rounded-[var(--radius-pill)] bg-muted">
+            <div className="h-full w-2/3 rounded-[var(--radius-pill)] bg-primary transition-[width,background-color] [transition-duration:var(--duration-base)] [transition-timing-function:var(--ease-emphasized)]" />
           </div>
         </div>
 

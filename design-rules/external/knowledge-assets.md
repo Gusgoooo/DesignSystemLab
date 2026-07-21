@@ -89,7 +89,8 @@ Important families:
 - `pageType`: dashboard, theme-lab, marketing, settings, resource-index, detail,
   form-flow, ai-command, docs-spec.
 - `structure`: shell, background, width, grid, spacing, navigation, headings.
-- `tokens`: seed candidates, semantic mapping, shadcn adapter tokens.
+- `tokens`: seed candidates, semantic mapping, official shadcn adapter tokens,
+  and project extensions.
 - `components`: controls, cards, tables, forms, tabs, overlays, status, charts.
 - `craft`: typography, color strategy, hierarchy, density, shape, elevation,
   motion, polish.

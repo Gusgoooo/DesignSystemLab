@@ -51,7 +51,8 @@ Use UIUXPROMAX for:
   product-type mappings, UX guidelines, interface rules
 - generator: search and design-system scripts as implementation references
 - style library: rows from `styles.csv` mapped through Design System Lab seed,
-  semantic tokens, shadcn adapter tokens, and preview components
+  algorithmic map tokens, semantic tokens, official shadcn adapter tokens,
+  project extensions, and preview components
 - cross-stack rules: Next.js, React, shadcn, Tailwind, Vue, Flutter, SwiftUI,
   Jetpack Compose, and other stack-specific CSV files
 

@@ -8,8 +8,11 @@ export function exportThemeAlgorithmFromOutput(theme: ThemeOutput): string {
  * Seed Token
  * -> Algorithmic Map Token
  * -> Semantic Token
- * -> shadcn Adapter Token
+ * -> Official shadcn Adapter Token
+ * -> Design System Lab shadcn Extension Token
  * -> ThemeOutput
+ *
+ * ThemeSeed is the only editable theme source. Downstream tokens are derived.
  */
 
 import type { ThemeSeed } from "./schema"

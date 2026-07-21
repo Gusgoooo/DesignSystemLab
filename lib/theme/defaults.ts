@@ -3,32 +3,32 @@ import type { ThemeSeed } from "./schema"
 export const defaultThemeSeed: ThemeSeed = {
   color: {
     primary: {
-      hex: "#6366f1",
+      hex: "#1d4ed8",
       alpha: 1,
     },
     success: {
-      hex: "#10b981",
+      hex: "#15803d",
       alpha: 1,
     },
     warning: {
-      hex: "#f59e0b",
+      hex: "#b45309",
       alpha: 1,
     },
     info: {
-      hex: "#3b82f6",
+      hex: "#2563eb",
       alpha: 1,
     },
     infoMatchesPrimary: false,
     danger: {
-      hex: "#ef4444",
+      hex: "#dc2626",
       alpha: 1,
     },
     background: {
-      hex: "#ffffff",
+      hex: "#fafafa",
       alpha: 1,
     },
     foreground: {
-      hex: "#09090b",
+      hex: "#171717",
       alpha: 1,
     },
     neutral: {
@@ -37,17 +37,18 @@ export const defaultThemeSeed: ThemeSeed = {
     },
   },
   shape: {
-    radius: 0.75,
+    radius: 0.625,
     radiusRatio: 1,
   },
   density: {
     mode: "default",
-    controlHeight: 2.5,
+    controlHeight: 2.375,
     densityRatio: 1,
   },
   typography: {
     sans: "Inter, ui-sans-serif, system-ui, sans-serif",
     mono: "\"JetBrains Mono\", ui-monospace, monospace",
+    baseSize: 16,
     scaleRatio: 1.2,
     headingWeight: 650,
     bodyWeight: 400,
@@ -55,15 +56,15 @@ export const defaultThemeSeed: ThemeSeed = {
   },
   material: {
     elevation: "soft",
-    shadowAlpha: 0.08,
-    borderContrast: 1,
-    surfaceContrast: 1,
+    shadowAlpha: 0.065,
+    borderContrast: 1.05,
+    surfaceContrast: 1.05,
     glassOpacity: 0,
     noiseOpacity: 0,
   },
   motion: {
     level: "subtle",
-    durationBase: 180,
+    durationBase: 170,
   },
   vibe: {
     temperature: "cool",

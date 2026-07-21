@@ -124,7 +124,7 @@ export function NavActions() {
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className="w-56 overflow-hidden rounded-lg p-0"
+          className="w-56 overflow-hidden rounded-[var(--radius-panel)] p-0"
           align="end"
         >
           <Sidebar

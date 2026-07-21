@@ -14,7 +14,7 @@ function InputGroup({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="input-group"
       role="group"
       className={cn(
-        "group/input-group relative flex w-full items-center rounded-md border border-input shadow-xs transition-[color,box-shadow] outline-none dark:bg-input/30",
+        "group/input-group relative flex w-full items-center rounded-[var(--radius-control)] border border-input bg-background text-foreground [box-shadow:var(--elevation-control)] transition-[color,box-shadow] outline-none dark:bg-input/30",
         "h-9 min-w-0 has-[>textarea]:h-auto",
 
         // Variants based on alignment.
@@ -80,12 +80,12 @@ function InputGroupAddon({
 }
 
 const inputGroupButtonVariants = cva(
-  "flex items-center gap-2 text-sm shadow-none",
+  "flex items-center gap-2 text-sm [box-shadow:var(--elevation-none)]",
   {
     variants: {
       size: {
         xs: "h-6 gap-1 rounded-[calc(var(--radius)-5px)] px-2 has-[>svg]:px-2 [&>svg:not([class*='size-'])]:size-3.5",
-        sm: "h-8 gap-1.5 rounded-md px-2.5 has-[>svg]:px-2.5",
+        sm: "h-8 gap-1.5 rounded-[var(--radius-control)] px-2.5 has-[>svg]:px-2.5",
         "icon-xs":
           "size-6 rounded-[calc(var(--radius)-5px)] p-0 has-[>svg]:p-0",
         "icon-sm": "size-8 p-0 has-[>svg]:p-0",
@@ -136,7 +136,7 @@ function InputGroupInput({
     <Input
       data-slot="input-group-control"
       className={cn(
-        "flex-1 rounded-none border-0 bg-transparent shadow-none focus-visible:ring-0 dark:bg-transparent",
+        "flex-1 rounded-[var(--radius-none)] border-0 bg-transparent [box-shadow:var(--elevation-none)] focus-visible:ring-0 dark:bg-transparent",
         className
       )}
       {...props}
@@ -152,7 +152,7 @@ function InputGroupTextarea({
     <Textarea
       data-slot="input-group-control"
       className={cn(
-        "flex-1 resize-none rounded-none border-0 bg-transparent py-3 shadow-none focus-visible:ring-0 dark:bg-transparent",
+        "flex-1 resize-none rounded-[var(--radius-none)] border-0 bg-transparent py-3 [box-shadow:var(--elevation-none)] focus-visible:ring-0 dark:bg-transparent",
         className
       )}
       {...props}

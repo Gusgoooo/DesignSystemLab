@@ -1,18 +1,229 @@
-import type { ThemeOutput } from "./schema"
+import {
+  requiredAntdAliasTokenNames,
+  requiredAntdSeedTokenNames,
+  requiredMapTokenNames,
+  requiredSemanticTokenNames,
+  requiredShadcnExtensionTokenNames,
+  requiredShadcnOfficialTokenNames,
+  type ThemeOutput,
+} from "./schema"
+import { registryResolverContract } from "./registry-capabilities"
+import {
+  assertCoreThemeHealth,
+  assertThemeHealth,
+  coreThemeHealthContract,
+  createCoreThemeHealthReport,
+  createThemeHealthReport,
+  themeHealthContract,
+} from "./health"
+import {
+  assertAntdThemeHealth,
+  createAntdThemeHealthReport,
+  antdThemeHealthContract,
+} from "./antd-health"
 
 const algorithmVersions = {
-  color: "oklch-seed-v1",
+  color: "oklch-seed-v3",
   radius: "ratio-v1",
   density: "density-v1",
-  typography: "type-v1",
-  elevation: "elevation-v1",
+  typography: "type-v5",
+  elevation: "elevation-v2",
   motion: "motion-v1",
-  semantic: "semantic-map-v1",
-  shadcn: "shadcn-adapter-v1",
+  semantic: "map-driven-semantic-v6",
+  shadcn: "official-plus-extensions-v4",
+  antd: "config-provider-theme-v1",
   vibe: "descriptor-v1",
 } as const
 
-const themeLabManifestAlgorithmVersion = "theme-lab-seed-algorithm-v1"
+export const themeLabManifestAlgorithmVersion =
+  "theme-lab-seed-algorithm-v12"
+
+export const themeLabTokenArchitectureContract = {
+  version: 2,
+  sourceOfTruth: "ThemeSeed",
+  generationOrder: [
+    "ThemeSeed",
+    "Algorithmic Map Tokens",
+    "Semantic Tokens",
+    "Selected Component-System Adapter: shadcn, Ant Design, or none",
+    "Framework Runtime Exposure And Preview Components",
+  ],
+  mutationPolicy:
+    "Change theme direction in ThemeSeed, then regenerate every downstream layer. Do not hand-edit generated map, semantic, adapter, or compiled CSS values.",
+  layerRules: {
+    map:
+      "Algorithms expand seed color, shape, density, typography, material, and motion controls into deterministic scales and primitives.",
+    semantic:
+      "Semantic colors must consume algorithmic map colors. Seed material and vibe controls may influence semantic decisions, but must not create a second color-generation path.",
+    shadcnOfficial:
+      "This layer contains only the current official shadcn theme vocabulary.",
+    shadcnExtensions:
+      "Compatibility or product additions remain separate so official support can be audited without confusing project-specific capabilities.",
+    antd:
+      "The Ant Design adapter converts the same semantic source into opaque ConfigProvider ThemeConfig tokens. Global Seed, Map, and Alias tokens cover every Ant Design component; component overrides remain optional and local.",
+    portableCore:
+      "The portable core export stops after Map and Semantic Tokens and is available for custom adapters without becoming a third main application workflow.",
+  },
+  officialShadcnTokens: requiredShadcnOfficialTokenNames,
+  shadcnExtensionTokens: requiredShadcnExtensionTokenNames,
+  projectSemanticTokens: requiredSemanticTokenNames,
+  antDesignSeedTokens: requiredAntdSeedTokenNames,
+  antDesignAliasTokens: requiredAntdAliasTokenNames,
+} as const
+
+export const themeLabShadcnTokenArchitectureContract = {
+  version: 2,
+  sourceOfTruth: "ThemeSeed",
+  generationOrder: [
+    "ThemeSeed",
+    "Algorithmic Map Tokens",
+    "Semantic Tokens",
+    "Official shadcn Adapter Tokens",
+    "Design System Lab shadcn Extensions",
+    "Tailwind Exposure And Preview Components",
+  ],
+  mutationPolicy:
+    "Change theme direction in ThemeSeed, then regenerate every downstream layer. Do not hand-edit generated map, semantic, adapter, or compiled CSS values.",
+  layerRules: {
+    map:
+      "Algorithms expand seed color, shape, density, typography, material, and motion controls into deterministic scales and primitives.",
+    semantic:
+      "Semantic colors must consume algorithmic map colors. Seed material and vibe controls may influence semantic decisions, but must not create a second color-generation path.",
+    shadcnOfficial:
+      "This layer contains only the current official shadcn theme vocabulary.",
+    shadcnExtensions:
+      "Compatibility or product additions remain separate so official support can be audited without confusing project-specific capabilities.",
+  },
+  officialShadcnTokens: requiredShadcnOfficialTokenNames,
+  shadcnExtensionTokens: requiredShadcnExtensionTokenNames,
+  projectSemanticTokens: requiredSemanticTokenNames,
+} as const
+
+export const themeLabCoreTokenArchitectureContract = {
+  version: 1,
+  sourceOfTruth: "ThemeSeed",
+  generationOrder: [
+    "ThemeSeed",
+    "Algorithmic Map Tokens",
+    "Semantic Tokens",
+    "Detected Project Styling Adapter",
+  ],
+  mutationPolicy:
+    "Change theme direction in ThemeSeed, regenerate map and semantic tokens, then bind the target project's existing components and styling layer to the generated CSS variables.",
+  layerRules: {
+    map:
+      "Algorithms expand color, shape, density, typography, material, and motion seeds into deterministic framework-neutral primitives.",
+    semantic:
+      "Semantic roles describe product meaning without assuming shadcn, Ant Design, Radix, Base UI, Tailwind, or a specific framework.",
+    projectAdapter:
+      "Detect the existing styling mechanism and bind it to the semantic variables. Do not install, replace, or imply a component system.",
+  },
+  mapTokens: requiredMapTokenNames,
+  semanticTokens: requiredSemanticTokenNames,
+  excludedAdapters: [
+    "official shadcn adapter tokens",
+    "Design System Lab shadcn extensions",
+    "Ant Design ThemeConfig tokens",
+    "registry or primitive-engine assumptions",
+  ],
+} as const
+
+export const themeLabAntdTokenArchitectureContract = {
+  version: 1,
+  sourceOfTruth: "ThemeSeed",
+  generationOrder: [
+    "ThemeSeed",
+    "Algorithmic Map Tokens",
+    "Semantic Tokens",
+    "Ant Design Seed And Alias Tokens",
+    "ConfigProvider ThemeConfig",
+    "Ant CSS Variables",
+    "Optional Detected Styling-Layer Exposure",
+  ],
+  mutationPolicy:
+    "Change theme direction in ThemeSeed, regenerate ThemeConfig, then update an optional styling-layer bridge only when the target project already uses that styling layer.",
+  layerRules: {
+    map:
+      "Algorithms expand color, shape, density, typography, material, and motion seeds into deterministic scales.",
+    semantic:
+      "Semantic roles decide product meaning before framework adaptation.",
+    antDesign:
+      "The adapter emits opaque Seed and Alias token values for ConfigProvider so every Ant Design component inherits one complete global theme.",
+    stylingLayer:
+      "Detect Tailwind, CSS Modules, CSS-in-JS, Less/SCSS, or plain CSS. Reuse Ant Design CSS variables when a custom styling layer exists; never add Tailwind solely for theme installation.",
+    component:
+      "Component token overrides are optional, preserved when already present, and used only for repeated concepts that the global Alias layer cannot express.",
+  },
+  antDesignSeedTokens: requiredAntdSeedTokenNames,
+  antDesignAliasTokens: requiredAntdAliasTokenNames,
+} as const
+
+export const themeLabCoreTokenContract = {
+  version: 1,
+  componentSystem: "none",
+  mapTokens: requiredMapTokenNames,
+  semanticTokens: requiredSemanticTokenNames,
+  runtime: "framework-neutral-css-variables",
+  guarantees: [
+    "one seed-driven map and semantic source of truth",
+    "light and dark semantic values",
+    "color, typography, radius, density, elevation, and motion variables",
+    "no component library, primitive engine, registry, or framework dependency",
+  ],
+  limitations: [
+    "does not replace inconsistent component markup",
+    "does not add accessibility or interaction behavior",
+    "does not guarantee visual consistency until existing components bind to the variables",
+  ],
+  forbidden: [
+    "installing shadcn or Ant Design implicitly",
+    "running a registry resolver",
+    "migrating Radix or Base UI",
+    "creating a second component system",
+    "claiming component normalization from token installation alone",
+  ],
+} as const
+
+export const themeLabAntdContract = {
+  version: 2,
+  officialArchitecture: [
+    "Seed Token",
+    "Map Token",
+    "Alias Token",
+    "Component Token",
+  ],
+  runtimeEntry: "ConfigProvider.theme",
+  componentCoverage:
+    "Every Ant Design component consumes the complete global ThemeConfig token layer. Use ThemeConfig.components only for repeated component-specific concepts that global tokens cannot express.",
+  algorithms: {
+    light: ["theme.defaultAlgorithm"],
+    dark: ["theme.darkAlgorithm"],
+    compact: ["theme.compactAlgorithm"],
+    composition:
+      "Compose compactAlgorithm with the light or dark algorithm only when the density seed is compact.",
+  },
+  cssVariables:
+    "Enable ThemeConfig.cssVar with the ant prefix and a stable light/dark key. Do not enable zeroRuntime by default because it requires the target project's static style extraction setup.",
+  provider:
+    "Wrap the React root with ConfigProvider and App. Use App/useApp or component hooks instead of context-free static message, Modal, and notification calls.",
+  componentOverrides:
+    "Preserve existing component overrides. Merge them after the generated global token layer and audit every override against the semantic source.",
+  installationBoundary:
+    "Install and verify ThemeConfig without restyling or replacing existing UI. Ask for explicit approval before mapping current interface content.",
+  existingUiMapping:
+    "After approval, infer component responsibility, hierarchy, surface, interaction, and state before choosing Alias or Component Tokens and official component variants. Do not replace literal values one-to-one.",
+  forbidden: [
+    "parallel Less/SCSS color systems that bypass ConfigProvider",
+    "global .ant-* selector overrides for normal theming",
+    "hardcoded component colors when an Alias or Component Token exists",
+    "replacing Ant Design with another component system during theme installation",
+    "enabling zeroRuntime without the required Ant Design static style import workflow",
+  ],
+  officialDocs: [
+    "https://ant.design/docs/react/customize-theme/",
+    "https://ant.design/components/config-provider/",
+  ],
+} as const
 
 function normalizeUserDesignRules(userDesignRules?: string): string {
   return userDesignRules?.trim() ?? ""
@@ -26,10 +237,15 @@ export const themeLabDesignRuleLibrary = {
     "https://raw.githubusercontent.com/Gusgoooo/DesignSystemLab/codex/distributed-design-rules",
   basePath: "design-rules",
   routing:
-    "Detect page type first, load requiredAlways rules, open matched page-structure/block rules, then open only matched component, pattern, token, and external-knowledge files from rules[].source. If the local design-rules directory is unavailable, read the raw GitHub rule URLs.",
+    "Choose the task mode first: token installation, new UI creation, or approved existing-UI mapping. Installation stops after wiring and verification. Creation loads the matched block before component rules. Existing UI mapping requires explicit user approval and uses model-reasoned semantic token selection. If local rules are unavailable, read the raw GitHub URLs.",
   readConfirmation:
-    "Before editing, list ruleIndexRead, requiredRuleFilesLoaded, matchedRuleFilesLoaded with elementType/source/firstHeading, and missingRuleFiles. Do not claim a rule was applied unless the file was actually opened.",
+    "Before editing, list taskMode, ruleIndexRead, rulesLoaded with elementType/source/firstHeading, and missingRules. Do not claim a rule was applied unless the file was actually opened.",
   externalKnowledgeManifest: "design-rules/external/knowledge-assets.json",
+  embeddedContractFallbacks: [
+    "theme-lab.json.registryContract",
+    "theme-lab.json.tokenUsageContract",
+    "theme-lab.json.tokenHealthContract",
+  ],
   files: [
     "design-rules/index.json",
     "design-rules/core/rule-router.md",
@@ -39,6 +255,7 @@ export const themeLabDesignRuleLibrary = {
     "design-rules/core/ui-normalization.md",
     "design-rules/core/token-binding.md",
     "design-rules/core/token-system.md",
+    "design-rules/core/registry-block-mapping.md",
     "design-rules/core/visual-qa.md",
     "design-rules/core/completion-compliance.md",
     "design-rules/core/product-alignment.md",
@@ -103,6 +320,9 @@ export const themeLabAiInstructionTargets = [
 ] as const
 
 export const themeLabTokenContract = {
+  officialShadcnBaseline: requiredShadcnOfficialTokenNames,
+  shadcnCompatibleExtensions: requiredShadcnExtensionTokenNames,
+  projectSemanticExtensions: requiredSemanticTokenNames,
   allowed: [
     "bg-background",
     "text-foreground",
@@ -127,7 +347,17 @@ export const themeLabTokenContract = {
     "bg-sidebar-accent",
     "text-sidebar-accent-foreground",
     "border-border",
+    "border-input",
+    "border-sidebar-border",
     "ring-ring",
+    "ring-sidebar-ring",
+    "bg-surface-canvas",
+    "bg-surface-panel",
+    "bg-surface-raised",
+    "bg-surface-overlay",
+    "text-content-primary",
+    "text-content-secondary",
+    "text-content-tertiary",
     "bg-[var(--surface-canvas)]",
     "bg-[var(--surface-panel)]",
     "bg-[var(--surface-raised)]",
@@ -136,9 +366,11 @@ export const themeLabTokenContract = {
     "text-[var(--content-tertiary)]",
     "border-[var(--border-subtle)]",
     "border-[var(--border-default)]",
+    "rounded-[var(--radius-none)]",
     "rounded-[var(--radius-control)]",
     "rounded-[var(--radius-card)]",
     "rounded-[var(--radius-panel)]",
+    "rounded-[var(--radius-pill)]",
     "rounded-[var(--radius)]",
     "h-[var(--control-height-sm)]",
     "h-[var(--control-height-md)]",
@@ -149,6 +381,8 @@ export const themeLabTokenContract = {
     "p-[var(--panel-padding)]",
     "px-[var(--table-cell-padding-x)]",
     "py-[var(--table-cell-padding-y)]",
+    "[box-shadow:var(--elevation-none)]",
+    "[box-shadow:var(--elevation-control)]",
     "[box-shadow:var(--elevation-card)]",
     "[box-shadow:var(--elevation-popover)]",
     "duration-[var(--duration-base)]",
@@ -191,128 +425,336 @@ export const themeLabTokenContract = {
     "random gradient utilities",
     "unapproved new color scales beyond the sanctioned --status-* and --chart-1..5 families",
   ],
+  intrinsicPrimitiveGeometry: [
+    "checkbox keeps a stable 4-6px corner instead of following the global control radius",
+    "radio and avatar remain circular",
+    "switch and progress tracks remain pill-shaped",
+  ],
+} as const
+
+export const themeLabRegistryContract = {
+  version: 3,
+  boundary:
+    "Blocks provide page-level structure and behavior guidance. Components provide implementation. Semantic tokens provide visual meaning. Token installation does not trigger block installation or existing-UI replacement.",
+  requiredOrder: [
+    "install and verify the token contract before UI creation",
+    "classify the requested page or substantial component",
+    "read the matched raw block rule before individual component rules",
+    "for shadcn, inspect matching official or configured Registry Blocks before composing from primitives",
+    "for Ant Design, compose the matched block structure from official Ant components",
+    "replace demo content with real product responsibilities",
+    "bind each block slot to semantic token roles",
+    "verify behavior, states, responsiveness, and token usage",
+  ],
+  modes: {
+    tokenInstallation: [
+      "write the runtime token adapter, theme-lab.json, and one AI instruction file",
+      "do not change current pages or components",
+      "after successful verification, ask whether the user wants to map existing UI",
+    ],
+    newUiCreation: [
+      "use tokens from the first implementation",
+      "start from the closest matching block",
+      "compose only the components required by real product behavior",
+      "do not copy demo content",
+    ],
+    existingUiMapping: [
+      "run only after explicit user approval",
+      "infer semantic roles from responsibility, hierarchy, surface, interaction, and state",
+      "select the correct token and component variant instead of replacing literal values one-to-one",
+      "preserve routes, APIs, data, handlers, validation, permissions, accessibility, and behavior",
+      "do not replace component structure unless the user separately requests it",
+    ],
+  },
+  pageBaselines: {
+    dashboard: ["dashboard shell", "sidebar", "site header", "summary", "chart", "table"],
+    resourceIndex: ["page heading", "toolbar", "table/list", "row detail", "states"],
+    settings: ["page heading", "field groups", "save/reset actions", "validation", "states"],
+    formFlow: ["workflow header", "field groups", "validation", "submit actions", "states"],
+    aiCommand: ["app shell", "context/navigation", "thread/results", "composer", "tool states"],
+    docsSpec: ["docs shell", "section navigation", "content", "code/table", "detail overlay"],
+    auth: ["auth shell", "credentials", "recovery", "validation", "submit", "states"],
+    detail: ["page heading", "summary", "sections", "actions", "states"],
+    marketing: ["page shell", "hero", "proof", "offer", "CTA", "states"],
+  },
+  shadcnInstallSafety:
+    "Before an actual Registry Block write, inspect the item and file diff. Preserve the existing primitive engine and never use overwrite by default.",
+  failureConditions: [
+    "a page is built from isolated primitives without checking a matching block first",
+    "demo content or routes remain",
+    "component slots use raw structural values",
+    "business behavior or responsive states are dropped",
+    "existing UI is mapped before the user explicitly approves it",
+    "token mapping is performed as literal value replacement without semantic reasoning",
+    "a Registry Block write overwrites local work without diff review",
+  ],
+} as const
+
+export const themeLabTokenUsageContract = {
+  version: 1,
+  decisionOrder: [
+    "component responsibility",
+    "interaction or product state",
+    "surface layer",
+    "matching background and foreground pair",
+    "border and focus role",
+    "radius, density, elevation, and motion role",
+  ],
+  slots: [
+    {
+      slot: "page.canvas",
+      purpose: "base application or page surface",
+      tokens: ["bg-background", "text-foreground"],
+    },
+    {
+      slot: "card.raised",
+      purpose: "object, module, or decision preview",
+      tokens: [
+        "bg-card",
+        "text-card-foreground",
+        "border-border",
+        "rounded-[var(--radius-card)]",
+        "[box-shadow:var(--elevation-card)]",
+      ],
+    },
+    {
+      slot: "overlay.floating",
+      purpose: "menu, popover, dialog, sheet, or contextual workflow",
+      tokens: [
+        "bg-popover",
+        "text-popover-foreground",
+        "border-border",
+        "ring-ring",
+        "[box-shadow:var(--elevation-popover)]",
+      ],
+    },
+    {
+      slot: "navigation.sidebar",
+      purpose: "persistent product navigation",
+      tokens: [
+        "bg-sidebar",
+        "text-sidebar-foreground",
+        "border-sidebar-border",
+        "ring-sidebar-ring",
+      ],
+    },
+    {
+      slot: "navigation.sidebar-active",
+      purpose: "current navigation destination",
+      tokens: ["bg-sidebar-accent", "text-sidebar-accent-foreground"],
+    },
+    {
+      slot: "action.primary",
+      purpose: "highest-priority command",
+      tokens: [
+        "bg-primary",
+        "text-primary-foreground",
+        "text-[length:var(--text-caption)]",
+        "ring-ring",
+      ],
+    },
+    {
+      slot: "action.secondary",
+      purpose: "quiet filled command",
+      tokens: [
+        "bg-secondary",
+        "text-secondary-foreground",
+        "text-[length:var(--text-caption)]",
+        "ring-ring",
+      ],
+    },
+    {
+      slot: "state.interactive",
+      purpose: "hover, current selection, or active neutral state",
+      tokens: ["bg-accent", "text-accent-foreground", "ring-ring"],
+    },
+    {
+      slot: "content.muted",
+      purpose: "passive region, helper copy, metadata, or skeleton",
+      tokens: ["bg-muted", "text-muted-foreground"],
+    },
+    {
+      slot: "control.input",
+      purpose: "editable value and focus boundary",
+      tokens: [
+        "bg-background",
+        "text-foreground",
+        "border-input",
+        "ring-ring",
+        "rounded-[var(--radius-control)]",
+        "[box-shadow:var(--elevation-control)]",
+      ],
+    },
+    {
+      slot: "action.destructive",
+      purpose: "irreversible or high-risk command",
+      tokens: [
+        "bg-destructive",
+        "text-destructive-foreground",
+        "text-[length:var(--text-caption)]",
+      ],
+    },
+    {
+      slot: "feedback.status-soft",
+      purpose: "success, warning, info, or danger feedback",
+      tokens: [
+        "bg-success-bg text-success-foreground",
+        "bg-warning-bg text-warning-foreground",
+        "bg-info-bg text-info-foreground",
+        "bg-danger-bg text-danger-foreground",
+      ],
+    },
+    {
+      slot: "data.category",
+      purpose: "stable non-status series or category identity",
+      tokens: ["chart-1", "chart-2", "chart-3", "chart-4", "chart-5"],
+    },
+  ],
+  requiredChecks: [
+    "existing UI mapping runs only after explicit user approval",
+    "mapping infers responsibility, hierarchy, surface, interaction, and state instead of matching literal values",
+    "filled backgrounds declare matching foregrounds",
+    "selected state does not impersonate a primary command",
+    "focus-visible uses ring tokens",
+    "radius, density, elevation, and motion use generated map tokens",
+    "status and chart/category color meanings stay separate",
+    "loading, empty, error, disabled, permission, and responsive states remain connected",
+  ],
+} as const
+
+export const themeLabCoreTokenUsageContract = {
+  version: 1,
+  bindingMode: "existing-components",
+  decisionOrder: [
+    "existing component responsibility",
+    "interaction or product state",
+    "surface layer",
+    "matching background and foreground pair",
+    "border and focus role",
+    "radius, density, elevation, typography, and motion role",
+  ],
+  slots: [
+    {
+      slot: "page.canvas",
+      purpose: "base application or page surface",
+      tokens: ["--surface-canvas", "--content-primary"],
+    },
+    {
+      slot: "surface.panel",
+      purpose: "passive grouped region",
+      tokens: ["--surface-panel", "--content-primary", "--border-subtle"],
+    },
+    {
+      slot: "surface.raised",
+      purpose: "card, object, or module surface",
+      tokens: [
+        "--surface-raised",
+        "--content-primary",
+        "--border-default",
+        "--radius-card",
+        "--elevation-card",
+      ],
+    },
+    {
+      slot: "overlay.floating",
+      purpose: "menu, popover, dialog, drawer, or contextual workflow",
+      tokens: [
+        "--surface-overlay",
+        "--content-primary",
+        "--border-default",
+        "--focus-ring",
+        "--elevation-popover",
+      ],
+    },
+    {
+      slot: "action.primary",
+      purpose: "highest-priority command",
+      tokens: [
+        "--action-primary",
+        "--action-primary-hover",
+        "--action-primary-active",
+        "--action-primary-fg",
+        "--focus-ring",
+      ],
+    },
+    {
+      slot: "action.secondary",
+      purpose: "quiet command or selected neutral state",
+      tokens: [
+        "--action-secondary",
+        "--action-secondary-hover",
+        "--action-secondary-fg",
+        "--focus-ring",
+      ],
+    },
+    {
+      slot: "content.secondary",
+      purpose: "helper copy, metadata, or secondary hierarchy",
+      tokens: ["--content-secondary", "--content-tertiary"],
+    },
+    {
+      slot: "control.input",
+      purpose: "editable value and focus boundary",
+      tokens: [
+        "--surface-canvas",
+        "--content-primary",
+        "--border-default",
+        "--focus-ring",
+        "--radius-control",
+        "--control-height-md",
+        "--elevation-control",
+      ],
+    },
+    {
+      slot: "feedback.status",
+      purpose: "success, warning, info, or danger feedback",
+      tokens: [
+        "--status-success-bg + --status-success-fg",
+        "--status-warning-bg + --status-warning-fg",
+        "--status-info-bg + --status-info-fg",
+        "--status-danger-bg + --status-danger-fg",
+      ],
+    },
+    {
+      slot: "data.category",
+      purpose: "stable non-status series or category identity",
+      tokens: ["--data-1", "--data-2", "--data-3", "--data-4", "--data-5"],
+    },
+  ],
+  requiredChecks: [
+    "existing UI mapping runs only after explicit user approval",
+    "mapping infers responsibility, hierarchy, surface, interaction, and state instead of matching literal values",
+    "existing components remain the implementation source of truth unless a separate component change is requested",
+    "filled backgrounds use matching foreground variables",
+    "focus-visible uses --focus-ring",
+    "raw structural values are replaced only in new UI or the approved mapping scope",
+    "intrinsic primitive geometry is preserved",
+    "loading, empty, error, disabled, permission, and responsive states remain connected",
+  ],
 } as const
 
 export const themeLabAiCodingRules = [
-  "Write all AI-facing instructions, theme manifests, vibe descriptors, task packets, and final implementation reports in English.",
-  "Read theme-lab.json before UI changes.",
-  "Global CSS variables are the runtime source for styling.",
-  "One-time prompts are not the source of truth.",
-  "Preserve routes, APIs, data loading, state, handlers, forms, validation, permissions, feature flags, and business logic.",
-  "Do not scaffold a new app inside an existing project.",
-  "Do not create a parallel design system.",
-  "Do not install dependencies unless approved.",
-  "The exactly-three persistent touchpoints rule applies only to theme contract files; UI normalization may modify existing route, layout, app shell, and component files that are part of the approved normalization plan.",
-  "Do not use raw Tailwind palette classes for structural UI.",
-  "Do not use hardcoded hex colors for structural UI.",
-  "Do not use arbitrary OKLCH values for structural UI.",
-  "When changing UI, consume the existing compiled CSS variables and token contract.",
-  "Use design-rules/index.json as the distributed design rule router when it exists.",
-  "If local design-rules/index.json is unavailable, read the raw GitHub rule index at https://raw.githubusercontent.com/Gusgoooo/DesignSystemLab/codex/distributed-design-rules/design-rules/index.json.",
-  "Before UI normalization, first classify page type, then detect page structure, then load requiredAlways rule files, then open only page-structure, block, component, pattern, token, and external-knowledge rule files matched from rules[].source or the corresponding raw GitHub URL.",
-  "Use the page-type workflow order for existing-product UI work: classify page type; normalize shell, background, max width, grid, and spacing; audit token usage; tune typography and density; apply radius, elevation, motion, and decoration last.",
-  "Read PRODUCT.md and DESIGN.md when present before product-wide UI work; local product context outranks external references.",
-  "When the user explicitly asks for Impeccable, UIUXPROMAX, raw GitHub design assets, style datasets, generators, or cross-stack rules, load design-rules/core/external-knowledge-routing.md and design-rules/external/knowledge-assets.json.",
-  "Use Impeccable raw assets for language, commands, project context patterns, critique, QA, and anti-pattern detection; do not copy Impeccable brand styling into the product.",
-  "Use UIUXPROMAX raw assets for datasets, style recipes, color and typography candidates, chart guidance, design-system generator references, and stack-specific rules; map every selected row through Design System Lab seed, semantic, and shadcn adapter tokens before implementation.",
-  "Before editing, output a Rule Read Confirmation listing the exact rule files actually opened, including first headings for matched files.",
-  "When changing a route, page, or app-level layout, open design-rules/blocks/page-shell.md or its raw GitHub URL before editing page structure.",
-  "When installing or bridging tokens, open design-rules/core/token-system.md or its raw GitHub URL before editing token-bearing UI.",
-  "Before final response, open design-rules/core/completion-compliance.md or its raw GitHub URL and verify the task against it.",
-  "If the selected scope contains cards, open design-rules/components/card.md or its raw GitHub URL before card UI is changed; do not claim the card rule was applied if the file could not be opened.",
-  "If the selected scope contains tables, open design-rules/components/table.md or its raw GitHub URL before table UI is changed; do not claim the table rule was applied if the file could not be opened.",
-  "If the selected scope contains forms, inputs, field groups, or validation, open design-rules/components/forms-and-inputs.md or its raw GitHub URL before changing form UI.",
-  "If the selected scope contains tabs, segmented controls, view switches, mode switches, status switches, or period switches, open design-rules/components/tabs.md or its raw GitHub URL before changing that single-select UI.",
-  "If the selected scope contains dialogs, sheets, drawers, popovers, dropdown menus, command palettes, or contextual menus, open design-rules/components/overlays.md or its raw GitHub URL before changing overlay UI.",
-  "If the selected scope contains badges, tags, chips, alerts, notices, banners, toasts, or status indicators, open design-rules/components/badges-and-alerts.md and design-rules/patterns/semantic-color.md or their raw GitHub URLs before changing status or feedback UI.",
-  "If the selected scope contains KPI cards, metrics, charts, legends, progress indicators, sparklines, trends, or data series, open design-rules/components/metrics-and-charts.md or its raw GitHub URL before changing analytical UI.",
-  "If the selected scope is a standard dashboard, open design-rules/blocks/dashboard.md or its raw GitHub URL; use npx shadcn@latest add dashboard-01 as the default implementation baseline when safe, then map the user's original dashboard modules into the new shell one by one.",
-  "If a tool cannot access local files or raw URLs, say so explicitly and ask the user to provide the rule files or accessible raw URLs; do not hallucinate rule contents.",
-  "Do not compress all component rules into one prompt; detailed design rules live in separate design-rules/**/*.md files.",
-  "If a matching design rule file is missing, make the smallest safe normalization and report the missing rule file.",
-  "When asked to redesign, optimize, rebuild, or refactor a selected UI scope, treat it as UI normalization by default rather than a redesign from scratch.",
-  "Preserve existing page content, information architecture, workflow order, business rules, routes, APIs, data loading, state, handlers, forms, validation, permissions, feature flags, and domain copy.",
-  "Do not discard the old visible UI tree by default; normalize components, repeated style fragments, token usage, spacing, radius, elevation, and states around the existing product structure.",
-  "shadcn/ui and Radix UI are mandatory component foundations for product UI touched by Design System Lab.",
-  "Reuse existing project components only when they are already built on shadcn/Radix primitives or can wrap them without preserving a parallel component system.",
-  "If a user adopts Design System Lab in the middle of an existing project, refactor touched non-shadcn/Radix UI to shadcn/Radix instead of applying a token-only skin.",
-  "Before product UI edits, choose the closest fitting shadcn registry primitive or block as the implementation baseline and repair reference when a safe registry workflow is available.",
-  "Map the user's existing routes, data, permissions, actions, filters, tables, forms, charts, states, and responsive behavior into registry slots before styling.",
-  "Do not hand-write fake shadcn components, copy registry demo data, or invent a broad custom component suite when a registry or project component baseline should be used.",
-  "If no reliable shadcn/Radix registry baseline exists for the requested scope, report the blocked component gap instead of fabricating UI.",
-  "Use user-authored Design System Lab design rules as the design source; do not browse, import, or imitate external visual references unless the user explicitly asks.",
-  "Before editing, identify which user-authored design rule applies to the selected UI pattern; if no rule exists, make the smallest safe normalization and report the missing rule.",
-  "Decorative exceptions explicitly defined by user-authored rules may use non-token colors or values only for non-structural ambient layers, never for text, primary surfaces, borders, focus rings, or actionable states.",
-  "For plain page canvases, a very subtle page-top ambient wash may be added as a non-structural background layer behind content.",
-  "Page-top ambient wash should occupy only the top fifth of the page or viewport, fade fully into bg-background or transparent, and never create layout height or become an interactive layer.",
-  "Page-top ambient wash is a decorative exception: it may use non-token colors, opacity, blur, and gradient stops, but all real UI surfaces, text, borders, focus rings, actions, states, radius, and elevation must remain token-bound.",
-  "Page-top ambient wash must stay extremely quiet: low opacity, low saturation, high lightness, broad softness, no hard edge, no bokeh, no blobs, no rainbow gradients, and no strong brand-color bands.",
-  "Page-top ambient wash must not reduce contrast, tint cards heavily, hide dividers, compete with the page header, affect sidebars by default, or make primary actions less obvious.",
-  "Do not use external references unless the user explicitly provides or requests them; never copy brand styling, demo content, paid/proprietary source code, or unrelated product patterns.",
-  "Do not merely place shadcn primitives one by one; normalize the existing product UI with complete, behavior-preserving component patterns.",
-  "Use one primary user-authored rule or existing local pattern per page or scope; do not mix multiple systems or invented patterns unless the workflow truly requires it.",
-  "Do not introduce extra cards, nested panels, borders, shadows, badges, icons, or toolbars just to make the UI look more shadcn.",
-  "For dashboards, use the dashboard block only as shell and composition structure; never keep shadcn demo content, fake users, fake teams, sample chart data, sample table rows, placeholder routes, or generic copy.",
-  "Dashboard normalization must preserve route URLs, active route logic, API calls, filters, date ranges, chart transforms, table sorting/filtering/pagination/selection, row actions, permissions, refresh behavior, and loading/empty/error states.",
-  "Dashboard UI should answer in order: what is happening, what changed, what needs attention, and what the user can do next.",
-  "Dashboard sections should have clear jobs: overview summarizes status and trend, charts explain movement or comparison, tables/lists support investigation, activity shows recency, and alerts identify action-needed items.",
-  "Preserve any existing information architecture or workflow order that is already clear, and normalize only the problematic visible UI layer around it.",
-  "When the selected scope contains a page heading, page header, title/action bar, resource header, detail header, or list header, reuse the Page Heading pattern: left title and metadata facts, right primary and secondary actions, responsive stacking, and mobile More menu for secondary actions.",
-  "Page headings should use a responsive layout equivalent to lg:flex lg:items-center lg:justify-between, with a min-w-0 flex-1 title area and a mt-5 action group that aligns on large screens.",
-  "Page heading metadata should be compact icon + short text facts below the title, using actual product fields such as status, type, owner, team, location, date, amount, workspace, lifecycle stage, last updated, or due date.",
-  "Do not copy page heading demo content such as job titles, fake locations, fake salaries, or fake dates; preserve the product's real title, metadata, breadcrumbs, status, filters, and action semantics.",
-  "Do not add @heroicons/react or @headlessui/react for page headings unless the project already uses them; map icons to the existing icon library and menus/actions to existing shadcn or project components.",
-  "Convert page heading raw sample colors to Design System Lab tokens: text-foreground, text-muted-foreground, bg-background, bg-primary text-primary-foreground, border-border, ring-ring, and existing button variants.",
-  "Keep page headings unframed by default; do not wrap the whole heading in a decorative card unless the product already uses framed headers.",
-  "Page heading actions must preserve behavior: keep the primary action visible, make secondary actions quieter, and collapse secondary actions into a More dropdown on small screens when horizontal space is limited.",
-  "Page headings must avoid overflow: long titles should use min-w-0, truncate, wrapping, or responsive stacking, and actions must not collide with the title.",
-  "Before final report, verify that the normalized UI is calmer, clearer, more readable, and more internally consistent than the previous UI.",
-  "Normalize bespoke, non-shadcn, or non-shadcn-like visible components inside the selected scope when behavior can be preserved.",
-  "If a needed shadcn component file is missing, inspect the existing shadcn setup and add local component files through the project's established shadcn workflow when that does not introduce new production dependencies.",
-  "Reconnect existing API calls, data loaders, mutations, event handlers, validation, navigation, permissions, and state to the normalized UI.",
-  "When the selected page or product scope contains a sidebar, include the complete sidebar in the UI normalization scope; do not polish only the main content while leaving the old bespoke sidebar in place.",
-  "When a sidebar is detected, do not ask an open-ended question such as whether the sidebar should also be changed; include it by default in the normalization plan.",
-  "If a sidebar is detected, the execution plan must include a Direct Confirmation line: The selected scope contains a sidebar, so sidebar normalization/replacement is included by default. Please confirm the full plan if you want me to proceed.",
-  "For sidebar replacement, the user explicitly approves the official shadcn sidebar blocks reference: https://ui.shadcn.com/blocks/sidebar.",
-  "Choose the closest matching shadcn sidebar block based on the existing navigation structure, density, grouping, collapse behavior, account/workspace switchers, search, badges, nested groups, and responsive behavior.",
-  "If no shadcn sidebar block clearly matches the existing navigation structure, install the fallback block with npx shadcn@latest add sidebar-08, then adapt it to the existing routes, labels, groups, data, permissions, and active states.",
-  "Before running a shadcn sidebar command, inspect components.json, the existing components/ui directory, aliases, package manager, and whether components/ui/sidebar already exists; do not overwrite unrelated files.",
-  "Do not copy shadcn demo content, fake teams, fake projects, fake users, or placeholder routes into the product; the block is only an implementation pattern.",
-  "Sidebar replacement must preserve existing route URLs, active route logic, permissions, badges/counts, account or workspace context, user menu actions, collapse behavior, and responsive behavior unless the user explicitly changes them.",
-  "Sidebar replacement must use shadcn sidebar primitives such as SidebarProvider, Sidebar, SidebarInset, SidebarHeader, SidebarContent, SidebarGroup, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter, SidebarRail, and SidebarTrigger when they fit the project setup.",
-  "Sidebar styling must connect to Design System Lab tokens: use bg-sidebar text-sidebar-foreground, bg-sidebar-primary text-sidebar-primary-foreground, bg-sidebar-accent text-sidebar-accent-foreground, border-sidebar-border or border-border, ring-sidebar-ring or ring-ring, and token-backed radius, spacing, and elevation where applicable.",
-  "After replacing a sidebar, verify active, hover, focus-visible, selected, collapsed, expanded, mobile sheet/drawer, disabled, loading, and permission-hidden states.",
-  "For long-term projects, treat the work as product-wide UI alignment: preserve existing page workflows while unifying component grammar, page-header rhythm, content width system, action placement, state design, and responsive behavior.",
-  "Do not deliver isolated page makeovers in a long-term project; similar page types must share component and token patterns while preserving their workflows.",
-  "Do not produce a generic shadcn SaaS look; use shadcn primitives as implementation materials while creating product-specific rhythm through page headers, density, surface contrast, card grouping, navigation emphasis, primary action placement, state tone, and restrained brand color.",
-  "Before the final report, compare normalized UI against previous UI and explicitly report preserved content/workflow, unified component patterns, reduced UI debt, semantic token pairs checked, responsive states checked, and pages still needing alignment.",
-  "Normalize component hierarchy, responsive behavior, and interaction states before or while applying tokens.",
-  "Reject token-only outcomes when obvious ad hoc controls or inconsistent component patterns remain.",
-  "Cards and tables must follow their distributed rule files; do not rely on summarized card/table guidance embedded in the prompt.",
-  "Forms, tabs, overlays, badges/alerts, and metrics/charts must follow their distributed rule files; do not rely on generic shadcn defaults alone when those element types are present.",
-  "For single-select UI that switches a view, filter, mode, status, period, or section, use shadcn Tabs rather than a row of Button components.",
-  "Do not express selected state by making one option a primary button and the remaining options secondary, outline, or ghost buttons; that confuses action hierarchy with selection state.",
-  "Use Button components for commands such as create, save, export, delete, refresh, submit, open, and cancel; use Tabs for single-select switching; use RadioGroup only for true form-field choices submitted as data.",
-  "When tabs, buttons, selects, search inputs, date ranges, or view controls appear in the same horizontal row, make them share the same token-backed control height.",
-  "In horizontal control rows, keep filters, search, tabs, view switches, status switches, sort, and date ranges left-aligned; keep operation buttons such as create, export, refresh, save, apply, delete, and bulk actions right-aligned on desktop.",
-  "Do not mix visibly different heights for TabsList, TabsTrigger, Input, SelectTrigger, Button, DropdownMenuTrigger, and date range triggers in the same toolbar unless the controls belong to separate visual regions.",
-  "When card or table UI is present, the final report must list the exact local rule file or raw GitHub URL opened for the card/table rule.",
-  "For long-term projects, land the persistent token contract through exactly the three conceptual touchpoints: existing global CSS token block, theme-lab.json, and the target tool's native AI instruction file.",
-  "Resolve the AI instruction target by tool: Claude Code uses CLAUDE.md; Codex and generic agents use AGENTS.md; Cursor uses .cursor/rules/theme-lab.mdc when Cursor rules exist; GitHub Copilot uses .github/copilot-instructions.md; Gemini CLI uses GEMINI.md; Windsurf uses .windsurfrules; Qoder can use AGENTS.md.",
-  "Do not create every supported AI instruction file by default; update the detected or requested tool-native file, and create multiple instruction files only when the user explicitly requests multi-tool compatibility.",
-  "Do not create or update local design-rules/ files by default; read distributed rules from raw GitHub URLs unless the user explicitly asks to install the rule library locally.",
-  "Do not ship partial token setup such as primary/background only; incomplete token systems cause invisible text, mismatched radius, unsafe focus states, and inconsistent cards.",
-  "Semantic token pairs are mandatory for filled surfaces: use bg-primary text-primary-foreground, bg-secondary text-secondary-foreground, bg-card text-card-foreground, bg-popover text-popover-foreground, bg-accent text-accent-foreground, bg-destructive text-destructive-foreground, bg-sidebar text-sidebar-foreground, bg-sidebar-primary text-sidebar-primary-foreground, and bg-sidebar-accent text-sidebar-accent-foreground.",
-  "Never use same-role filled background/text pairs such as bg-primary text-primary, bg-secondary text-secondary, bg-accent text-accent, bg-destructive text-destructive, bg-card text-card, or bg-popover text-popover.",
-  "Before final report, audit changed product UI for raw palette classes, hardcoded color functions, legacy radius/shadow utilities, same-role filled surface pairs, missing foreground tokens, and missing focus-visible rings.",
-  "Token binding is incomplete if old radius or shadow values remain in normalized product components, if filled actions have invisible text, or if token audit hits are ignored silently.",
-  "When changing theme direction, update the seed in theme-lab.json, then regenerate compiled CSS variables through Design System Lab or the available theme generation pipeline.",
+  "Read theme-lab.json before creating or mapping UI. ThemeSeed is the only editable theme source; regenerate downstream tokens after seed changes.",
+  "Token installation is installation-only. Do not restyle, replace, normalize, or map existing UI during the installation task.",
+  "After successful installation and verification, ask whether the user wants to map the existing interface to the Token system. Do not continue without explicit approval.",
+  "New pages and components must consume the installed tokens from their first implementation.",
+  "Use the raw GitHub design-rules index as the guidance router. Load only the matched block and component rules.",
+  "For page-level creation, start from the closest matching Block before composing individual components. Never copy demo content.",
+  "For shadcn, inspect matching official or configured Registry Blocks before primitives. For Ant Design, use the matched block structure with official Ant components.",
+  "Approved existing-UI mapping is a model-reasoned semantic task: infer responsibility, hierarchy, surface, interaction, and state before choosing tokens or component variants. Do not perform literal value replacement alone.",
+  "Preserve routes, APIs, data, handlers, forms, validation, permissions, accessibility, responsive behavior, and domain copy.",
+  "Use semantic token pairs and generated geometry, typography, elevation, and motion values. Do not invent raw structural colors or a parallel token system.",
+  "Update one existing tool-native AI instruction file. Do not copy the local design-rules directory or create every instruction target by default.",
+  "Use external knowledge assets only when explicitly requested; local product context and the installed Token contract remain authoritative.",
 ] as const
 
 export function exportPresetJsonFromOutput(theme: ThemeOutput): string {
+  assertThemeHealth(theme, "Theme preset export")
+  assertAntdThemeHealth(theme, "Theme preset export")
+
   return JSON.stringify(
     {
-      version: "0.1.0",
+      version: "0.4.0",
       name: theme.vibe.name,
       seed: theme.seed,
       algorithms: algorithmVersions,
@@ -320,8 +762,11 @@ export function exportPresetJsonFromOutput(theme: ThemeOutput): string {
         map: theme.mapTokens,
         semantic: theme.semanticTokens,
         darkSemantic: theme.darkSemanticTokens,
-        shadcn: theme.shadcnTokens,
-        darkShadcn: theme.darkShadcnTokens,
+        shadcnOfficial: theme.shadcnTokens,
+        darkShadcnOfficial: theme.darkShadcnTokens,
+        shadcnExtensions: theme.shadcnExtensionTokens,
+        darkShadcnExtensions: theme.darkShadcnExtensionTokens,
+        antd: theme.antdTheme,
       },
       vibe: theme.vibe,
     },
@@ -346,18 +791,30 @@ export function exportThemeLabManifestJsonFromOutput(
   theme: ThemeOutput,
   userDesignRules?: string
 ): string {
+  assertCoreThemeHealth(theme, "Theme Lab manifest export")
+  assertThemeHealth(theme, "Theme Lab manifest export")
+  assertAntdThemeHealth(theme, "Theme Lab manifest export")
+  const coreTokenHealth = createCoreThemeHealthReport(theme)
+  const tokenHealth = createThemeHealthReport(theme)
+  const antdHealth = createAntdThemeHealthReport(theme)
   const normalizedUserDesignRules = normalizeUserDesignRules(userDesignRules)
 
   return JSON.stringify(
     {
-      schemaVersion: 1,
+      schemaVersion: 7,
       kind: "theme-lab-manifest",
+      applicationRoutes: {
+        componentSystems: ["shadcn", "antd"],
+        operation: "install-token-contract",
+        frameworkPolicy: "use-current-project-without-migration",
+        portableCoreTokenExport: true,
+        existingUiMapping: "ask-after-successful-installation",
+      },
       theme: {
         name: theme.vibe.name,
-        sourceOfTruth: "seed-and-algorithm",
+        sourceOfTruth: "theme-seed",
         algorithmVersion: themeLabManifestAlgorithmVersion,
         cssTarget: "existing-global-css-marker-block",
-        generatedAt: new Date().toISOString(),
         seed: theme.seed,
       },
       vibe: {
@@ -366,6 +823,21 @@ export function exportThemeLabManifestJsonFromOutput(
         avoid: theme.vibe.visualContract.avoid,
       },
       tokenContract: themeLabTokenContract,
+      tokenArchitecture: themeLabTokenArchitectureContract,
+      tokenUsageContract: themeLabTokenUsageContract,
+      coreTokenContract: themeLabCoreTokenContract,
+      coreTokenArchitecture: themeLabCoreTokenArchitectureContract,
+      coreTokenUsageContract: themeLabCoreTokenUsageContract,
+      coreTokenHealthContract: coreThemeHealthContract,
+      coreTokenHealth,
+      tokenHealthContract: themeHealthContract,
+      tokenHealth,
+      antdContract: themeLabAntdContract,
+      antdHealthContract: antdThemeHealthContract,
+      antdHealth,
+      antdAdapter: theme.antdTheme,
+      registryContract: themeLabRegistryContract,
+      registryResolver: registryResolverContract,
       designRuleLibrary: themeLabDesignRuleLibrary,
       userAuthoredDesignRules: normalizedUserDesignRules
         ? {
@@ -375,7 +847,6 @@ export function exportThemeLabManifestJsonFromOutput(
           }
         : undefined,
       aiCoding: {
-        defaultProjectMode: "existing-product-project",
         instructionTargets: themeLabAiInstructionTargets,
         rules: themeLabAiCodingRules,
       },

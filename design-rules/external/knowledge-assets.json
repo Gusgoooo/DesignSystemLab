@@ -271,7 +271,7 @@
       "id": "theme-style-generation",
       "stages": [
         "Search UIUXPROMAX products, styles, colors, typography, and charts for candidate rows.",
-        "Map selected rows to seed tokens, map tokens, semantic tokens, and shadcn adapter tokens.",
+        "Map selected rows to seed tokens, map tokens, semantic tokens, official shadcn adapter tokens, and project extensions.",
         "Reject rows whose Do Not Use For conflicts with the page type.",
         "Use Impeccable colorize/typeset/layout language to explain the design direction.",
         "Preview through Design System Lab components before exporting guidance."

@@ -1,11 +1,12 @@
 import type { ThemeSeed } from "../schema"
-import { rem } from "./utils"
+import { clamp, rem } from "./utils"
 
 export function deriveRadiusMap(seed: ThemeSeed): Record<string, string> {
-  const base = seed.shape.radius
-  const ratio = seed.shape.radiusRatio
+  const base = clamp(seed.shape.radius, 0, 1)
+  const ratio = clamp(seed.shape.radiusRatio, 0.8, 1.15)
 
   return {
+    "--radius-none": "0px",
     "--radius": "var(--radius-base)",
     "--radius-base": rem(base),
     "--radius-control": rem(base * 0.85 * ratio),
